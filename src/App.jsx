@@ -8,6 +8,7 @@ import GayoonWealthPage from './pages/GayoonWealthPage'
 import PortfolioBattlePage from './pages/PortfolioBattlePage'
 import PortfolioReportPage from './pages/PortfolioReportPage'
 import TaxGuidePage from './pages/TaxGuidePage'
+import HaugaHousePage from './pages/HaugaHousePage'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="gayoon/report" element={<PortfolioReportPage />} />
             <Route path="battle" element={<PortfolioBattlePage />} />
             <Route path="tax" element={<TaxGuidePage />} />
+            <Route path="house" element={<HaugaHousePage />} />
           </Route>
         </Routes>
       </BrowserRouter>
