@@ -488,8 +488,37 @@ export default function GayoonWealthPage() {
   // 보유 종목 필터 상태
   const [holdingsFilter, setHoldingsFilter] = useState({
     account: 'all', // all, ISA, 연금저축, IRP, 해외주식, 암호화폐
-    sort: 'value', // value, gain, name
+    sort: 'value', // value, gain, name, invested
+    sortDir: 'desc', // asc, desc
   })
+
+  // 정렬 토글 함수
+  const toggleSort = (sortKey) => {
+    if (holdingsFilter.sort === sortKey) {
+      // 같은 컬럼 클릭 시 방향 토글
+      setHoldingsFilter({
+        ...holdingsFilter,
+        sortDir: holdingsFilter.sortDir === 'desc' ? 'asc' : 'desc'
+      })
+    } else {
+      // 다른 컬럼 클릭 시 해당 컬럼으로 변경 (기본 내림차순)
+      setHoldingsFilter({
+        ...holdingsFilter,
+        sort: sortKey,
+        sortDir: 'desc'
+      })
+    }
+  }
+
+  // 정렬 화살표 표시
+  const SortArrow = ({ column }) => {
+    if (holdingsFilter.sort !== column) return null
+    return (
+      <span style={{ marginLeft: '4px', fontSize: '10px' }}>
+        {holdingsFilter.sortDir === 'desc' ? '▼' : '▲'}
+      </span>
+    )
+  }
 
   // localStorage에서 캐시된 가격 불러오기
   const getCachedPrices = () => {
@@ -1293,7 +1322,7 @@ export default function GayoonWealthPage() {
             <span style={{ fontSize: '12px', color: '#8B95A1' }}>정렬:</span>
             <select
               value={holdingsFilter.sort}
-              onChange={(e) => setHoldingsFilter({ ...holdingsFilter, sort: e.target.value })}
+              onChange={(e) => setHoldingsFilter({ ...holdingsFilter, sort: e.target.value, sortDir: 'desc' })}
               style={{
                 padding: '4px 8px',
                 borderRadius: '6px',
@@ -1304,9 +1333,25 @@ export default function GayoonWealthPage() {
               }}
             >
               <option value="value">평가금액순</option>
+              <option value="invested">매입금액순</option>
               <option value="gain">수익률순</option>
+              <option value="gainKRW">손익금액순</option>
               <option value="name">이름순</option>
             </select>
+            <button
+              onClick={() => setHoldingsFilter({ ...holdingsFilter, sortDir: holdingsFilter.sortDir === 'desc' ? 'asc' : 'desc' })}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '6px',
+                border: '1px solid #E5E8EB',
+                fontSize: '12px',
+                color: '#4E5968',
+                cursor: 'pointer',
+                backgroundColor: 'white',
+              }}
+            >
+              {holdingsFilter.sortDir === 'desc' ? '▼ 내림' : '▲ 오름'}
+            </button>
           </div>
         </div>
 
@@ -1316,11 +1361,38 @@ export default function GayoonWealthPage() {
             <thead>
               <tr>
                 {!isMobile && <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '100px' }}>계좌</th>}
-                <th style={{ padding: isMobile ? '8px 4px 8px 8px' : '12px 16px', textAlign: 'left', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB' }}>종목명</th>
-                <th style={{ padding: isMobile ? '8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB' }}>매입</th>
-                <th style={{ padding: isMobile ? '8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB' }}>평가</th>
-                {!isMobile && <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '90px' }}>손익</th>}
-                <th style={{ padding: isMobile ? '8px 8px 8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB' }}>수익률</th>
+                <th
+                  onClick={() => toggleSort('name')}
+                  style={{ padding: isMobile ? '8px 4px 8px 8px' : '12px 16px', textAlign: 'left', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'name' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none' }}
+                >
+                  종목명<SortArrow column="name" />
+                </th>
+                <th
+                  onClick={() => toggleSort('invested')}
+                  style={{ padding: isMobile ? '8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'invested' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none' }}
+                >
+                  매입<SortArrow column="invested" />
+                </th>
+                <th
+                  onClick={() => toggleSort('value')}
+                  style={{ padding: isMobile ? '8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'value' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none' }}
+                >
+                  평가<SortArrow column="value" />
+                </th>
+                {!isMobile && (
+                  <th
+                    onClick={() => toggleSort('gainKRW')}
+                    style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: holdingsFilter.sort === 'gainKRW' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '90px', cursor: 'pointer', userSelect: 'none' }}
+                  >
+                    손익<SortArrow column="gainKRW" />
+                  </th>
+                )}
+                <th
+                  onClick={() => toggleSort('gain')}
+                  style={{ padding: isMobile ? '8px 8px 8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'gain' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none' }}
+                >
+                  수익률<SortArrow column="gain" />
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -1343,9 +1415,12 @@ export default function GayoonWealthPage() {
                 })
                 // 정렬 적용
                 .sort((a, b) => {
-                  if (holdingsFilter.sort === 'value') return b.currentKRW - a.currentKRW
-                  if (holdingsFilter.sort === 'gain') return b.gainPercent - a.gainPercent
-                  if (holdingsFilter.sort === 'name') return a.name.localeCompare(b.name)
+                  const dir = holdingsFilter.sortDir === 'desc' ? 1 : -1
+                  if (holdingsFilter.sort === 'value') return (b.currentKRW - a.currentKRW) * dir
+                  if (holdingsFilter.sort === 'invested') return (b.investedKRW - a.investedKRW) * dir
+                  if (holdingsFilter.sort === 'gain') return (b.gainPercent - a.gainPercent) * dir
+                  if (holdingsFilter.sort === 'gainKRW') return (b.gainKRW - a.gainKRW) * dir
+                  if (holdingsFilter.sort === 'name') return a.name.localeCompare(b.name) * dir
                   return 0
                 })
                 .map((item, idx) => {
