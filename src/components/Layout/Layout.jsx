@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 const navItems = [
   { path: '/', label: '하우가 패밀리', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -9,89 +10,209 @@ const navItems = [
   { path: '/tax', label: '절세 가이드', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
 ]
 
-const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    backgroundColor: '#F7F8FA',
-  },
-  sidebar: {
-    width: '240px',
-    backgroundColor: '#FFFFFF',
-    borderRight: '1px solid #E5E8EB',
-    position: 'fixed',
-    left: 0,
-    top: 0,
-    height: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  logo: {
-    padding: '24px 20px',
-    borderBottom: '1px solid #F2F4F6',
-  },
-  logoInner: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  logoIcon: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '12px',
-    background: 'linear-gradient(135deg, #3182F6 0%, #6366F1 100%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoTitle: {
-    fontSize: '16px',
-    fontWeight: '700',
-    color: '#191F28',
-    margin: 0,
-  },
-  logoSub: {
-    fontSize: '12px',
-    color: '#8B95A1',
-    margin: 0,
-  },
-  nav: {
-    flex: 1,
-    padding: '12px',
-  },
-  navList: {
-    listStyle: 'none',
-    margin: 0,
-    padding: 0,
-  },
-  navItem: {
-    marginBottom: '4px',
-  },
-  navLink: (isActive) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px 16px',
-    borderRadius: '12px',
-    fontSize: '14px',
-    fontWeight: '500',
-    color: isActive ? '#3182F6' : '#4E5968',
-    backgroundColor: isActive ? '#E8F3FF' : 'transparent',
-    textDecoration: 'none',
-    transition: 'all 0.2s',
-  }),
-  main: {
-    flex: 1,
-    marginLeft: '240px',
-    padding: '32px 40px',
-    maxWidth: '1200px',
-  },
-}
-
 export default function Layout() {
+  const [isMobile, setIsMobile] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const location = useLocation()
+
+  // 화면 크기 감지
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // 페이지 이동 시 사이드바 닫기
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [location.pathname])
+
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      display: 'flex',
+      backgroundColor: '#F7F8FA',
+    },
+    sidebar: {
+      width: '240px',
+      backgroundColor: '#FFFFFF',
+      borderRight: '1px solid #E5E8EB',
+      position: 'fixed',
+      left: isMobile ? (sidebarOpen ? 0 : '-240px') : 0,
+      top: 0,
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      zIndex: 1000,
+      transition: 'left 0.3s ease',
+    },
+    overlay: {
+      display: isMobile && sidebarOpen ? 'block' : 'none',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      zIndex: 999,
+    },
+    logo: {
+      padding: '24px 20px',
+      borderBottom: '1px solid #F2F4F6',
+    },
+    logoInner: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+    },
+    logoIcon: {
+      width: '40px',
+      height: '40px',
+      borderRadius: '12px',
+      background: 'linear-gradient(135deg, #3182F6 0%, #6366F1 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    logoTitle: {
+      fontSize: '16px',
+      fontWeight: '700',
+      color: '#191F28',
+      margin: 0,
+    },
+    logoSub: {
+      fontSize: '12px',
+      color: '#8B95A1',
+      margin: 0,
+    },
+    nav: {
+      flex: 1,
+      padding: '12px',
+    },
+    navList: {
+      listStyle: 'none',
+      margin: 0,
+      padding: 0,
+    },
+    navItem: {
+      marginBottom: '4px',
+    },
+    navLink: (isActive) => ({
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      padding: '12px 16px',
+      borderRadius: '12px',
+      fontSize: '14px',
+      fontWeight: '500',
+      color: isActive ? '#3182F6' : '#4E5968',
+      backgroundColor: isActive ? '#E8F3FF' : 'transparent',
+      textDecoration: 'none',
+      transition: 'all 0.2s',
+    }),
+    main: {
+      flex: 1,
+      marginLeft: isMobile ? 0 : '240px',
+      padding: isMobile ? '16px' : '32px 40px',
+      paddingTop: isMobile ? '70px' : '32px',
+      maxWidth: '1200px',
+      width: '100%',
+    },
+    mobileHeader: {
+      display: isMobile ? 'flex' : 'none',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '56px',
+      backgroundColor: '#FFFFFF',
+      borderBottom: '1px solid #E5E8EB',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 16px',
+      zIndex: 998,
+    },
+    hamburger: {
+      width: '40px',
+      height: '40px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'transparent',
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    },
+    mobileTitle: {
+      fontSize: '16px',
+      fontWeight: '700',
+      color: '#191F28',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+    },
+    closeBtn: {
+      position: 'absolute',
+      top: '16px',
+      right: '16px',
+      width: '32px',
+      height: '32px',
+      display: isMobile ? 'flex' : 'none',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#F2F4F6',
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    },
+  }
+
   return (
     <div style={styles.container}>
+      {/* 모바일 헤더 */}
+      <div style={styles.mobileHeader}>
+        <button style={styles.hamburger} onClick={() => setSidebarOpen(true)}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#191F28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <span style={styles.mobileTitle}>
+          <span style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #3182F6 0%, #6366F1 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+              <polyline points="16 7 22 7 22 13"/>
+            </svg>
+          </span>
+          투자 리서치
+        </span>
+        <div style={{ width: '40px' }} /> {/* 균형용 빈 공간 */}
+      </div>
+
+      {/* 오버레이 */}
+      <div style={styles.overlay} onClick={() => setSidebarOpen(false)} />
+
+      {/* 사이드바 */}
       <aside style={styles.sidebar}>
+        <button style={styles.closeBtn} onClick={() => setSidebarOpen(false)}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4E5968" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
         <div style={styles.logo}>
           <div style={styles.logoInner}>
             <div style={styles.logoIcon}>
