@@ -843,8 +843,35 @@ export default function PortfolioPage() {
   const [holdingsFilter, setHoldingsFilter] = useState({
     broker: 'all', // all, 토스증권, 미래에셋
     account: 'all', // all, 해외주식, 연금저축계좌, ISA (중개형), etc.
-    sort: 'value', // value, gain, name
+    sort: 'value', // value, gain, name, invested
+    sortDir: 'desc', // asc, desc
   })
+
+  // 정렬 토글 함수
+  const toggleSort = (sortKey) => {
+    if (holdingsFilter.sort === sortKey) {
+      setHoldingsFilter({
+        ...holdingsFilter,
+        sortDir: holdingsFilter.sortDir === 'desc' ? 'asc' : 'desc'
+      })
+    } else {
+      setHoldingsFilter({
+        ...holdingsFilter,
+        sort: sortKey,
+        sortDir: 'desc'
+      })
+    }
+  }
+
+  // 정렬 화살표 표시
+  const SortArrow = ({ column }) => {
+    if (holdingsFilter.sort !== column) return null
+    return (
+      <span style={{ marginLeft: '4px', fontSize: '10px' }}>
+        {holdingsFilter.sortDir === 'desc' ? '▼' : '▲'}
+      </span>
+    )
+  }
 
   // 현재 분기 포트폴리오
   const PORTFOLIO = QUARTERLY_PORTFOLIOS[currentQuarter]?.portfolio || []
@@ -1702,12 +1729,37 @@ export default function PortfolioPage() {
               <thead>
                 <tr>
                   <th style={{ ...styles.th, width: '130px' }}>증권사/계좌</th>
-                  <th style={{ ...styles.th, width: '160px' }}>종목명</th>
+                  <th
+                    style={{ ...styles.th, width: '160px', cursor: 'pointer' }}
+                    onClick={() => toggleSort('name')}
+                  >
+                    종목명<SortArrow column="name" />
+                  </th>
                   <th style={{ ...styles.thRight, width: '70px' }}>수량</th>
-                  <th style={{ ...styles.thRight, width: '100px' }}>매입금액</th>
-                  <th style={{ ...styles.thRight, width: '100px' }}>평가금액</th>
-                  <th style={{ ...styles.thRight, width: '90px' }}>손익</th>
-                  <th style={{ ...styles.thRight, width: '80px' }}>수익률</th>
+                  <th
+                    style={{ ...styles.thRight, width: '100px', cursor: 'pointer' }}
+                    onClick={() => toggleSort('invested')}
+                  >
+                    매입금액<SortArrow column="invested" />
+                  </th>
+                  <th
+                    style={{ ...styles.thRight, width: '100px', cursor: 'pointer' }}
+                    onClick={() => toggleSort('value')}
+                  >
+                    평가금액<SortArrow column="value" />
+                  </th>
+                  <th
+                    style={{ ...styles.thRight, width: '90px', cursor: 'pointer' }}
+                    onClick={() => toggleSort('gainKRW')}
+                  >
+                    손익<SortArrow column="gainKRW" />
+                  </th>
+                  <th
+                    style={{ ...styles.thRight, width: '80px', cursor: 'pointer' }}
+                    onClick={() => toggleSort('gain')}
+                  >
+                    수익률<SortArrow column="gain" />
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -1720,9 +1772,14 @@ export default function PortfolioPage() {
                   })
                   // 정렬 적용
                   .sort((a, b) => {
-                    if (holdingsFilter.sort === 'value') return b.currentKRW - a.currentKRW
-                    if (holdingsFilter.sort === 'gain') return b.gainPercent - a.gainPercent
-                    if (holdingsFilter.sort === 'name') return a.name.localeCompare(b.name)
+                    const dir = holdingsFilter.sortDir === 'desc' ? 1 : -1
+                    const aInvested = a.investedKRW !== undefined ? a.investedKRW : (a.currentKRW - a.gainKRW)
+                    const bInvested = b.investedKRW !== undefined ? b.investedKRW : (b.currentKRW - b.gainKRW)
+                    if (holdingsFilter.sort === 'value') return (b.currentKRW - a.currentKRW) * dir
+                    if (holdingsFilter.sort === 'gain') return (b.gainPercent - a.gainPercent) * dir
+                    if (holdingsFilter.sort === 'gainKRW') return (b.gainKRW - a.gainKRW) * dir
+                    if (holdingsFilter.sort === 'invested') return (bInvested - aInvested) * dir
+                    if (holdingsFilter.sort === 'name') return a.name.localeCompare(b.name) * dir
                     return 0
                   })
                   .map((item, idx) => {
@@ -1868,6 +1925,32 @@ export default function PortfolioPage() {
                     .reduce((acc, item) => acc + item.gainKRW, 0)).toLocaleString()}
                 </strong>
               </span>
+              {/* 총 수익률 */}
+              {(() => {
+                const filtered = ALL_HOLDINGS.filter(item => {
+                  if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
+                  if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
+                  return true
+                })
+                const totalInvested = filtered.reduce((acc, item) => {
+                  const invested = item.investedKRW !== undefined ? item.investedKRW : (item.currentKRW - item.gainKRW)
+                  return acc + invested
+                }, 0)
+                const totalGain = filtered.reduce((acc, item) => acc + item.gainKRW, 0)
+                const totalPercent = totalInvested > 0 ? (totalGain / totalInvested * 100) : 0
+                return (
+                  <span style={{
+                    fontSize: isMobile ? '12px' : '14px',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontWeight: '600',
+                    backgroundColor: totalPercent >= 0 ? '#E8F5E9' : '#FFEBEE',
+                    color: totalPercent >= 0 ? '#00C853' : '#F04438',
+                  }}>
+                    {totalPercent >= 0 ? '+' : ''}{totalPercent.toFixed(2)}%
+                  </span>
+                )
+              })()}
             </div>
           </div>
           {/* 범례 */}
