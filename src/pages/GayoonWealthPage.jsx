@@ -866,7 +866,10 @@ export default function GayoonWealthPage() {
                     <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28' }}>
                       {item.name.replace('TIGER ', '').replace('KODEX ', '')}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.targetWeight}%</div>
+                    <div style={{ fontSize: '11px', color: '#8B95A1' }}>
+                      <span style={{ backgroundColor: '#E8F3FF', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', color: '#3182F6', fontWeight: '600' }}>{item.ticker}</span>
+                      {item.targetWeight}%
+                    </div>
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: '700', color: '#3182F6' }}>
                     ₩{amount.toLocaleString()}
@@ -907,7 +910,10 @@ export default function GayoonWealthPage() {
                     <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28' }}>
                       {item.name.replace('TIGER ', '').replace('KODEX ', '')}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.targetWeight}%</div>
+                    <div style={{ fontSize: '11px', color: '#8B95A1' }}>
+                      <span style={{ backgroundColor: '#FFF3E0', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', color: '#E65100', fontWeight: '600' }}>{item.ticker}</span>
+                      {item.targetWeight}%
+                    </div>
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: '700', color: '#E65100' }}>
                     ₩{amount.toLocaleString()}
