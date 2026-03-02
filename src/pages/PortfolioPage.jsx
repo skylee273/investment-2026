@@ -820,6 +820,18 @@ export default function PortfolioPage() {
   const [trackingData, setTrackingData] = useState(() => loadTrackingData())
   // trackingData 구조: { [quarter]: { [ticker]: { avgPrice, highSinceBuy, buyDate } } }
 
+  // 모바일 감지
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // 필터 상태
   const [filter, setFilter] = useState({
     status: 'all', // all, invested, notInvested, needBuy, overBuy
@@ -1072,29 +1084,38 @@ export default function PortfolioPage() {
         }
       `}</style>
 
-      <div style={styles.header}>
+      <div style={{
+        ...styles.header,
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        gap: isMobile ? '16px' : '0',
+      }}>
         <div>
-          <h1 style={styles.title}>🏠 하우가 패밀리</h1>
-          <p style={styles.subtitle}>
+          <h1 style={{ ...styles.title, fontSize: isMobile ? '20px' : '24px' }}>🏠 하우가 패밀리</h1>
+          <p style={{ ...styles.subtitle, fontSize: isMobile ? '12px' : '14px' }}>
             {quarterInfo?.label} ({quarterInfo?.period}) · 투자 원금: ₩{TOTAL_INVESTMENT.toLocaleString()}
           </p>
           <p style={styles.lastUpdate}>
             <span style={styles.statusDot(isLive)} />
             {isLive ? '실시간' : '데이터 로딩 중...'}
-            {lastUpdate && ` · 마지막 업데이트: ${lastUpdate.toLocaleTimeString()}`}
-            {exchangeRate && ` · 환율: $1 = ₩${exchangeRate.toLocaleString()}`}
+            {lastUpdate && ` · ${lastUpdate.toLocaleTimeString()}`}
+            {exchangeRate && !isMobile && ` · 환율: $1 = ₩${exchangeRate.toLocaleString()}`}
           </p>
         </div>
         <button
           style={{
             ...styles.refreshButton,
             opacity: isRefreshing ? 0.7 : 1,
+            width: isMobile ? '100%' : 'auto',
+            justifyContent: 'center',
+            padding: isMobile ? '10px 16px' : '12px 20px',
+            fontSize: isMobile ? '13px' : '14px',
           }}
           onClick={() => refreshData(true)}
           disabled={isRefreshing}
         >
           <span style={isRefreshing ? { animation: 'spin 1s linear infinite', display: 'inline-block' } : {}}>↻</span>
-          {isRefreshing ? '새로고침 중...' : '데이터 새로고침'}
+          {isRefreshing ? '새로고침 중...' : '새로고침'}
         </button>
       </div>
 
@@ -1182,11 +1203,15 @@ export default function PortfolioPage() {
       ) : (
       <>
       {/* 투자 원칙 */}
-      <div style={styles.rulesCard}>
+      <div style={{ ...styles.rulesCard, padding: isMobile ? '16px' : '20px' }}>
         <div style={styles.rulesTitle}>
           <span>📋</span> 나의 투자 원칙
         </div>
-        <div style={styles.rulesList}>
+        <div style={{
+          ...styles.rulesList,
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gap: isMobile ? '8px' : '12px',
+        }}>
           <div style={styles.ruleItem}>
             <span>🔴</span>
             <span><strong>손절:</strong> -15% 고려, -20% 무조건 실행 (무서워하면 안 된다)</span>
@@ -1207,7 +1232,11 @@ export default function PortfolioPage() {
       </div>
 
       {/* 요약 카드 */}
-      <div style={styles.summaryGrid}>
+      <div style={{
+        ...styles.summaryGrid,
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+        gap: isMobile ? '12px' : '16px',
+      }}>
         <div style={styles.summaryCard}>
           <div style={styles.summaryLabel}>총 평가금액</div>
           <div style={styles.summaryValue}>₩{Math.round(portfolioStats.totalValue).toLocaleString()}</div>
@@ -1237,8 +1266,8 @@ export default function PortfolioPage() {
       {/* 비상금/현금 계좌 */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '16px',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+        gap: isMobile ? '12px' : '16px',
         marginBottom: '24px',
       }}>
         {CASH_ACCOUNTS.map(account => {
@@ -1334,9 +1363,9 @@ export default function PortfolioPage() {
             +{REALIZED_GAINS.total.toLocaleString()}원
           </span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '8px' : '12px' }}>
           {REALIZED_GAINS.details.map((item, idx) => (
-            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobile ? '12px' : '13px' }}>
               <span style={{ color: '#4E5968' }}>{item.type}</span>
               <span style={{ color: '#00C853', fontWeight: '600' }}>
                 +{item.amount.toLocaleString()}원
@@ -1349,12 +1378,12 @@ export default function PortfolioPage() {
 
       {/* 포트폴리오 구성 */}
       <div style={{ marginBottom: '16px' }}>
-        <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '12px' }}>📊 포트폴리오 구성</h3>
+        <h3 style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28', marginBottom: '12px' }}>📊 포트폴리오 구성</h3>
       </div>
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '16px',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+        gap: isMobile ? '12px' : '16px',
         marginBottom: '24px',
       }}>
         {/* 토스증권 해외주식 */}
@@ -1576,9 +1605,15 @@ export default function PortfolioPage() {
       <div style={styles.mainGrid}>
         {/* 보유 종목 테이블 (토스 + 미래에셋 통합) */}
         <div style={styles.tableCard}>
-          <div style={styles.tableHeader}>
-            <span style={styles.tableTitle}>보유 종목</span>
-            <span style={{ fontSize: '13px', color: '#8B95A1' }}>
+          <div style={{
+            ...styles.tableHeader,
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center',
+            gap: isMobile ? '8px' : '0',
+            padding: isMobile ? '16px' : '20px',
+          }}>
+            <span style={{ ...styles.tableTitle, fontSize: isMobile ? '14px' : '16px' }}>보유 종목</span>
+            <span style={{ fontSize: isMobile ? '11px' : '13px', color: '#8B95A1' }}>
               {ALL_HOLDINGS.length}개 종목 · 토스 {TOSS_HOLDINGS.length}개 + 미래에셋 {MIRAE_ACCOUNTS.reduce((acc, a) => acc + a.holdings.length, 0)}개
             </span>
           </div>
@@ -1778,14 +1813,16 @@ export default function PortfolioPage() {
           </div>
           {/* 합계 */}
           <div style={{
-            padding: '16px 20px',
+            padding: isMobile ? '12px 16px' : '16px 20px',
             borderTop: '1px solid #E5E8EB',
             display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: isMobile ? 'flex-start' : 'center',
+            gap: isMobile ? '8px' : '0',
             backgroundColor: '#F7F8FA',
           }}>
-            <span style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>
+            <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '600', color: '#191F28' }}>
               합계 ({ALL_HOLDINGS
                 .filter(item => {
                   if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
@@ -1793,8 +1830,8 @@ export default function PortfolioPage() {
                   return true
                 }).length}개 종목)
             </span>
-            <div style={{ display: 'flex', gap: '24px' }}>
-              <span style={{ fontSize: '14px', color: '#4E5968' }}>
+            <div style={{ display: 'flex', gap: isMobile ? '12px' : '24px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#4E5968' }}>
                 평가금액: <strong style={{ color: '#191F28' }}>
                   ₩{Math.round(ALL_HOLDINGS
                     .filter(item => {
@@ -1805,7 +1842,7 @@ export default function PortfolioPage() {
                     .reduce((acc, item) => acc + item.currentKRW, 0)).toLocaleString()}
                 </strong>
               </span>
-              <span style={{ fontSize: '14px', color: '#4E5968' }}>
+              <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#4E5968' }}>
                 손익: <strong style={{
                   color: ALL_HOLDINGS
                     .filter(item => {
@@ -1835,15 +1872,15 @@ export default function PortfolioPage() {
           </div>
           {/* 범례 */}
           <div style={{
-            padding: '16px 20px',
+            padding: isMobile ? '12px 16px' : '16px 20px',
             borderTop: '1px solid #E5E8EB',
             backgroundColor: '#FAFAFA',
           }}>
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '16px',
-              fontSize: '12px',
+              gap: isMobile ? '10px' : '16px',
+              fontSize: isMobile ? '11px' : '12px',
               color: '#4E5968',
             }}>
               <span><strong style={{ color: '#00C853' }}>🔥</strong> = 내 수익 +5% 이상</span>
@@ -1857,19 +1894,28 @@ export default function PortfolioPage() {
         </div>
 
         {/* 비중 차트 */}
-        <div style={styles.chartCard}>
-          <div>
+        <div style={{
+          ...styles.chartCard,
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '20px' : '40px',
+          padding: isMobile ? '16px' : '24px',
+        }}>
+          <div style={{ width: isMobile ? '100%' : 'auto', display: 'flex', flexDirection: 'column', alignItems: isMobile ? 'center' : 'flex-start' }}>
             <div style={styles.chartTitle}>목표 포트폴리오 비중</div>
-            <div style={styles.pieContainer}>
+            <div style={{ ...styles.pieContainer, width: isMobile ? '160px' : '200px', height: isMobile ? '160px' : '200px' }}>
               <div style={getPieChartStyle(PORTFOLIO)} />
-              <div style={styles.pieCenter}>
-                <div style={styles.pieCenterValue}>₩{(TARGET_TOTAL / 10000).toFixed(0)}만</div>
+              <div style={{ ...styles.pieCenter, width: isMobile ? '80px' : '100px', height: isMobile ? '80px' : '100px' }}>
+                <div style={{ ...styles.pieCenterValue, fontSize: isMobile ? '14px' : '16px' }}>₩{(TARGET_TOTAL / 10000).toFixed(0)}만</div>
                 <div style={styles.pieCenterLabel}>목표 투자금</div>
               </div>
             </div>
           </div>
 
-          <div style={styles.legendList}>
+          <div style={{
+            ...styles.legendList,
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+            gap: isMobile ? '8px' : '12px',
+          }}>
             {PORTFOLIO
               .sort((a, b) => b.targetWeight - a.targetWeight)
               .map(item => {
