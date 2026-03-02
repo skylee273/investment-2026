@@ -108,6 +108,82 @@ const LIQUID_ASSETS = [
   { id: 'pension-extra', name: '추가 연금저축', icon: '💰', currentKRW: 0, note: '과세이연 · 월 60만원 예정' },
 ]
 
+// 전체 보유 종목 통합 (ISA + 연금저축 + IRP + 개별주식)
+const GAYOON_ALL_HOLDINGS = [
+  // ISA (2,000만원)
+  ...ISA_PORTFOLIO.map(item => ({
+    ...item,
+    account: 'ISA',
+    accountIcon: '📈',
+    investedKRW: Math.round(20000000 * item.targetWeight / 100),
+    currentKRW: Math.round(20000000 * item.targetWeight / 100),
+    gainKRW: 0,
+    gainPercent: 0,
+  })),
+  // 연금저축 (600만원)
+  ...PENSION_PORTFOLIO.map(item => ({
+    ...item,
+    account: '연금저축',
+    accountIcon: '🧓',
+    investedKRW: Math.round(6000000 * item.targetWeight / 100),
+    currentKRW: Math.round(6000000 * item.targetWeight / 100),
+    gainKRW: 0,
+    gainPercent: 0,
+  })),
+  // IRP (25만원 현재)
+  ...IRP_PORTFOLIO.map(item => ({
+    ...item,
+    account: 'IRP',
+    accountIcon: '🏦',
+    investedKRW: Math.round(250000 * item.targetWeight / 100),
+    currentKRW: Math.round(250000 * item.targetWeight / 100),
+    gainKRW: 0,
+    gainPercent: 0,
+  })),
+  // S&P500 + 배당주
+  {
+    ticker: 'SPY+DIV',
+    name: 'S&P500 + 배당주',
+    category: '해외주식',
+    account: '해외주식',
+    accountIcon: '📊',
+    investedKRW: 26796000,
+    currentKRW: 26796000,
+    gainKRW: 0,
+    gainPercent: 0,
+    risk: 3,
+  },
+  // 아마존
+  {
+    ticker: 'AMZN',
+    name: '아마존',
+    category: '해외주식',
+    account: '해외주식',
+    accountIcon: '🛒',
+    shares: 9,
+    investedKRW: 2782034,
+    currentKRW: 2653715,
+    gainKRW: -128319,
+    gainPercent: -4.61,
+    risk: 4,
+  },
+  // 비트코인 (실시간 가격은 컴포넌트 내에서 계산)
+  {
+    ticker: 'BTC',
+    name: '비트코인',
+    category: '암호화폐',
+    account: '암호화폐',
+    accountIcon: '₿',
+    investedKRW: 1000000,
+    currentKRW: 1000000, // 기본값, 실시간으로 업데이트
+    gainKRW: 0,
+    gainPercent: 0,
+    risk: 5,
+    isCrypto: true,
+    btcAmount: 1000000 / 98180000,
+  },
+]
+
 // 카테고리별 색상
 const CATEGORY_COLORS = {
   'S&P500': '#3182F6',
@@ -312,6 +388,12 @@ const styles = {
 export default function GayoonWealthPage() {
   const navigate = useNavigate()
   const [currentQuarter, setCurrentQuarter] = useState('Q1')
+
+  // 보유 종목 필터 상태
+  const [holdingsFilter, setHoldingsFilter] = useState({
+    account: 'all', // all, ISA, 연금저축, IRP, 해외주식, 암호화폐
+    sort: 'value', // value, gain, name
+  })
 
   // localStorage에서 캐시된 가격 불러오기
   const getCachedPrices = () => {
@@ -882,6 +964,272 @@ export default function GayoonWealthPage() {
                 </div>
               )
             })}
+          </div>
+        </div>
+      </div>
+
+      {/* 보유 종목 테이블 */}
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '12px' }}>💼 보유 종목</h3>
+      </div>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        border: '1px solid #E5E8EB',
+        overflow: 'hidden',
+        marginBottom: '24px',
+      }}>
+        {/* 헤더 */}
+        <div style={{
+          padding: '16px 20px',
+          borderBottom: '1px solid #E5E8EB',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <span style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>전체 보유 종목</span>
+          <span style={{ fontSize: '13px', color: '#8B95A1' }}>
+            {(() => {
+              // 비트코인 실시간 가격 반영
+              const btcItem = GAYOON_ALL_HOLDINGS.find(h => h.ticker === 'BTC')
+              const btcCurrentValue = btcItem ? btcItem.btcAmount * (prices.btc || 125000000) : 0
+              const btcInvested = btcItem ? btcItem.investedKRW : 0
+              const otherTotal = GAYOON_ALL_HOLDINGS.filter(h => h.ticker !== 'BTC').reduce((acc, h) => acc + h.currentKRW, 0)
+              return GAYOON_ALL_HOLDINGS.length
+            })()}개 종목
+          </span>
+        </div>
+
+        {/* 필터 */}
+        <div style={{
+          padding: '12px 20px',
+          borderBottom: '1px solid #E5E8EB',
+          display: 'flex',
+          gap: '16px',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '12px', color: '#8B95A1' }}>계좌:</span>
+            {[
+              { value: 'all', label: '전체' },
+              { value: 'ISA', label: 'ISA' },
+              { value: '연금저축', label: '연금저축' },
+              { value: 'IRP', label: 'IRP' },
+              { value: '해외주식', label: '해외주식' },
+              { value: '암호화폐', label: '암호화폐' },
+            ].map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setHoldingsFilter({ ...holdingsFilter, account: opt.value })}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  backgroundColor: holdingsFilter.account === opt.value ? '#3182F6' : '#F2F4F6',
+                  color: holdingsFilter.account === opt.value ? 'white' : '#4E5968',
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '12px', color: '#8B95A1' }}>정렬:</span>
+            <select
+              value={holdingsFilter.sort}
+              onChange={(e) => setHoldingsFilter({ ...holdingsFilter, sort: e.target.value })}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '6px',
+                border: '1px solid #E5E8EB',
+                fontSize: '12px',
+                color: '#4E5968',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="value">평가금액순</option>
+              <option value="gain">수익률순</option>
+              <option value="name">이름순</option>
+            </select>
+          </div>
+        </div>
+
+        {/* 테이블 */}
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+            <thead>
+              <tr>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '100px' }}>계좌</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '180px' }}>종목명</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '100px' }}>매입금액</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '100px' }}>평가금액</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '90px' }}>손익</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '80px' }}>수익률</th>
+              </tr>
+            </thead>
+            <tbody>
+              {GAYOON_ALL_HOLDINGS
+                // 비트코인 실시간 가격 반영
+                .map(item => {
+                  if (item.isCrypto && item.ticker === 'BTC') {
+                    const btcPrice = prices.btc || 125000000
+                    const currentValue = item.btcAmount * btcPrice
+                    const gainKRW = currentValue - item.investedKRW
+                    const gainPercent = (gainKRW / item.investedKRW) * 100
+                    return { ...item, currentKRW: currentValue, gainKRW, gainPercent }
+                  }
+                  return item
+                })
+                // 필터 적용
+                .filter(item => {
+                  if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
+                  return true
+                })
+                // 정렬 적용
+                .sort((a, b) => {
+                  if (holdingsFilter.sort === 'value') return b.currentKRW - a.currentKRW
+                  if (holdingsFilter.sort === 'gain') return b.gainPercent - a.gainPercent
+                  if (holdingsFilter.sort === 'name') return a.name.localeCompare(b.name)
+                  return 0
+                })
+                .map((item, idx) => {
+                  const gainPercent = item.gainPercent
+                  return (
+                    <tr key={`${item.account}-${item.ticker}-${idx}`}>
+                      {/* 계좌 */}
+                      <td style={{ padding: '14px 16px', fontSize: '14px', color: '#191F28', borderBottom: '1px solid #F2F4F6' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>{item.accountIcon}</span>
+                          <span style={{ fontSize: '12px', color: '#4E5968' }}>{item.account}</span>
+                        </div>
+                      </td>
+                      {/* 종목명 */}
+                      <td style={{ padding: '14px 16px', fontSize: '14px', color: '#191F28', borderBottom: '1px solid #F2F4F6' }}>
+                        <div>
+                          <div style={{ fontWeight: '600', fontSize: '13px' }}>{item.ticker}</div>
+                          <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.name}</div>
+                        </div>
+                      </td>
+                      {/* 매입금액 */}
+                      <td style={{ padding: '14px 16px', fontSize: '13px', color: '#8B95A1', borderBottom: '1px solid #F2F4F6', textAlign: 'right' }}>
+                        ₩{Math.round(item.investedKRW).toLocaleString()}
+                      </td>
+                      {/* 평가금액 */}
+                      <td style={{ padding: '14px 16px', fontSize: '14px', fontWeight: '600', color: '#191F28', borderBottom: '1px solid #F2F4F6', textAlign: 'right' }}>
+                        ₩{Math.round(item.currentKRW).toLocaleString()}
+                      </td>
+                      {/* 손익 */}
+                      <td style={{ padding: '14px 16px', fontSize: '13px', fontWeight: '600', borderBottom: '1px solid #F2F4F6', textAlign: 'right', color: item.gainKRW > 0 ? '#00C853' : item.gainKRW < 0 ? '#F04438' : '#8B95A1' }}>
+                        {item.gainKRW >= 0 ? '+' : ''}₩{Math.round(item.gainKRW).toLocaleString()}
+                      </td>
+                      {/* 수익률 */}
+                      <td style={{ padding: '14px 16px', borderBottom: '1px solid #F2F4F6', textAlign: 'right' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          backgroundColor: gainPercent >= 5 ? '#E8F5E9' : gainPercent > 0 ? '#F0FFF4' : gainPercent < 0 ? '#FFEBEE' : '#F2F4F6',
+                          color: gainPercent > 0 ? '#00C853' : gainPercent < 0 ? '#F04438' : '#8B95A1',
+                        }}>
+                          {gainPercent >= 5 && '🔥 '}
+                          {gainPercent > 0 ? '+' : ''}{gainPercent.toFixed(2)}%
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* 합계 */}
+        <div style={{
+          padding: '16px 20px',
+          borderTop: '1px solid #E5E8EB',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: '#F7F8FA',
+        }}>
+          <span style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>
+            합계 ({GAYOON_ALL_HOLDINGS
+              .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
+              .length}개 종목)
+          </span>
+          <div style={{ display: 'flex', gap: '24px' }}>
+            <span style={{ fontSize: '14px', color: '#4E5968' }}>
+              평가금액: <strong style={{ color: '#191F28' }}>
+                ₩{Math.round(GAYOON_ALL_HOLDINGS
+                  .map(item => {
+                    if (item.isCrypto && item.ticker === 'BTC') {
+                      return { ...item, currentKRW: item.btcAmount * (prices.btc || 125000000) }
+                    }
+                    return item
+                  })
+                  .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
+                  .reduce((acc, item) => acc + item.currentKRW, 0)).toLocaleString()}
+              </strong>
+            </span>
+            <span style={{ fontSize: '14px', color: '#4E5968' }}>
+              손익: <strong style={{
+                color: (() => {
+                  const totalGain = GAYOON_ALL_HOLDINGS
+                    .map(item => {
+                      if (item.isCrypto && item.ticker === 'BTC') {
+                        const currentValue = item.btcAmount * (prices.btc || 125000000)
+                        return { ...item, gainKRW: currentValue - item.investedKRW }
+                      }
+                      return item
+                    })
+                    .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
+                    .reduce((acc, item) => acc + item.gainKRW, 0)
+                  return totalGain >= 0 ? '#00C853' : '#F04438'
+                })()
+              }}>
+                {(() => {
+                  const totalGain = GAYOON_ALL_HOLDINGS
+                    .map(item => {
+                      if (item.isCrypto && item.ticker === 'BTC') {
+                        const currentValue = item.btcAmount * (prices.btc || 125000000)
+                        return { ...item, gainKRW: currentValue - item.investedKRW }
+                      }
+                      return item
+                    })
+                    .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
+                    .reduce((acc, item) => acc + item.gainKRW, 0)
+                  return `${totalGain >= 0 ? '+' : ''}₩${Math.round(totalGain).toLocaleString()}`
+                })()}
+              </strong>
+            </span>
+          </div>
+        </div>
+
+        {/* 범례 */}
+        <div style={{
+          padding: '16px 20px',
+          borderTop: '1px solid #E5E8EB',
+          backgroundColor: '#FAFAFA',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px',
+            fontSize: '12px',
+            color: '#4E5968',
+          }}>
+            <span><strong style={{ color: '#00C853' }}>🔥</strong> = 내 수익 +5% 이상</span>
+            <span><strong style={{ color: '#F57F17' }}>⚠️</strong> = 매수후고점 대비 -10% 이상</span>
+            <span><strong style={{ color: '#F04438' }}>🚨</strong> = 매수후고점 대비 -15% 이상 (손절 고려)</span>
+            <span><strong>PER</strong> = 주가수익비율</span>
+            <span><strong>PBR</strong> = 주가순자산비율</span>
+            <span><strong>ROE</strong> = 자기자본이익률 (15%+ 우량)</span>
           </div>
         </div>
       </div>
