@@ -40,16 +40,17 @@ const TOSS_HOLDINGS = [
 ]
 
 // 토스증권 ETF/채권
-const TOSS_ETFS = []
+const TOSS_ETFS = [
+  { name: 'TIGER 미국채 15', shares: 15, currentKRW: 199050, investedKRW: 198375, gainKRW: 675, gainPercent: 0.34 },
+  { name: '발행어음CMA', shares: 0, currentKRW: 600179, investedKRW: 600032, gainKRW: 147, gainPercent: 0.02 },
+]
 
 // 미래에셋증권 보유 종목
 const MIRAE_HOLDINGS = [
   { name: 'KODEX 200', shares: 7, currentKRW: 658840, investedKRW: 617700, gainKRW: 41140, gainPercent: 6.66 },
-  { name: '발행어음CMA (2)', shares: 0, currentKRW: 600179, investedKRW: 600032, gainKRW: 147, gainPercent: 0.02 },
   { name: '알파벳 C', shares: 1, currentKRW: 443632, investedKRW: 442635, gainKRW: 997, gainPercent: 0.23 },
   { name: '발행어음CMA', shares: 0, currentKRW: 410119, investedKRW: 410000, gainKRW: 119, gainPercent: 0.03 },
   { name: 'KODEX 코스닥150', shares: 10, currentKRW: 211000, investedKRW: 202375, gainKRW: 8625, gainPercent: 4.26 },
-  { name: 'TIGER 미국채', shares: 15, currentKRW: 199050, investedKRW: 198375, gainKRW: 675, gainPercent: 0.34 },
   { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 196520, investedKRW: 196840, gainKRW: -320, gainPercent: -0.16 },
   { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 171955, investedKRW: 174090, gainKRW: -2135, gainPercent: -1.23 },
   { name: '1Q 미국S&P500', shares: 10, currentKRW: 113550, investedKRW: 116250, gainKRW: -2700, gainPercent: -2.32 },
@@ -60,8 +61,16 @@ const PENDING_SALES = []
 
 // 비상금/현금 계좌 (매월 25일 입금)
 const CASH_ACCOUNTS = [
+  { id: 'parking', name: '파킹계좌', icon: '🅿️', targetKRW: 900000, currentKRW: 0, depositDay: 25, note: '비상금 (언제든 출금 가능)' },
+  { id: 'cma-trip', name: 'CMA (가족여행)', icon: '✈️', targetKRW: 0, currentKRW: 400000, depositDay: null, note: '하우가 가족여행' },
+  { id: 'cma-emergency', name: 'CMA (비상금)', icon: '💳', targetKRW: 1000000, currentKRW: 600000, depositDay: 25, note: '비상금 (증권사 CMA)' },
   { id: 'hanwha-insurance', name: '한화생명보험저축', icon: '🛡️', targetKRW: 30240000, currentKRW: 12390000, depositDay: null, monthlyDeposit: 210000, depositCount: 59, targetCount: 144, note: '월 21만원 × 59/144회 납입' },
   { id: 'housing', name: '청약저축', icon: '🏠', targetKRW: 3000000, currentKRW: 720000, depositDay: 25, monthlyDeposit: 20000, depositCount: 36, targetCount: 24, note: '1순위 달성 (36회 납입)' },
+  { id: 'pension', name: '연금저축 ETF', icon: '🧓', targetKRW: 6000000, currentKRW: 827010, depositDay: 25, monthlyDeposit: 500000, note: '세액공제 연 600만원 한도' },
+  { id: 'isa', name: 'ISA', icon: '📈', targetKRW: 20000000, currentKRW: 504089, depositDay: 25, monthlyDeposit: 0, note: '비과세 200만원 한도 (3년 유지 필수)' },
+  { id: 'irp', name: 'IRP', icon: '🏦', targetKRW: 3000000, currentKRW: 250000, depositDay: 25, monthlyDeposit: 0, note: '세액공제 300만원 한도' },
+  { id: 'pension-extra', name: '추가 연금저축', icon: '🧓', targetKRW: 9000000, currentKRW: 0, depositDay: null, monthlyDeposit: 0, note: '과세이연 (일반주식 오르면 이동 예정)' },
+  { id: 'stocks', name: '일반 주식', icon: '📊', targetKRW: 0, currentKRW: 1370000, depositDay: null, note: '일반 증권계좌' },
 ]
 
 // 공모주 청약 일정
@@ -1012,34 +1021,32 @@ export default function PortfolioPage() {
         </div>
 
         {/* 토스 ETF/채권 */}
-        {TOSS_ETFS.length > 0 && (
-          <div style={{ marginBottom: '16px' }}>
-            <div style={{ fontSize: '13px', fontWeight: '600', color: '#8B95A1', marginBottom: '8px' }}>ETF/채권/CMA</div>
-            <div style={{ display: 'grid', gap: '8px' }}>
-              {TOSS_ETFS.map((item, idx) => (
-                <div key={idx} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px',
-                  backgroundColor: '#F7F8FA',
-                  borderRadius: '8px',
-                }}>
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
-                    {item.shares > 0 && <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.shares}주</div>}
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '14px', fontWeight: '600' }}>₩{item.currentKRW.toLocaleString()}</div>
-                    <div style={{ fontSize: '11px', color: item.gainKRW >= 0 ? '#00C853' : '#F04438' }}>
-                      {item.gainKRW >= 0 ? '+' : ''}{item.gainKRW.toLocaleString()}원 ({item.gainPercent}%)
-                    </div>
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: '600', color: '#8B95A1', marginBottom: '8px' }}>ETF/채권/CMA</div>
+          <div style={{ display: 'grid', gap: '8px' }}>
+            {TOSS_ETFS.map((item, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '12px',
+                backgroundColor: '#F7F8FA',
+                borderRadius: '8px',
+              }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
+                  {item.shares > 0 && <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.shares}주</div>}
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '14px', fontWeight: '600' }}>₩{item.currentKRW.toLocaleString()}</div>
+                  <div style={{ fontSize: '11px', color: item.gainKRW >= 0 ? '#00C853' : '#F04438' }}>
+                    {item.gainKRW >= 0 ? '+' : ''}{item.gainKRW.toLocaleString()}원 ({item.gainPercent}%)
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
 
         {/* 토스 해외주식 */}
         <div style={{ fontSize: '13px', fontWeight: '600', color: '#8B95A1', marginBottom: '8px' }}>해외주식 (소수점)</div>
