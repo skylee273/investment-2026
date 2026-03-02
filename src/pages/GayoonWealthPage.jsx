@@ -84,23 +84,29 @@ const TRACKED_ASSETS = [
   },
 ]
 
-// 현재 자산 현황
-const CURRENT_ASSETS = {
-  // 일반 증권 주식 (IRP 섹션 위쪽에 표시)
-  stocks: [
-    { id: 'sp500-dividend', name: 'S&P500 + 배당주', icon: '📈', currentKRW: 26796000, note: '소수점 매수' },
-  ],
-  locked: [
-    { id: 'youth-account', name: '청년 도약 계좌', icon: '🚀', currentKRW: 16800000, monthlyDeposit: 700000, endDate: '2029-03', interestRate: '6% + 정부기여금', note: '5년 만기' },
-    { id: 'housing', name: '청약저축', icon: '🏠', currentKRW: 6220000, monthlyDeposit: 20000, endDate: null, interestRate: '2.3%', note: '1순위 충족' },
-    { id: 'free-savings', name: '자율적금', icon: '💰', currentKRW: 4500000, monthlyDeposit: 900000, endDate: '2026-09', interestRate: '3.3%', note: '1년 만기' },
-  ],
-  cma: { id: 'cma', name: 'CMA', icon: '💵', currentKRW: 6690000, note: '6개월치 생활비' },
-  receivables: [
-    { id: 'family', name: '가족 받을 돈', icon: '👨‍👩‍👧', amount: 20000000, expectedDate: '2026-06', note: '6월 수령 예정' },
-    { id: 'deposit', name: '전세 보증금', icon: '🏢', amount: 45000000, expectedDate: '2026-07', note: '7월 수령 예정' },
-  ],
-}
+// 1. 고정자산 (빼면 손해나는 자산)
+const FIXED_ASSETS = [
+  { id: 'youth-account', name: '청년 도약 계좌', icon: '🚀', currentKRW: 16800000, note: '5년 만기 · 6%+정부기여금' },
+  { id: 'housing', name: '청약저축', icon: '🏠', currentKRW: 6220000, note: '1순위 충족 · 2.3%' },
+  { id: 'isa', name: 'ISA', icon: '📈', currentKRW: 20000000, note: '비과세 200만원' },
+  { id: 'pension', name: '연금저축', icon: '🧓', currentKRW: 6000000, note: '세액공제 79.2만원' },
+]
+
+// 2. 비변동성 자산 (투자 중인 자산 + 받을 돈)
+const STABLE_ASSETS = [
+  { id: 'sp500-dividend', name: 'S&P500 + 배당주', icon: '📈', currentKRW: 26796000, note: '소수점 매수', type: 'stock' },
+  // 아마존, 비트코인은 TRACKED_ASSETS에서 가져옴
+  { id: 'family', name: '가족 받을 돈', icon: '👨‍👩‍👧', currentKRW: 20000000, note: '6월 수령 예정', type: 'receivable' },
+  { id: 'deposit', name: '전세 보증금', icon: '🏢', currentKRW: 45000000, note: '7월 수령 예정', type: 'receivable' },
+]
+
+// 3. 변동성 자산 (언제든 쓸 수 있는 자산)
+const LIQUID_ASSETS = [
+  { id: 'cma', name: 'CMA', icon: '💵', currentKRW: 6690000, note: '6개월치 생활비' },
+  { id: 'free-savings', name: '자율적금', icon: '💰', currentKRW: 4500000, note: '1년 만기 · 2026-09 · 3.3%' },
+  { id: 'irp', name: 'IRP', icon: '🏦', currentKRW: 250000, note: '세액공제 39.6만원 · 월 25만원' },
+  { id: 'pension-extra', name: '추가 연금저축', icon: '💰', currentKRW: 0, note: '과세이연 · 월 60만원 예정' },
+]
 
 // 카테고리별 색상
 const CATEGORY_COLORS = {
@@ -393,14 +399,13 @@ export default function GayoonWealthPage() {
   const quarterInfo = QUARTERLY_PORTFOLIOS[currentQuarter]
   const PORTFOLIO = quarterInfo?.portfolio || []
 
-  // 총 자산 계산
+  // 총 자산 계산 (새 구조)
   const totalTracked = trackedAssetsWithReturns.reduce((sum, item) => sum + (item.currentKRW || 0), 0)
-  const totalStocks = CURRENT_ASSETS.stocks.reduce((sum, item) => sum + item.currentKRW, 0) + totalTracked
-  const totalLocked = CURRENT_ASSETS.locked.reduce((sum, item) => sum + item.currentKRW, 0)
-  const totalCMA = CURRENT_ASSETS.cma.currentKRW
-  const totalTaxAccounts = TAX_ACCOUNTS.reduce((sum, item) => sum + item.currentKRW, 0)
-  const totalReceivables = CURRENT_ASSETS.receivables.reduce((sum, item) => sum + item.amount, 0)
-  const totalCurrentAssets = totalStocks + totalLocked + totalCMA + totalTaxAccounts
+  const totalFixed = FIXED_ASSETS.reduce((sum, item) => sum + item.currentKRW, 0)
+  const totalStable = STABLE_ASSETS.reduce((sum, item) => sum + item.currentKRW, 0) + totalTracked
+  const totalLiquid = LIQUID_ASSETS.reduce((sum, item) => sum + item.currentKRW, 0)
+  const totalReceivables = STABLE_ASSETS.filter(a => a.type === 'receivable').reduce((sum, item) => sum + item.currentKRW, 0)
+  const totalCurrentAssets = totalFixed + totalStable + totalLiquid - totalReceivables // 받을돈 중복 제거
 
   return (
     <div style={styles.container}>
@@ -516,287 +521,187 @@ export default function GayoonWealthPage() {
           </div>
         </div>
         <div style={styles.summaryCard}>
-          <div style={styles.summaryLabel}>세제혜택 계좌</div>
-          <div style={styles.summaryValue}>₩{totalTaxAccounts.toLocaleString()}</div>
-          <div style={{ fontSize: '12px', color: '#00C853', marginTop: '4px' }}>
-            세액공제 118.8만원
+          <div style={styles.summaryLabel}>고정자산</div>
+          <div style={styles.summaryValue}>₩{totalFixed.toLocaleString()}</div>
+          <div style={{ fontSize: '12px', color: '#8B95A1', marginTop: '4px' }}>
+            빼면 손해
           </div>
         </div>
         <div style={styles.summaryCard}>
-          <div style={styles.summaryLabel}>일반 증권</div>
-          <div style={styles.summaryValue}>₩{Math.round(totalStocks).toLocaleString()}</div>
+          <div style={styles.summaryLabel}>비변동성 자산</div>
+          <div style={styles.summaryValue}>₩{Math.round(totalStable).toLocaleString()}</div>
+          <div style={{ fontSize: '12px', color: '#3182F6', marginTop: '4px' }}>
+            투자 + 받을돈
+          </div>
         </div>
         <div style={styles.summaryCard}>
-          <div style={styles.summaryLabel}>받을 돈 (6~7월)</div>
-          <div style={styles.summaryValue}>₩{totalReceivables.toLocaleString()}</div>
-          <div style={{ fontSize: '12px', color: '#9C27B0', marginTop: '4px' }}>
-            수령 후 {((totalCurrentAssets + totalReceivables) / 100000000).toFixed(2)}억
+          <div style={styles.summaryLabel}>변동성 자산</div>
+          <div style={styles.summaryValue}>₩{totalLiquid.toLocaleString()}</div>
+          <div style={{ fontSize: '12px', color: '#00C853', marginTop: '4px' }}>
+            언제든 사용
           </div>
         </div>
       </div>
 
-      {/* 통합 자산 현황 */}
+      {/* 1. 고정자산 */}
       <div style={{ marginBottom: '16px' }}>
-        <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '12px' }}>💰 자산 현황</h3>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '4px' }}>🔒 고정자산</h3>
+        <p style={{ fontSize: '12px', color: '#8B95A1', margin: 0 }}>빼면 손해나는 자산</p>
       </div>
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '16px',
+        gap: '12px',
         marginBottom: '24px',
       }}>
-        {/* 일반 증권 주식 */}
-        {CURRENT_ASSETS.stocks.map(item => (
+        {FIXED_ASSETS.map(item => (
           <div key={item.id} style={{
-            padding: '20px',
+            padding: '16px',
             backgroundColor: 'white',
-            borderRadius: '16px',
+            borderRadius: '12px',
             border: '1px solid #E5E8EB',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '24px' }}>{item.icon}</span>
-                <div>
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>{item.name}</div>
-                  <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.note}</div>
-                </div>
-              </div>
-              <div style={{
-                padding: '4px 8px',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontWeight: '600',
-                backgroundColor: '#E8F3FF',
-                color: '#3182F6',
-              }}>
-                주식
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '20px' }}>{item.icon}</span>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
+                <div style={{ fontSize: '10px', color: '#8B95A1' }}>{item.note}</div>
               </div>
             </div>
-            <div style={{ fontSize: '20px', fontWeight: '700', color: '#191F28' }}>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: '#191F28' }}>
+              ₩{item.currentKRW.toLocaleString()}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 2. 비변동성 자산 */}
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '4px' }}>📈 비변동성 자산</h3>
+        <p style={{ fontSize: '12px', color: '#8B95A1', margin: 0 }}>투자 중인 자산 + 받을 돈</p>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '12px',
+        marginBottom: '24px',
+      }}>
+        {/* S&P500 */}
+        {STABLE_ASSETS.filter(a => a.type === 'stock').map(item => (
+          <div key={item.id} style={{
+            padding: '16px',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            border: '1px solid #E8F3FF',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '20px' }}>{item.icon}</span>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
+                <div style={{ fontSize: '10px', color: '#8B95A1' }}>{item.note}</div>
+              </div>
+            </div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: '#3182F6' }}>
               ₩{item.currentKRW.toLocaleString()}
             </div>
           </div>
         ))}
 
-        {/* 실시간 추적 자산 (AMZN, BTC) */}
+        {/* 아마존, 비트코인 (실시간 추적) */}
         {trackedAssetsWithReturns.map(asset => (
           <div key={asset.id} style={{
-            padding: '20px',
+            padding: '16px',
             backgroundColor: 'white',
-            borderRadius: '16px',
+            borderRadius: '12px',
             border: `1px solid ${asset.returnRate >= 0 ? '#E8F5E9' : '#FFEBEE'}`,
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '24px' }}>{asset.icon}</span>
+                <span style={{ fontSize: '20px' }}>{asset.icon}</span>
                 <div>
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>{asset.name}</div>
-                  <div style={{ fontSize: '11px', color: '#8B95A1' }}>{asset.note}</div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{asset.name}</div>
+                  <div style={{ fontSize: '10px', color: '#8B95A1' }}>{asset.note}</div>
                 </div>
               </div>
               <div style={{
-                padding: '4px 8px',
-                borderRadius: '6px',
-                fontSize: '11px',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                fontSize: '10px',
                 fontWeight: '600',
                 backgroundColor: asset.returnRate >= 0 ? '#E8F5E9' : '#FFEBEE',
                 color: asset.returnRate >= 0 ? '#00C853' : '#F04438',
               }}>
-                {(asset.type === 'manual' || !loading) ? `${asset.returnRate >= 0 ? '+' : ''}${asset.returnRate.toFixed(1)}%` : '...'}
+                {`${asset.returnRate >= 0 ? '+' : ''}${asset.returnRate.toFixed(1)}%`}
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <div style={{ fontSize: '20px', fontWeight: '700', color: '#191F28' }}>
-                {(asset.type === 'manual' || !loading) ? `₩${Math.round(asset.currentKRW).toLocaleString()}` : '로딩...'}
+              <div style={{ fontSize: '18px', fontWeight: '700', color: '#191F28' }}>
+                ₩{Math.round(asset.currentKRW).toLocaleString()}
               </div>
-              <div style={{ fontSize: '11px', color: '#8B95A1' }}>
+              <div style={{ fontSize: '10px', color: '#8B95A1' }}>
                 매입 ₩{asset.investedKRW.toLocaleString()}
               </div>
             </div>
-            {asset.type === 'manual' && (
-              <div style={{ fontSize: '10px', color: asset.currentKRW >= asset.investedKRW ? '#00C853' : '#F04438', marginTop: '6px' }}>
-                평가손익 {asset.currentKRW >= asset.investedKRW ? '+' : ''}₩{(asset.currentKRW - asset.investedKRW).toLocaleString()}
-              </div>
-            )}
             {asset.type === 'crypto' && prices.btc && (
-              <div style={{ fontSize: '10px', color: '#6B7684', marginTop: '6px' }}>
-                BTC ₩{prices.btc.toLocaleString()} · 보유 {asset.btcAmount.toFixed(6)} BTC
+              <div style={{ fontSize: '9px', color: '#6B7684', marginTop: '4px' }}>
+                BTC ₩{prices.btc.toLocaleString()}
               </div>
             )}
           </div>
         ))}
-
-        {/* 세제혜택 계좌 */}
-        {TAX_ACCOUNTS.map(account => {
-          const progress = account.targetKRW > 0 ? (account.currentKRW / account.targetKRW) * 100 : 0
-          const remaining = account.targetKRW - account.currentKRW
-          const today = new Date().getDate()
-          const daysUntilDeposit = account.depositDay
-            ? (account.depositDay >= today
-              ? account.depositDay - today
-              : (new Date(new Date().getFullYear(), new Date().getMonth() + 1, account.depositDay).getDate() - today + 30) % 30)
-            : null
-
-          return (
-            <div key={account.id} style={{
-              padding: '20px',
-              backgroundColor: 'white',
-              borderRadius: '16px',
-              border: '1px solid #E5E8EB',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '24px' }}>{account.icon}</span>
-                  <div>
-                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>{account.name}</div>
-                    <div style={{ fontSize: '11px', color: '#8B95A1' }}>{account.note}</div>
-                  </div>
-                </div>
-                <div style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  backgroundColor: progress >= 100 ? '#E8F5E9' : daysUntilDeposit !== null && daysUntilDeposit <= 3 ? '#FFEBEE' : '#E8F3FF',
-                  color: progress >= 100 ? '#2E7D32' : daysUntilDeposit !== null && daysUntilDeposit <= 3 ? '#F04438' : '#3182F6',
-                }}>
-                  {progress >= 100 ? '완료' : daysUntilDeposit === 0 ? '오늘!' : daysUntilDeposit !== null ? `D-${daysUntilDeposit}` : '세제혜택'}
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                  <span style={{ fontSize: '20px', fontWeight: '700', color: '#191F28' }}>
-                    ₩{account.currentKRW.toLocaleString()}
-                  </span>
-                  <span style={{ fontSize: '12px', color: '#8B95A1' }}>
-                    / {(account.targetKRW / 10000).toLocaleString()}만
-                  </span>
-                </div>
-              </div>
-
-              <div style={{
-                height: '6px',
-                backgroundColor: '#F2F4F6',
-                borderRadius: '3px',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  width: `${Math.min(progress, 100)}%`,
-                  height: '100%',
-                  backgroundColor: progress >= 100 ? '#00C853' : '#3182F6',
-                  borderRadius: '3px',
-                }} />
-              </div>
-            </div>
-          )
-        })}
-
-        {/* 묶여있는 돈 */}
-        {CURRENT_ASSETS.locked.map(item => (
-          <div key={item.id} style={{
-            padding: '20px',
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            border: '1px solid #E5E8EB',
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '24px' }}>{item.icon}</span>
-                <div>
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>{item.name}</div>
-                  <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.note} · {item.interestRate}</div>
-                </div>
-              </div>
-              <div style={{
-                padding: '4px 8px',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontWeight: '600',
-                backgroundColor: '#FFF3E0',
-                color: '#E65100',
-              }}>
-                {item.endDate ? `만기 ${item.endDate}` : '적금'}
-              </div>
-            </div>
-            <div style={{ fontSize: '20px', fontWeight: '700', color: '#191F28', marginBottom: '4px' }}>
-              ₩{item.currentKRW.toLocaleString()}
-            </div>
-            <div style={{ fontSize: '12px', color: '#6B7684' }}>
-              월 {(item.monthlyDeposit / 10000).toLocaleString()}만원 납입
-            </div>
-          </div>
-        ))}
-
-        {/* CMA */}
-        <div style={{
-          padding: '20px',
-          backgroundColor: 'white',
-          borderRadius: '16px',
-          border: '1px solid #E5E8EB',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '24px' }}>{CURRENT_ASSETS.cma.icon}</span>
-              <div>
-                <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>{CURRENT_ASSETS.cma.name}</div>
-                <div style={{ fontSize: '11px', color: '#8B95A1' }}>{CURRENT_ASSETS.cma.note}</div>
-              </div>
-            </div>
-            <div style={{
-              padding: '4px 8px',
-              borderRadius: '6px',
-              fontSize: '11px',
-              fontWeight: '600',
-              backgroundColor: '#E8F5E9',
-              color: '#2E7D32',
-            }}>
-              비상금
-            </div>
-          </div>
-          <div style={{ fontSize: '20px', fontWeight: '700', color: '#191F28' }}>
-            ₩{CURRENT_ASSETS.cma.currentKRW.toLocaleString()}
-          </div>
-        </div>
 
         {/* 받을 돈 */}
-        {CURRENT_ASSETS.receivables.map(item => {
-          const target = new Date(item.expectedDate)
-          const now = new Date()
-          const daysUntil = Math.ceil((target - now) / (1000 * 60 * 60 * 24))
-
-          return (
-            <div key={item.id} style={{
-              padding: '20px',
-              backgroundColor: 'white',
-              borderRadius: '16px',
-              border: '1px solid #F3E5F5',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '24px' }}>{item.icon}</span>
-                  <div>
-                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>{item.name}</div>
-                    <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.note}</div>
-                  </div>
-                </div>
-                <div style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  backgroundColor: '#F3E5F5',
-                  color: '#9C27B0',
-                }}>
-                  D-{daysUntil}
-                </div>
-              </div>
-              <div style={{ fontSize: '20px', fontWeight: '700', color: '#9C27B0' }}>
-                ₩{item.amount.toLocaleString()}
+        {STABLE_ASSETS.filter(a => a.type === 'receivable').map(item => (
+          <div key={item.id} style={{
+            padding: '16px',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            border: '1px solid #F3E5F5',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '20px' }}>{item.icon}</span>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
+                <div style={{ fontSize: '10px', color: '#8B95A1' }}>{item.note}</div>
               </div>
             </div>
-          )
-        })}
+            <div style={{ fontSize: '18px', fontWeight: '700', color: '#9C27B0' }}>
+              ₩{item.currentKRW.toLocaleString()}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 3. 변동성 자산 */}
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '4px' }}>💧 변동성 자산</h3>
+        <p style={{ fontSize: '12px', color: '#8B95A1', margin: 0 }}>언제든 쓸 수 있는 자산</p>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '12px',
+        marginBottom: '24px',
+      }}>
+        {LIQUID_ASSETS.map(item => (
+          <div key={item.id} style={{
+            padding: '16px',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            border: '1px solid #E5E8EB',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '20px' }}>{item.icon}</span>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
+                <div style={{ fontSize: '10px', color: '#8B95A1' }}>{item.note}</div>
+              </div>
+            </div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: '#191F28' }}>
+              ₩{item.currentKRW.toLocaleString()}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* 포트폴리오 구성 */}
