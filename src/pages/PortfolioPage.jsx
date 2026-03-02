@@ -39,22 +39,80 @@ const TOSS_HOLDINGS = [
   { ticker: 'VST', name: '비스트라 에너지', shares: 0.003951, currentKRW: 955, gainKRW: -30, gainPercent: -3.0 },
 ]
 
-// 토스증권 ETF/채권
-const TOSS_ETFS = [
-  { name: 'TIGER 미국채 15', shares: 15, currentKRW: 199050, investedKRW: 198375, gainKRW: 675, gainPercent: 0.34 },
-  { name: '발행어음CMA', shares: 0, currentKRW: 600179, investedKRW: 600032, gainKRW: 147, gainPercent: 0.02 },
+// 토스증권 ETF/채권 (미래에셋으로 이동됨)
+const TOSS_ETFS = []
+
+// 미래에셋증권 계좌별 보유 종목 (2026.03.02 기준)
+const MIRAE_ACCOUNTS = [
+  {
+    id: 'pension',
+    name: '연금저축계좌',
+    accountNo: '010-8784-7546-2',
+    icon: '🧓',
+    totalKRW: 827010,
+    gainKRW: 45340,
+    gainPercent: 6.31,
+    holdings: [
+      { name: 'KODEX 200', shares: 7, currentKRW: 658840, investedKRW: 617700, gainKRW: 41140, gainPercent: 6.66 },
+      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 105500, investedKRW: 101300, gainKRW: 4200, gainPercent: 4.15 },
+    ]
+  },
+  {
+    id: 'isa',
+    name: 'ISA (중개형)',
+    accountNo: '660-9824-0136-0',
+    icon: '📊',
+    totalKRW: 504089,
+    gainKRW: 4780,
+    gainPercent: 0.96,
+    holdings: [
+      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 105500, investedKRW: 101075, gainKRW: 4425, gainPercent: 4.38 },
+      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 199050, investedKRW: 198375, gainKRW: 675, gainPercent: 0.34 },
+      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 196520, investedKRW: 196840, gainKRW: -320, gainPercent: -0.16 },
+    ]
+  },
+  {
+    id: 'cma-emergency',
+    name: '비상금 CMA',
+    accountNo: '690-6340-5654-1',
+    icon: '💰',
+    totalKRW: 600179,
+    gainKRW: 147,
+    gainPercent: 0.02,
+    holdings: [
+      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 600179, investedKRW: 600032, gainKRW: 147, gainPercent: 0.02 },
+    ]
+  },
+  {
+    id: 'stock',
+    name: '종합_주식',
+    accountNo: '010-8784-7546-0',
+    icon: '📈',
+    totalKRW: 740637,
+    gainKRW: -3838,
+    gainPercent: -0.52,
+    holdings: [
+      { name: '알파벳 C', shares: 1, currentKRW: 443632, investedKRW: 442635, gainKRW: 997, gainPercent: 0.23 },
+      { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 171955, investedKRW: 174090, gainKRW: -2135, gainPercent: -1.23 },
+      { name: '1Q 미국S&P500미국채혼합', shares: 10, currentKRW: 113550, investedKRW: 116250, gainKRW: -2700, gainPercent: -2.32 },
+    ]
+  },
+  {
+    id: 'cma-family',
+    name: '하우가 가족여행 CMA',
+    accountNo: '010-8784-7546-1',
+    icon: '✈️',
+    totalKRW: 410119,
+    gainKRW: 119,
+    gainPercent: 0.03,
+    holdings: [
+      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 410119, investedKRW: 410000, gainKRW: 119, gainPercent: 0.03 },
+    ]
+  },
 ]
 
-// 미래에셋증권 보유 종목
-const MIRAE_HOLDINGS = [
-  { name: 'KODEX 200', shares: 7, currentKRW: 658840, investedKRW: 617700, gainKRW: 41140, gainPercent: 6.66 },
-  { name: '알파벳 C', shares: 1, currentKRW: 443632, investedKRW: 442635, gainKRW: 997, gainPercent: 0.23 },
-  { name: '발행어음CMA', shares: 0, currentKRW: 410119, investedKRW: 410000, gainKRW: 119, gainPercent: 0.03 },
-  { name: 'KODEX 코스닥150', shares: 10, currentKRW: 211000, investedKRW: 202375, gainKRW: 8625, gainPercent: 4.26 },
-  { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 196520, investedKRW: 196840, gainKRW: -320, gainPercent: -0.16 },
-  { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 171955, investedKRW: 174090, gainKRW: -2135, gainPercent: -1.23 },
-  { name: '1Q 미국S&P500', shares: 10, currentKRW: 113550, investedKRW: 116250, gainKRW: -2700, gainPercent: -2.32 },
-]
+// 미래에셋 전체 보유 종목 (기존 코드 호환용)
+const MIRAE_HOLDINGS = MIRAE_ACCOUNTS.flatMap(acc => acc.holdings)
 
 // 매도 예정/완료 종목 (비중 미포함)
 const PENDING_SALES = []
@@ -693,15 +751,30 @@ export default function PortfolioPage() {
     return ((stockData.price - tracking.avgPrice) / tracking.avgPrice) * 100
   }
 
-  // 포트폴리오 가치 계산 (실제 투자금액 기반)
+  // 포트폴리오 가치 계산 (전체 자산 포함)
   const calculatePortfolioValue = () => {
     let totalCost = 0 // 총 투자원금
     let totalGain = 0 // 총 수익금
 
+    // PORTFOLIO (기존 목표 포트폴리오)
     PORTFOLIO.forEach(item => {
-      // 실제 투자금액과 손익 사용
       totalCost += item.investedKRW || 0
       totalGain += item.gainKRW || 0
+    })
+
+    // 토스증권 보유 종목
+    TOSS_HOLDINGS.forEach(item => {
+      const invested = item.currentKRW - item.gainKRW
+      totalCost += invested
+      totalGain += item.gainKRW || 0
+    })
+
+    // 미래에셋증권 계좌별
+    MIRAE_ACCOUNTS.forEach(acc => {
+      acc.holdings.forEach(item => {
+        totalCost += item.investedKRW || 0
+        totalGain += item.gainKRW || 0
+      })
     })
 
     const totalValue = totalCost + totalGain
@@ -711,12 +784,14 @@ export default function PortfolioPage() {
 
   // 총 투자금액 계산
   const TOTAL_INVESTMENT = PORTFOLIO.reduce((sum, item) => sum + (item.investedKRW || 0), 0)
+    + TOSS_HOLDINGS.reduce((sum, h) => sum + (h.currentKRW - h.gainKRW), 0)
+    + MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.holdings.reduce((s, h) => s + h.investedKRW, 0), 0)
 
   const portfolioStats = calculatePortfolioValue()
 
-  // 위험 종목 수
-  const warningCount = PORTFOLIO.filter(item => getAlertType(getDropFromHigh(item.ticker)) === 'warning').length
-  const dangerCount = PORTFOLIO.filter(item => getAlertType(getDropFromHigh(item.ticker)) === 'danger').length
+  // 위험 종목 수 (고점 대비 -10% 이상 하락)
+  const warningCount = TOSS_HOLDINGS.filter(item => item.gainPercent <= -10 && item.gainPercent > -15).length
+  const dangerCount = TOSS_HOLDINGS.filter(item => item.gainPercent <= -15).length
 
   return (
     <div style={styles.container}>
@@ -1098,7 +1173,7 @@ export default function PortfolioPage() {
         </table>
       </div>
 
-      {/* 미래에셋증권 보유 현황 */}
+      {/* 미래에셋증권 보유 현황 - 계좌별 */}
       <div style={{
         padding: '20px',
         backgroundColor: 'white',
@@ -1112,60 +1187,102 @@ export default function PortfolioPage() {
             <span style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>미래에셋증권</span>
           </div>
           <span style={{ fontSize: '14px', color: '#8B95A1' }}>
-            평가금액: ₩{MIRAE_HOLDINGS.reduce((sum, h) => sum + h.currentKRW, 0).toLocaleString()}
+            총 평가금액: ₩{MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.totalKRW, 0).toLocaleString()}
           </span>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #E5E8EB' }}>
-              <th style={{ padding: '8px', textAlign: 'left', color: '#8B95A1', fontWeight: '500' }}>종목</th>
-              <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>수량</th>
-              <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>평가금액</th>
-              <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>매입금액</th>
-              <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>손익</th>
-            </tr>
-          </thead>
-          <tbody>
-            {MIRAE_HOLDINGS.map((item, idx) => (
-              <tr key={idx} style={{ borderBottom: '1px solid #F2F4F6' }}>
-                <td style={{ padding: '10px 8px', fontWeight: '600' }}>{item.name}</td>
-                <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1' }}>
-                  {item.shares > 0 ? `${item.shares}주` : '-'}
-                </td>
-                <td style={{ padding: '10px 8px', textAlign: 'right', fontWeight: '600' }}>
-                  ₩{item.currentKRW.toLocaleString()}
-                </td>
-                <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1' }}>
-                  ₩{item.investedKRW.toLocaleString()}
-                </td>
-                <td style={{ padding: '10px 8px', textAlign: 'right' }}>
-                  <span style={{ color: item.gainKRW >= 0 ? '#00C853' : '#F04438', fontWeight: '600' }}>
-                    {item.gainKRW >= 0 ? '+' : ''}{item.gainKRW.toLocaleString()}
-                  </span>
-                  <div style={{ fontSize: '11px', color: item.gainPercent >= 0 ? '#00C853' : '#F04438' }}>
-                    ({item.gainPercent >= 0 ? '+' : ''}{item.gainPercent}%)
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr style={{ backgroundColor: '#F7F8FA' }}>
-              <td colSpan={2} style={{ padding: '10px 8px', fontWeight: '600' }}>합계</td>
-              <td style={{ padding: '10px 8px', textAlign: 'right', fontWeight: '700' }}>
-                ₩{MIRAE_HOLDINGS.reduce((sum, h) => sum + h.currentKRW, 0).toLocaleString()}
-              </td>
-              <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1' }}>
-                ₩{MIRAE_HOLDINGS.reduce((sum, h) => sum + h.investedKRW, 0).toLocaleString()}
-              </td>
-              <td style={{ padding: '10px 8px', textAlign: 'right', fontWeight: '700', color: MIRAE_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0) >= 0 ? '#00C853' : '#F04438' }}>
-                {MIRAE_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0) >= 0 ? '+' : ''}
-                ₩{MIRAE_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0).toLocaleString()}
-              </td>
-            </tr>
-          </tfoot>
-        </table>
+        {MIRAE_ACCOUNTS.map((account) => (
+          <div key={account.id} style={{ marginBottom: '20px' }}>
+            {/* 계좌 헤더 */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '12px',
+              backgroundColor: '#F7F8FA',
+              borderRadius: '8px',
+              marginBottom: '8px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>{account.icon}</span>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{account.name}</div>
+                  <div style={{ fontSize: '11px', color: '#8B95A1' }}>{account.accountNo}</div>
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '15px', fontWeight: '700', color: '#191F28' }}>
+                  ₩{account.totalKRW.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '12px', color: account.gainKRW >= 0 ? '#00C853' : '#F04438' }}>
+                  {account.gainKRW >= 0 ? '▲' : '▼'} {Math.abs(account.gainKRW).toLocaleString()}원 ({account.gainKRW >= 0 ? '+' : ''}{account.gainPercent}%)
+                </div>
+              </div>
+            </div>
+
+            {/* 종목 테이블 */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #E5E8EB' }}>
+                  <th style={{ padding: '8px', textAlign: 'left', color: '#8B95A1', fontWeight: '500' }}>종목</th>
+                  <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>수량</th>
+                  <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>평가금액</th>
+                  <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>매입금액</th>
+                  <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>손익</th>
+                </tr>
+              </thead>
+              <tbody>
+                {account.holdings.map((item, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #F2F4F6' }}>
+                    <td style={{ padding: '10px 8px', fontWeight: '600' }}>{item.name}</td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1' }}>
+                      {item.shares > 0 ? `${item.shares}주` : '-'}
+                    </td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right', fontWeight: '600' }}>
+                      ₩{item.currentKRW.toLocaleString()}
+                    </td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1' }}>
+                      ₩{item.investedKRW.toLocaleString()}
+                    </td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right' }}>
+                      <span style={{ color: item.gainKRW >= 0 ? '#00C853' : '#F04438', fontWeight: '600' }}>
+                        {item.gainKRW >= 0 ? '+' : ''}{item.gainKRW.toLocaleString()}
+                      </span>
+                      <div style={{ fontSize: '11px', color: item.gainPercent >= 0 ? '#00C853' : '#F04438' }}>
+                        ({item.gainPercent >= 0 ? '+' : ''}{item.gainPercent}%)
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+
+        {/* 미래에셋 전체 합계 */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px',
+          backgroundColor: '#191F28',
+          borderRadius: '8px',
+          color: 'white',
+        }}>
+          <span style={{ fontWeight: '600' }}>미래에셋 전체 합계</span>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '16px', fontWeight: '700' }}>
+              ₩{MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.totalKRW, 0).toLocaleString()}
+            </div>
+            <div style={{
+              fontSize: '12px',
+              color: MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0) >= 0 ? '#4ADE80' : '#F87171'
+            }}>
+              {MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0) >= 0 ? '+' : ''}
+              ₩{MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0).toLocaleString()}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 공모주 청약 */}
