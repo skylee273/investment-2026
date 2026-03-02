@@ -6,6 +6,22 @@ npm run dev -- --port 1234 & sleep 2 && open http://localhost:1234
 
 ---
 
+# 배포 정보
+
+## 웹사이트
+**https://investment-2026.vercel.app**
+
+## GitHub
+**https://github.com/skylee273/investment-2026**
+
+## 배포 명령어
+```bash
+git add -A && git commit -m "업데이트" && git push
+npx vercel --prod
+```
+
+---
+
 # 프로젝트 메모리
 
 ## 프로젝트 개요
@@ -13,18 +29,12 @@ npm run dev -- --port 1234 & sleep 2 && open http://localhost:1234
 - **목적**: 개인 포트폴리오 기반 투자 리서치 도구
 
 ## 핵심 기능
-1. **뉴스 대시보드** (`/`) - 증권/부동산 뉴스, 직접 추가 가능
-2. **하우가 패밀리** (`/portfolio`) - 포트폴리오 관리
-3. **관심 종목** (`/watchlist`) - 관심 종목 추적
-4. **기관투자자** (`/whales`) - 기관 동향
-5. **시장 심리** (`/sentiment`) - 시장 심리 지표
-6. **투자 캘린더** (`/calendar`) - 일정 관리
-7. **투자 일지** (`/journal`) - 투자 기록
-8. **투자 학습** (`/learn`) - 학습 자료
-9. **리포트** (`/reports`) - 마크다운 에디터로 작성/편집
-10. **가윤 달리오** (`/gayoon`) - 포트폴리오 분석
-11. **수익률 대결** (`/battle`) - 수익률 비교
-12. **절세 가이드** (`/tax`) - 절세 마스터플랜 (HTML 브로셔)
+1. **하우가 패밀리** (`/`) - 포트폴리오 관리
+2. **기관투자자** (`/whales`) - 기관 동향 (13F 공시 기반)
+3. **투자 학습** (`/learn`) - 학습 자료
+4. **가윤 달리오** (`/gayoon`) - 자산현황 + 실시간 수익률
+5. **수익률 대결** (`/battle`) - 하늘 vs 가윤 (2026.12.24까지)
+6. **절세 가이드** (`/tax`) - 절세 마스터플랜 (HTML 브로셔)
 
 ## 기술 스택
 - React + Vite
@@ -88,30 +98,16 @@ src/
 ├── App.jsx                   # 라우터 설정
 ├── main.jsx
 ├── contexts/DataContext.jsx  # 전역 데이터 관리
-├── data/
-│   ├── sectors.js           # 섹터, 연결유형 정의
-│   └── generateData.js      # 대량 데이터 생성기
 ├── pages/
-│   ├── HomePage.jsx         # 뉴스 대시보드
-│   ├── PortfolioPage.jsx    # 하우가 패밀리
-│   ├── WatchlistPage.jsx    # 관심 종목
+│   ├── PortfolioPage.jsx    # 하우가 패밀리 (메인)
 │   ├── WhalesPage.jsx       # 기관투자자
-│   ├── MarketSentimentPage.jsx # 시장 심리
-│   ├── CalendarPage.jsx     # 투자 캘린더
-│   ├── JournalPage.jsx      # 투자 일지
 │   ├── LearnPage.jsx        # 투자 학습
-│   ├── ReportsPage.jsx      # 리포트 목록
-│   ├── ReportDetailPage.jsx # 리포트 상세
-│   ├── ReportEditorPage.jsx # 리포트 편집
-│   ├── GayoonWealthPage.jsx # 가윤 달리오
+│   ├── GayoonWealthPage.jsx # 가윤 달리오 (실시간 시세)
 │   ├── PortfolioReportPage.jsx # 포트폴리오 리포트
 │   ├── PortfolioBattlePage.jsx # 수익률 대결
 │   └── TaxGuidePage.jsx     # 절세 가이드 (iframe)
 ├── components/
-│   ├── Layout/Layout.jsx    # 사이드바 네비게이션
-│   ├── News/NewsCard.jsx, NewsForm.jsx
-│   ├── Reports/ReportCard.jsx
-│   └── Chain/NetworkGraph.jsx (미사용)
+│   └── Layout/Layout.jsx    # 사이드바 네비게이션
 └── public/
     └── tax-guide.html       # 절세 브로셔 원본 HTML
 ```
