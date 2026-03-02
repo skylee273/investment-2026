@@ -1545,6 +1545,33 @@ export default function GayoonWealthPage() {
                 })()}
               </strong>
             </span>
+            <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#4E5968' }}>
+              수익률: {(() => {
+                const filtered = GAYOON_ALL_HOLDINGS
+                  .map(item => {
+                    if (item.isCrypto && item.ticker === 'BTC') {
+                      const currentValue = item.btcAmount * (prices.btc || 125000000)
+                      return { ...item, currentKRW: currentValue, gainKRW: currentValue - item.investedKRW }
+                    }
+                    return item
+                  })
+                  .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
+                const totalInvested = filtered.reduce((acc, item) => acc + item.investedKRW, 0)
+                const totalGain = filtered.reduce((acc, item) => acc + item.gainKRW, 0)
+                const totalPercent = totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0
+                return (
+                  <strong style={{
+                    color: totalPercent >= 0 ? '#00C853' : '#F04438',
+                    padding: '2px 6px',
+                    backgroundColor: totalPercent >= 0 ? '#E8F5E9' : '#FFEBEE',
+                    borderRadius: '4px',
+                    marginLeft: '4px',
+                  }}>
+                    {totalPercent >= 0 ? '+' : ''}{totalPercent.toFixed(2)}%
+                  </strong>
+                )
+              })()}
+            </span>
           </div>
         </div>
 
