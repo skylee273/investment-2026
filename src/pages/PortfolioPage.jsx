@@ -19,6 +19,7 @@ const REALIZED_GAINS = {
 
 // 토스증권 보유 종목 (소수점 주식)
 const TOSS_HOLDINGS = [
+  { ticker: 'ADA', name: '에이다 (카르다노)', shares: 0, currentKRW: 63529, gainKRW: 3452, gainPercent: 5.75, type: 'crypto' },
   { ticker: 'AMZN', name: '아마존', shares: 1.218978, currentKRW: 357500, gainKRW: -48109, gainPercent: -11.8 },
   { ticker: 'GOOG', name: '알파벳 C', shares: 0.141936, currentKRW: 61640, gainKRW: -2000, gainPercent: -3.1 },
   { ticker: 'MSFT', name: '마이크로소프트', shares: 0.076658, currentKRW: 42545, gainKRW: -5044, gainPercent: -10.5 },
