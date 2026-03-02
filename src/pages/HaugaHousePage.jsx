@@ -1,14 +1,51 @@
 import { useState, useEffect } from 'react'
 
-// 현재 자산 현황 (주택 구매용)
-const HOUSE_FUND_ASSETS = [
-  { id: 'deposit', name: '전세 보증금', amount: 45000000, icon: '🏢', available: '2026.07', note: '현재 거주 중' },
-  { id: 'family', name: '가족 지원금', amount: 20000000, icon: '👨‍👩‍👧', available: '2026.06', note: '확정' },
-  { id: 'savings', name: '청약저축', amount: 6220000, icon: '🏠', available: '즉시', note: '1순위 충족' },
-  { id: 'youth', name: '청년도약계좌', amount: 16800000, icon: '🚀', available: '2030', note: '5년 만기' },
-  { id: 'investment', name: '투자자산 (예상)', amount: 50000000, icon: '📈', available: '2027', note: 'ISA+연금저축+주식' },
-  { id: 'cma', name: 'CMA 현금', amount: 7738854, icon: '💵', available: '즉시', note: '비상금' },
+// ===== 하늘 자산 (하우가 패밀리) =====
+const HANEUL_ASSETS = [
+  { id: 'toss', name: '토스증권 (소수점)', amount: 686187, icon: '📱', available: '즉시', note: '18개 종목' },
+  { id: 'mirae-pension', name: '연금저축 (미래에셋)', amount: 827010, icon: '🧓', available: '55세 이후', note: '+6.31%' },
+  { id: 'mirae-isa', name: 'ISA (미래에셋)', amount: 504089, icon: '📊', available: '3년 후', note: '+0.96%' },
+  { id: 'mirae-stock', name: '종합주식 (미래에셋)', amount: 740637, icon: '📈', available: '즉시', note: '-0.52%' },
+  { id: 'mirae-cma', name: 'CMA 비상금', amount: 600179, icon: '💰', available: '즉시', note: '미래에셋' },
+  { id: 'mirae-trip', name: 'CMA 가족여행', amount: 410119, icon: '✈️', available: '즉시', note: '미래에셋' },
+  { id: 'hanwha', name: '한화생명 저축보험', amount: 12390000, icon: '🛡️', available: '만기시', note: '59/144회 납입' },
+  { id: 'housing', name: '청약저축', amount: 720000, icon: '🏠', available: '즉시', note: '1순위 달성' },
 ]
+
+// ===== 가윤 자산 (가윤 달리오) =====
+const GAYOON_ASSETS = [
+  // 고정자산
+  { id: 'youth', name: '청년도약계좌', amount: 16800000, icon: '🚀', available: '2030', note: '5년 만기', category: '고정' },
+  { id: 'housing', name: '청약저축', amount: 6220000, icon: '🏠', available: '즉시', note: '1순위 충족', category: '고정' },
+  { id: 'isa', name: 'ISA (삼성증권)', amount: 20041099, icon: '📊', available: '3년 후', note: '+0.21%', category: '고정' },
+  { id: 'pension', name: '연금저축 (미래에셋)', amount: 3999404, icon: '🧓', available: '55세 이후', note: '-0.02%', category: '고정' },
+  // 비변동성 자산
+  { id: 'sp500', name: 'S&P500 + 배당주', amount: 24796498, icon: '📈', available: '즉시', note: '+8.96%', category: '투자' },
+  { id: 'amazon', name: '아마존 (AMZN)', amount: 2638715, icon: '🛒', available: '즉시', note: '9주 · -5.15%', category: '투자' },
+  { id: 'btc', name: '비트코인', amount: 990775, icon: '₿', available: '즉시', note: '0.0102 BTC', category: '투자' },
+  { id: 'family', name: '가족 받을 돈', amount: 20000000, icon: '👨‍👩‍👧', available: '2026.06', note: '확정', category: '예정' },
+  { id: 'deposit', name: '전세 보증금', amount: 45000000, icon: '🏢', available: '2026.07', note: '현재 거주 중', category: '예정' },
+  // 변동성 자산
+  { id: 'cma', name: 'CMA (삼성증권)', amount: 7738854, icon: '💵', available: '즉시', note: '+0.02%', category: '현금' },
+  { id: 'savings', name: '자율적금', amount: 4500000, icon: '💰', available: '2026.09', note: '1년 만기', category: '현금' },
+  { id: 'irp', name: 'IRP (삼성증권)', amount: 273323, icon: '🏦', available: '55세 이후', note: '+36.66%', category: '고정' },
+]
+
+// 합산 자산 (주택 구매용 - 즉시/2027년까지 활용 가능한 것만)
+const HOUSE_FUND_SUMMARY = {
+  haneul: {
+    total: HANEUL_ASSETS.reduce((sum, a) => sum + a.amount, 0),
+    available2027: HANEUL_ASSETS.filter(a =>
+      a.available === '즉시' || a.available === '3년 후'
+    ).reduce((sum, a) => sum + a.amount, 0),
+  },
+  gayoon: {
+    total: GAYOON_ASSETS.reduce((sum, a) => sum + a.amount, 0),
+    available2027: GAYOON_ASSETS.filter(a =>
+      a.available === '즉시' || a.available === '2026.06' || a.available === '2026.07' || a.available === '2026.09' || a.available === '3년 후'
+    ).reduce((sum, a) => sum + a.amount, 0),
+  },
+}
 
 // 목표 주택 옵션
 const TARGET_HOMES = [
@@ -66,31 +103,34 @@ const SUBSCRIPTION_INFO = {
   specialSupplyEligible: ['신혼부부', '생애최초'],
 }
 
-// 정부 지원 정책
+// 정부 지원 정책 (2026년 기준, 출처 포함)
 const GOVERNMENT_POLICIES = [
   {
-    id: 'newlywed-loan',
-    name: '신혼부부 전용 버팀목대출',
-    rate: '연 1.5~2.7%',
-    limit: '4억원',
-    condition: '혼인 7년 이내, 부부합산 소득 8,500만원 이하',
-    note: '우대금리 적용 가능',
+    id: 'didimdol',
+    name: '내집마련 디딤돌대출',
+    rate: '연 2.0~3.3% (우대 시 최저 1.2%)',
+    limit: '일반 2억, 신혼가구 3.2억',
+    condition: '무주택 세대주, 신혼 연소득 8,500만원 이하',
+    note: '생애최초 LTV 80%, 담보주택 6억원 이하',
+    source: '한국주택금융공사 (hf.go.kr)',
   },
   {
-    id: 'firsthome-loan',
-    name: '생애최초 주택구입 대출',
-    rate: '연 2.2~3.0%',
-    limit: '5억원',
-    condition: '무주택자, 소득 9,000만원 이하',
-    note: 'LTV 80%, DTI 60%',
+    id: 'newlywed-lease',
+    name: '신혼가구 전용 버팀목 전세대출',
+    rate: '연 1.9~3.3% (우대 시 최저 1.0%)',
+    limit: '최대 2.4억 (보증금 80%)',
+    condition: '혼인 7년 이내 또는 3개월 내 결혼예정',
+    note: '전세보증금 5억원까지 (수도권)',
+    source: '마이홈포털 (myhome.go.kr)',
   },
   {
-    id: 'youth-loan',
-    name: '청년 버팀목 전세대출',
-    rate: '연 1.5~2.1%',
-    limit: '2억원',
-    condition: '만 19~34세, 소득 5,000만원 이하',
-    note: '전세 보증금 지원',
+    id: 'newbaby',
+    name: '신생아 특례 대출 (디딤돌/버팀목)',
+    rate: '연 1.3~4.3%',
+    limit: '주택구입 최대 4억 / 전세 최대 2.4억',
+    condition: '2년 내 출산(입양), 소득 1.3억 이하',
+    note: 'LTV 70%, 생애최초 일부 구간 예외',
+    source: '뱅크샐러드 (banksalad.com)',
   },
   {
     id: 'special-supply',
@@ -99,6 +139,56 @@ const GOVERNMENT_POLICIES = [
     limit: '전용 85㎡ 이하',
     condition: '혼인 7년 이내, 무주택',
     note: '일반공급 대비 경쟁률 낮음',
+    source: '국토교통부 청약홈 (applyhome.co.kr)',
+  },
+]
+
+// 2025~2026 주요 부동산 정책 (출처 포함)
+const RECENT_POLICIES = [
+  {
+    id: 'policy-627',
+    date: '2025.06.27',
+    name: '6·27 부동산 대책',
+    content: '수도권/규제지역 주담대 한도 6억원 제한, LTV·DSR 규제 강화',
+    impact: '실수요자 대출 접근성 감소',
+    source: '금융위원회',
+    sourceUrl: 'https://www.fsc.go.kr',
+  },
+  {
+    id: 'policy-1015',
+    date: '2025.10.15',
+    name: '10·15 부동산 대책',
+    content: '시가 15억 초과 주택 최대 4억, 25억 초과 최대 2억 대출한도, 스트레스 금리 3.0%',
+    impact: '고가주택 대출 문턱 상승, 15억 이하 실수요자 영향 제한적',
+    source: '나무위키 (namu.wiki)',
+    sourceUrl: 'https://namu.wiki/w/10.15%20부동산%20대책',
+  },
+  {
+    id: 'policy-2026-lease',
+    date: '2026.04 예정',
+    name: '전세대출 규제',
+    content: '전세대출 한도 2억원 일원화, 보증료 차등 적용',
+    impact: '고가 전세 대출 어려움',
+    source: '금융위원회',
+    sourceUrl: 'https://www.fsc.go.kr',
+  },
+  {
+    id: 'policy-basic-housing',
+    date: '2026.상반기',
+    name: '기본주택 시범단지 입주자 모집',
+    content: '무주택자 대상 30년 이상 평생거주 공공임대, 소득/자산 무관',
+    impact: '청년/신혼부부 주거안정 기대',
+    source: '대한민국 정책브리핑 (korea.kr)',
+    sourceUrl: 'https://www.korea.kr',
+  },
+  {
+    id: 'policy-youth-housing',
+    date: '2026년',
+    name: '청년·신혼부부 공공임대 확대',
+    content: '청년 3.5만가구(+8천), 신혼 3.1만가구(+3천) 공급 확대',
+    impact: '공공임대 물량 증가',
+    source: '토스뱅크 (tossbank.com)',
+    sourceUrl: 'https://www.tossbank.com/articles/youth-2026',
   },
 ]
 
@@ -127,11 +217,13 @@ export default function HaugaHousePage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // 총 자산 계산
-  const totalAssets = HOUSE_FUND_ASSETS.reduce((sum, a) => sum + a.amount, 0)
-  const availableNow = HOUSE_FUND_ASSETS
-    .filter(a => a.available === '즉시' || a.available === '2026.06' || a.available === '2026.07')
-    .reduce((sum, a) => sum + a.amount, 0)
+  // 총 자산 계산 (하늘 + 가윤 합산)
+  const haneulTotal = HOUSE_FUND_SUMMARY.haneul.total
+  const gayoonTotal = HOUSE_FUND_SUMMARY.gayoon.total
+  const totalAssets = haneulTotal + gayoonTotal
+  const haneulAvailable = HOUSE_FUND_SUMMARY.haneul.available2027
+  const gayoonAvailable = HOUSE_FUND_SUMMARY.gayoon.available2027
+  const availableNow = haneulAvailable + gayoonAvailable
 
   // 월 상환액 계산 (원리금균등상환)
   const calculateMonthlyPayment = (principal, annualRate, years) => {
@@ -451,12 +543,12 @@ export default function HaugaHousePage() {
       </div>
 
       <div style={styles.grid}>
-        {/* 주택 구매 자금 현황 */}
+        {/* 하늘 자산 현황 */}
         <div style={styles.card}>
           <div style={styles.cardTitle}>
-            <span>💰</span> 주택 구매 자금
+            <span>☀️</span> 하늘 자산 (하우가 패밀리)
           </div>
-          {HOUSE_FUND_ASSETS.map(asset => (
+          {HANEUL_ASSETS.map(asset => (
             <div key={asset.id} style={styles.assetItem}>
               <div style={styles.assetName}>
                 <span style={styles.assetIcon}>{asset.icon}</span>
@@ -472,14 +564,84 @@ export default function HaugaHousePage() {
           ))}
           <div style={styles.totalBox}>
             <div style={styles.totalRow}>
-              <span style={styles.totalLabel}>총 자산</span>
-              <span style={styles.totalAmount}>₩{totalAssets.toLocaleString()}</span>
+              <span style={styles.totalLabel}>하늘 총 자산</span>
+              <span style={{ ...styles.totalAmount, color: '#FF6B35' }}>₩{haneulTotal.toLocaleString()}</span>
             </div>
             <div style={{ ...styles.totalRow, marginBottom: 0 }}>
               <span style={styles.totalLabel}>2027년 활용 가능</span>
-              <span style={{ ...styles.totalAmount, fontSize: isMobile ? '16px' : '18px', color: '#00C853' }}>
-                ₩{availableNow.toLocaleString()}
+              <span style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: '#00C853' }}>
+                ₩{haneulAvailable.toLocaleString()}
               </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 가윤 자산 현황 */}
+        <div style={styles.card}>
+          <div style={styles.cardTitle}>
+            <span>💜</span> 가윤 자산 (가윤 달리오)
+          </div>
+          {GAYOON_ASSETS.map(asset => (
+            <div key={asset.id} style={styles.assetItem}>
+              <div style={styles.assetName}>
+                <span style={styles.assetIcon}>{asset.icon}</span>
+                <div>
+                  <div style={styles.assetLabel}>{asset.name}</div>
+                  <div style={styles.assetNote}>{asset.note} · {asset.available}</div>
+                </div>
+              </div>
+              <div style={styles.assetAmount}>
+                ₩{asset.amount.toLocaleString()}
+              </div>
+            </div>
+          ))}
+          <div style={styles.totalBox}>
+            <div style={styles.totalRow}>
+              <span style={styles.totalLabel}>가윤 총 자산</span>
+              <span style={{ ...styles.totalAmount, color: '#9C27B0' }}>₩{gayoonTotal.toLocaleString()}</span>
+            </div>
+            <div style={{ ...styles.totalRow, marginBottom: 0 }}>
+              <span style={styles.totalLabel}>2027년 활용 가능</span>
+              <span style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: '#00C853' }}>
+                ₩{gayoonAvailable.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 합산 요약 카드 */}
+        <div style={{ ...styles.card, ...styles.fullWidth, backgroundColor: '#F0F7FF', border: '2px solid #3182F6' }}>
+          <div style={styles.cardTitle}>
+            <span>🏠</span> 하우가 합산 자산
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
+            gap: '16px',
+          }}>
+            <div style={{ textAlign: 'center', padding: '12px' }}>
+              <div style={{ fontSize: '12px', color: '#4E5968', marginBottom: '4px' }}>하늘</div>
+              <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: '700', color: '#FF6B35' }}>
+                {(haneulTotal / 100000000).toFixed(2)}억
+              </div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '12px' }}>
+              <div style={{ fontSize: '12px', color: '#4E5968', marginBottom: '4px' }}>가윤</div>
+              <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: '700', color: '#9C27B0' }}>
+                {(gayoonTotal / 100000000).toFixed(2)}억
+              </div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '12px' }}>
+              <div style={{ fontSize: '12px', color: '#4E5968', marginBottom: '4px' }}>합계</div>
+              <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: '700', color: '#3182F6' }}>
+                {(totalAssets / 100000000).toFixed(2)}억
+              </div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '12px', backgroundColor: '#E8F5E9', borderRadius: '8px' }}>
+              <div style={{ fontSize: '12px', color: '#00C853', marginBottom: '4px' }}>2027년 활용 가능</div>
+              <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: '700', color: '#00C853' }}>
+                {(availableNow / 100000000).toFixed(2)}억
+              </div>
             </div>
           </div>
         </div>
@@ -645,10 +807,10 @@ export default function HaugaHousePage() {
           </div>
         </div>
 
-        {/* 정부 지원 정책 */}
+        {/* 정부 지원 정책 (출처 포함) */}
         <div style={styles.card}>
           <div style={styles.cardTitle}>
-            <span>🏛️</span> 정부 지원 정책
+            <span>🏛️</span> 정부 지원 정책 (2026년 기준)
           </div>
           {GOVERNMENT_POLICIES.map(policy => (
             <div key={policy.id} style={styles.policyCard}>
@@ -658,6 +820,37 @@ export default function HaugaHousePage() {
               </div>
               <div style={styles.policyDetail}>조건: {policy.condition}</div>
               <div style={{ ...styles.policyDetail, color: '#3182F6', marginTop: '4px' }}>💡 {policy.note}</div>
+              <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#8B95A1', marginTop: '6px' }}>
+                📎 출처: {policy.source}
+              </div>
+            </div>
+          ))}
+          <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#8B95A1', marginTop: '8px', padding: '8px', backgroundColor: '#F7F8FA', borderRadius: '6px' }}>
+            ⚠️ 정책 내용은 수시로 변경될 수 있습니다. 최신 정보는 각 기관 공식 사이트에서 확인하세요.
+          </div>
+        </div>
+
+        {/* 2025~2026 주요 부동산 정책 */}
+        <div style={styles.card}>
+          <div style={styles.cardTitle}>
+            <span>📋</span> 최근 부동산 정책 (2025~2026)
+          </div>
+          {RECENT_POLICIES.map(policy => (
+            <div key={policy.id} style={{ ...styles.policyCard, borderLeft: '3px solid #3182F6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#3182F6', fontWeight: '600' }}>{policy.date}</span>
+                <span style={styles.badge(policy.impact.includes('감소') || policy.impact.includes('어려움') ? 'orange' : 'green')}>
+                  {policy.impact.includes('감소') || policy.impact.includes('어려움') ? '주의' : '긍정'}
+                </span>
+              </div>
+              <div style={styles.policyName}>{policy.name}</div>
+              <div style={styles.policyDetail}>{policy.content}</div>
+              <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#4E5968', marginTop: '4px' }}>
+                📌 영향: {policy.impact}
+              </div>
+              <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#8B95A1', marginTop: '4px' }}>
+                📎 출처: {policy.source}
+              </div>
             </div>
           ))}
         </div>
