@@ -89,27 +89,29 @@ const TRACKED_ASSETS = [
   },
 ]
 
-// 1. 고정자산 (빼면 손해나는 자산)
+// 1. 고정자산 (빼면 손해나는 자산) - 청년도약계좌, 청약저축, ISA, 연금저축
 const FIXED_ASSETS = [
   { id: 'youth-account', name: '청년 도약 계좌', icon: '🚀', currentKRW: 16800000, note: '5년 만기 · 6%+정부기여금' },
   { id: 'housing', name: '청약저축', icon: '🏠', currentKRW: 6220000, note: '1순위 충족 · 2.3%' },
   { id: 'isa', name: 'ISA', icon: '📈', currentKRW: 20041099, investedKRW: 19999709, gainKRW: 41390, gainPercent: 0.21, note: '삼성증권 · +0.21%' },
   { id: 'pension', name: '연금저축', icon: '🧓', currentKRW: 3999404, investedKRW: 4000204, gainKRW: -800, gainPercent: -0.02, note: '한화증권 · -0.02%' },
-  { id: 'irp', name: 'IRP (퇴직연금)', icon: '🏦', currentKRW: 273323, investedKRW: 200000, gainKRW: 73323, gainPercent: 36.66, note: '삼성증권 · +36.66%' },
 ]
 
-// 2. 비변동성 자산 (투자 중인 자산 + 받을 돈)
+// 2. 비변동성 자산 (투자 중인 자산 + 받을 돈) - S&P500, 아마존, 비트코인, 가족받을돈, 전세보증금
 const STABLE_ASSETS = [
   { id: 'sp500-dividend', name: 'S&P500 + 배당주', icon: '📈', currentKRW: 24796498, investedKRW: 22758816, gainKRW: 2037682, gainPercent: 8.96, note: '삼성증권 · +8.96%', type: 'stock' },
-  // 아마존, 비트코인은 TRACKED_ASSETS에서 가져옴
+  { id: 'amazon', name: '아마존 (AMZN)', icon: '🛒', currentKRW: 2638715, investedKRW: 2782034, gainKRW: -143319, gainPercent: -5.15, note: '한화증권 · 9주', type: 'stock' },
+  { id: 'bitcoin', name: '비트코인 (BTC)', icon: '₿', currentKRW: 990775, investedKRW: 999500, gainKRW: -8724, gainPercent: -0.87, note: '업비트 · 0.0102 BTC', type: 'crypto' },
   { id: 'family', name: '가족 받을 돈', icon: '👨‍👩‍👧', currentKRW: 20000000, note: '6월 수령 예정', type: 'receivable' },
   { id: 'deposit', name: '전세 보증금', icon: '🏢', currentKRW: 45000000, note: '7월 수령 예정', type: 'receivable' },
 ]
 
-// 3. 변동성 자산 (언제든 쓸 수 있는 자산)
+// 3. 변동성 자산 (언제든 쓸 수 있는 자산) - CMA, 자율적금, IRP, 추가 연금저축
 const LIQUID_ASSETS = [
   { id: 'cma', name: 'CMA', icon: '💵', currentKRW: 7738854, investedKRW: 7737693, gainKRW: 1161, gainPercent: 0.02, note: '삼성증권 · +0.02%' },
   { id: 'free-savings', name: '자율적금', icon: '💰', currentKRW: 4500000, note: '1년 만기 · 2026-09 · 3.3%' },
+  { id: 'irp', name: 'IRP (퇴직연금)', icon: '🏦', currentKRW: 273323, investedKRW: 200000, gainKRW: 73323, gainPercent: 36.66, note: '삼성증권 · +36.66%' },
+  { id: 'pension-extra', name: '추가 연금저축', icon: '💸', currentKRW: 0, investedKRW: 0, gainKRW: 0, gainPercent: 0, note: '월 60만원 예정' },
 ]
 
 // 전체 보유 종목 통합 (실제 데이터 기반 - 2026.03.02)
