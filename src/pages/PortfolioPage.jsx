@@ -40,10 +40,7 @@ const TOSS_HOLDINGS = [
 ]
 
 // 토스증권 ETF/채권
-const TOSS_ETFS = [
-  { name: 'TIGER 미국채 15', shares: 15, currentKRW: 199050, investedKRW: 198375, gainKRW: 675, gainPercent: 0.34 },
-  { name: '발행어음CMA', shares: 0, currentKRW: 600179, investedKRW: 600032, gainKRW: 147, gainPercent: 0.02 },
-]
+const TOSS_ETFS = []
 
 // 미래에셋증권 보유 종목
 const MIRAE_HOLDINGS = [
@@ -1013,32 +1010,34 @@ export default function PortfolioPage() {
         </div>
 
         {/* 토스 ETF/채권 */}
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: '600', color: '#8B95A1', marginBottom: '8px' }}>ETF/채권/CMA</div>
-          <div style={{ display: 'grid', gap: '8px' }}>
-            {TOSS_ETFS.map((item, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '12px',
-                backgroundColor: '#F7F8FA',
-                borderRadius: '8px',
-              }}>
-                <div>
-                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
-                  {item.shares > 0 && <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.shares}주</div>}
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '14px', fontWeight: '600' }}>₩{item.currentKRW.toLocaleString()}</div>
-                  <div style={{ fontSize: '11px', color: item.gainKRW >= 0 ? '#00C853' : '#F04438' }}>
-                    {item.gainKRW >= 0 ? '+' : ''}{item.gainKRW.toLocaleString()}원 ({item.gainPercent}%)
+        {TOSS_ETFS.length > 0 && (
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#8B95A1', marginBottom: '8px' }}>ETF/채권/CMA</div>
+            <div style={{ display: 'grid', gap: '8px' }}>
+              {TOSS_ETFS.map((item, idx) => (
+                <div key={idx} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px',
+                  backgroundColor: '#F7F8FA',
+                  borderRadius: '8px',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
+                    {item.shares > 0 && <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.shares}주</div>}
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '14px', fontWeight: '600' }}>₩{item.currentKRW.toLocaleString()}</div>
+                    <div style={{ fontSize: '11px', color: item.gainKRW >= 0 ? '#00C853' : '#F04438' }}>
+                      {item.gainKRW >= 0 ? '+' : ''}{item.gainKRW.toLocaleString()}원 ({item.gainPercent}%)
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 토스 해외주식 */}
         <div style={{ fontSize: '13px', fontWeight: '600', color: '#8B95A1', marginBottom: '8px' }}>해외주식 (소수점)</div>
