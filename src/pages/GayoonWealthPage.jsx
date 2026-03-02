@@ -306,55 +306,80 @@ const styles = {
 export default function GayoonWealthPage() {
   const navigate = useNavigate()
   const [currentQuarter, setCurrentQuarter] = useState('Q1')
-  const [prices, setPrices] = useState({ btc: null, amzn: null, usdkrw: 1450 })
-  const [loading, setLoading] = useState(true)
+
+  // localStorage에서 캐시된 가격 불러오기
+  const getCachedPrices = () => {
+    try {
+      const cached = localStorage.getItem('btcPrice')
+      if (cached) {
+        const { price, timestamp } = JSON.parse(cached)
+        // 1시간 이내 캐시는 유효
+        if (Date.now() - timestamp < 3600000) {
+          return price
+        }
+      }
+    } catch {}
+    return 125000000 // 기본값 1.25억
+  }
+
+  const [prices, setPrices] = useState({ btc: getCachedPrices(), usdkrw: 1450 })
+  const [loading, setLoading] = useState(false)
   const [lastUpdate, setLastUpdate] = useState(null)
 
-  // 실시간 시세 가져오기
+  // 실시간 시세 가져오기 (5분마다, 에러 방지)
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        // BTC 가격 (CoinGecko)
-        const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=krw')
-        const btcData = await btcRes.json()
+        // BTC 가격 (CoinGecko) - 에러 시 캐시 사용
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000) // 5초 타임아웃
 
-        // AMZN 가격 + 환율 (Yahoo Finance via proxy or fallback)
-        // 무료 API 제한으로 환율은 고정값 사용, 주가는 추정
-        const usdkrw = 1450 // 환율 고정
+        const btcRes = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=krw',
+          { signal: controller.signal }
+        )
+        clearTimeout(timeoutId)
 
-        // Yahoo Finance API (CORS 우회 필요하므로 간단히 추정값 사용)
-        // 실제 서비스에서는 백엔드 프록시 필요
-        let amznPrice = null
-        try {
-          const amznRes = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/AMZN?interval=1d&range=1d')
-          const amznData = await amznRes.json()
-          amznPrice = amznData?.chart?.result?.[0]?.meta?.regularMarketPrice
-        } catch {
-          amznPrice = 220 // fallback
+        if (btcRes.ok) {
+          const btcData = await btcRes.json()
+          const btcPrice = btcData?.bitcoin?.krw
+
+          if (btcPrice) {
+            // localStorage에 캐시 저장
+            localStorage.setItem('btcPrice', JSON.stringify({
+              price: btcPrice,
+              timestamp: Date.now()
+            }))
+
+            setPrices(prev => ({ ...prev, btc: btcPrice }))
+            setLastUpdate(new Date())
+          }
         }
-
-        setPrices({
-          btc: btcData?.bitcoin?.krw || null,
-          amzn: amznPrice,
-          usdkrw: usdkrw,
-        })
-        setLastUpdate(new Date())
       } catch (error) {
-        console.error('가격 조회 실패:', error)
+        // 에러 시 조용히 무시 (캐시된 값 사용)
+        console.log('시세 조회 스킵:', error.name)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchPrices()
-    const interval = setInterval(fetchPrices, 60000) // 1분마다 갱신
-    return () => clearInterval(interval)
+    // 첫 로드 시 약간 지연 후 fetch (rate limit 방지)
+    const initialDelay = setTimeout(fetchPrices, 1000)
+
+    // 5분마다 갱신 (rate limit 방지)
+    const interval = setInterval(fetchPrices, 300000)
+
+    return () => {
+      clearTimeout(initialDelay)
+      clearInterval(interval)
+    }
   }, [])
 
-  // 실시간 자산 계산
+  // 실시간 자산 계산 (prices.btc가 없어도 기본값 사용)
   const trackedAssetsWithReturns = TRACKED_ASSETS.map(asset => {
-    if (asset.type === 'crypto' && prices.btc) {
-      const currentValue = asset.btcAmount * prices.btc
+    if (asset.type === 'crypto') {
+      const btcPrice = prices.btc || 125000000 // 기본값 1.25억
+      const currentValue = asset.btcAmount * btcPrice
       const returnRate = ((currentValue - asset.investedKRW) / asset.investedKRW) * 100
       return { ...asset, currentKRW: currentValue, returnRate }
     }
