@@ -23,7 +23,7 @@ const CASH_ACCOUNTS = [
   { id: 'parking', name: '파킹계좌', icon: '🅿️', targetKRW: 900000, currentKRW: 0, depositDay: 25, note: '비상금 (언제든 출금 가능)' },
   { id: 'cma-trip', name: 'CMA (가족여행)', icon: '✈️', targetKRW: 0, currentKRW: 400000, depositDay: null, note: '하우가 가족여행' },
   { id: 'cma-emergency', name: 'CMA (비상금)', icon: '💳', targetKRW: 1000000, currentKRW: 600000, depositDay: 25, note: '비상금 (증권사 CMA)' },
-  { id: 'hanwha-insurance', name: '한화생명보험저축', icon: '🛡️', targetKRW: 0, currentKRW: 210000, depositDay: null, depositCount: 59, targetCount: 144, note: '월 59/144회 납입 완료' },
+  { id: 'hanwha-insurance', name: '한화생명보험저축', icon: '🛡️', targetKRW: 30240000, currentKRW: 12390000, depositDay: null, monthlyDeposit: 210000, depositCount: 59, targetCount: 144, note: '월 21만원 × 59/144회 납입' },
   { id: 'housing', name: '청약저축', icon: '🏠', targetKRW: 3000000, currentKRW: 720000, depositDay: 25, monthlyDeposit: 20000, depositCount: 36, targetCount: 24, note: '1순위 달성 (36회 납입)' },
   { id: 'pension', name: '연금저축 ETF', icon: '🧓', targetKRW: 6000000, currentKRW: 827010, depositDay: 25, monthlyDeposit: 500000, note: '세액공제 연 600만원 한도' },
   { id: 'isa', name: 'ISA', icon: '📈', targetKRW: 20000000, currentKRW: 504089, depositDay: 25, monthlyDeposit: 0, note: '비과세 200만원 한도 (3년 유지 필수)' },
