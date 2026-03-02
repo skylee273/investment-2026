@@ -50,6 +50,17 @@ const HOUSE_FUND_SUMMARY = {
 // 목표 주택 옵션
 const TARGET_HOMES = [
   {
+    id: 'apt-target',
+    type: '목표 아파트 (6~7억)',
+    size: '59~84㎡ (24~34평)',
+    priceRange: '6~7억',
+    avgPrice: 650000000,
+    regions: ['경기 수도권', '인천 송도', '수원/용인', '3기 신도시'],
+    pros: ['청약 활용 가능', '신혼부부 특별공급', '적정 가격대'],
+    cons: ['경쟁률 높음', '입주까지 대기'],
+    recommended: true,
+  },
+  {
     id: 'apt-small',
     type: '아파트 (소형)',
     size: '59㎡ (24평)',
@@ -63,31 +74,21 @@ const TARGET_HOMES = [
     id: 'apt-medium',
     type: '아파트 (중형)',
     size: '84㎡ (34평)',
-    priceRange: '6~9억',
-    avgPrice: 750000000,
+    priceRange: '7~9억',
+    avgPrice: 800000000,
     regions: ['경기 수도권', '분당', '용인'],
     pros: ['가족 생활 적합', '학군 선택 가능'],
     cons: ['높은 가격', '경쟁 치열'],
   },
   {
-    id: 'villa',
-    type: '빌라/다세대',
-    size: '66㎡ (20평)',
-    priceRange: '2~4억',
-    avgPrice: 300000000,
-    regions: ['서울 외곽', '경기'],
-    pros: ['낮은 가격', '즉시 입주'],
-    cons: ['시세 상승 제한', '관리비 변동'],
-  },
-  {
     id: 'newtown',
-    type: '신축 분양',
+    type: '신축 분양 (청약)',
     size: '84㎡ (34평)',
     priceRange: '5~8억',
     avgPrice: 650000000,
     regions: ['GTX 역세권', '3기 신도시'],
-    pros: ['청약 활용', '새 아파트'],
-    cons: ['입주까지 2~3년', '분양가 상승'],
+    pros: ['청약 활용', '새 아파트', '분양가 상한제'],
+    cons: ['입주까지 2~3년', '당첨 경쟁'],
   },
 ]
 
@@ -499,7 +500,7 @@ export default function HaugaHousePage() {
       <div style={styles.header}>
         <h1 style={styles.title}>하우가 하우스</h1>
         <p style={styles.subtitle}>
-          하늘 & 가윤의 내 집 마련 프로젝트 | 목표: 2027~2028년
+          하늘 & 가윤의 내 집 마련 프로젝트 | 2027 전세 → 2028 청약 매수 (6~7억)
         </p>
       </div>
 
@@ -900,7 +901,7 @@ export default function HaugaHousePage() {
         {/* 로드맵 */}
         <div style={{ ...styles.card, ...styles.fullWidth }}>
           <div style={styles.cardTitle}>
-            <span>🗺️</span> 내 집 마련 로드맵
+            <span>🗺️</span> 내 집 마련 로드맵 (2027 전세 → 2028 매수)
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '20px' }}>
             <div>
@@ -916,8 +917,8 @@ export default function HaugaHousePage() {
                 <div style={styles.timelineDot} />
                 <div style={styles.timelineContent}>
                   <div style={styles.timelineDate}>2026.07</div>
-                  <div style={styles.timelineTitle}>전세 보증금 회수</div>
-                  <div style={styles.timelineDesc}>4,500만원 확보 (임시 거주지 필요)</div>
+                  <div style={styles.timelineTitle}>현 전세 만기 → 신규 전세 이동</div>
+                  <div style={styles.timelineDesc}>보증금 4,500만원 활용, 2~3억 전세 이동</div>
                 </div>
               </div>
               <div style={styles.timelineItem}>
@@ -925,7 +926,15 @@ export default function HaugaHousePage() {
                 <div style={styles.timelineContent}>
                   <div style={styles.timelineDate}>2026.하반기</div>
                   <div style={styles.timelineTitle}>청약 신청 시작</div>
-                  <div style={styles.timelineDesc}>3기 신도시, GTX 역세권 위주</div>
+                  <div style={styles.timelineDesc}>3기 신도시, GTX 역세권 (6~7억대)</div>
+                </div>
+              </div>
+              <div style={styles.timelineItem}>
+                <div style={{ ...styles.timelineDot, backgroundColor: '#FF9800' }} />
+                <div style={styles.timelineContent}>
+                  <div style={{ ...styles.timelineDate, color: '#FF9800' }}>2027년</div>
+                  <div style={styles.timelineTitle}>전세 생활 + 자금 축적</div>
+                  <div style={styles.timelineDesc}>청약 지속 신청, 투자자산 수익 확보</div>
                 </div>
               </div>
             </div>
@@ -933,17 +942,17 @@ export default function HaugaHousePage() {
               <div style={styles.timelineItem}>
                 <div style={{ ...styles.timelineDot, backgroundColor: '#00C853' }} />
                 <div style={styles.timelineContent}>
-                  <div style={{ ...styles.timelineDate, color: '#00C853' }}>2027.상반기</div>
-                  <div style={styles.timelineTitle}>투자자산 정리</div>
-                  <div style={styles.timelineDesc}>ISA, 주식 일부 매도 (약 5,000만원)</div>
+                  <div style={{ ...styles.timelineDate, color: '#00C853' }}>2028년 목표</div>
+                  <div style={styles.timelineTitle}>청약 당첨 또는 매수</div>
+                  <div style={styles.timelineDesc}>6~7억 아파트 계약 (자기자본 1.3~1.5억 + 대출)</div>
                 </div>
               </div>
               <div style={styles.timelineItem}>
                 <div style={{ ...styles.timelineDot, backgroundColor: '#00C853' }} />
                 <div style={styles.timelineContent}>
-                  <div style={{ ...styles.timelineDate, color: '#00C853' }}>2027~2028</div>
-                  <div style={styles.timelineTitle}>주택 계약 & 입주</div>
-                  <div style={styles.timelineDesc}>청약 당첨 또는 매매 계약</div>
+                  <div style={{ ...styles.timelineDate, color: '#00C853' }}>2028~2029</div>
+                  <div style={styles.timelineTitle}>입주 준비</div>
+                  <div style={styles.timelineDesc}>잔금 납부, ISA/연금저축 일부 해지 검토</div>
                 </div>
               </div>
               <div style={styles.timelineItem}>
@@ -951,9 +960,21 @@ export default function HaugaHousePage() {
                 <div style={styles.timelineContent}>
                   <div style={{ ...styles.timelineDate, color: '#9C27B0' }}>2030</div>
                   <div style={styles.timelineTitle}>청년도약계좌 만기</div>
-                  <div style={styles.timelineDesc}>약 2,000만원+ 추가 확보 (중도상환용)</div>
+                  <div style={styles.timelineDesc}>약 2,000만원+ 확보 (대출 중도상환)</div>
                 </div>
               </div>
+            </div>
+          </div>
+          {/* 목표 요약 */}
+          <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#E8F3FF', borderRadius: '12px', border: '1px solid #3182F6' }}>
+            <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#3182F6', marginBottom: '8px' }}>
+              🎯 2028년 목표: 6~7억 아파트 매수
+            </div>
+            <div style={{ fontSize: isMobile ? '12px' : '13px', color: '#4E5968' }}>
+              • 필요 자기자본 (20%): 1.2~1.4억원<br/>
+              • 예상 대출 (LTV 80%): 4.8~5.6억원<br/>
+              • 월 상환액 (30년, 3.5%): 약 215~250만원<br/>
+              • 신혼부부 특별공급 + 생애최초 LTV 우대 활용
             </div>
           </div>
         </div>
