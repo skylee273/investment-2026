@@ -478,19 +478,50 @@ export default function GayoonWealthPage() {
         <div style={styles.rulesList}>
           <div style={styles.ruleItem}>
             <span>🔴</span>
-            <span><strong>손절:</strong> -15% 고려, -20% 무조건 실행 (무서워하면 안 된다)</span>
+            <span><strong>손절:</strong> -10% 하락 시 매도 (규칙만 정해도 편향성 제거)</span>
           </div>
           <div style={styles.ruleItem}>
             <span>🟢</span>
             <span><strong>익절:</strong> 최고가 대비 -10% 하락 시 매도</span>
           </div>
           <div style={styles.ruleItem}>
-            <span>📈</span>
-            <span><strong>원칙:</strong> 오르는 주식은 팔지 않는다</span>
+            <span>⚠️</span>
+            <span><strong>레버리지:</strong> 절대 안함 (ETF로 위험 분산)</span>
           </div>
           <div style={styles.ruleItem}>
             <span>🎯</span>
             <span><strong>전략:</strong> 무릎에 사서 어깨에 판다</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 시장 인사이트 */}
+      <div style={{
+        backgroundColor: '#F0F7FF',
+        borderRadius: '16px',
+        padding: '20px',
+        marginBottom: '24px',
+        border: '1px solid #BBDEFB',
+      }}>
+        <div style={{ fontSize: '14px', fontWeight: '700', color: '#1565C0', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>💡</span> 시장 인사이트
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#37474F' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <span>📊</span>
+            <span>자산 가격은 합리적 예상보다 훨씬 높게 형성됨</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <span>🤖</span>
+            <span>AI 버블 주의 - 인프라 부족으로 대중화까지 시간 필요</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <span>⚛️</span>
+            <span>양자컴퓨팅 - 너무 먼 미래, 기대값만 반영 중</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <span>🧠</span>
+            <span>손절은 어렵다 - 내 위험수용능력 파악이 먼저</span>
           </div>
         </div>
       </div>
