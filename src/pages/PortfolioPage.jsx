@@ -114,6 +114,27 @@ const MIRAE_ACCOUNTS = [
 // 미래에셋 전체 보유 종목 (기존 코드 호환용)
 const MIRAE_HOLDINGS = MIRAE_ACCOUNTS.flatMap(acc => acc.holdings)
 
+// 전체 보유 종목 통합 (토스 + 미래에셋)
+const ALL_HOLDINGS = [
+  // 토스증권
+  ...TOSS_HOLDINGS.map(h => ({
+    ...h,
+    broker: '토스증권',
+    account: '해외주식',
+    accountIcon: '🇺🇸',
+  })),
+  // 미래에셋증권 (계좌별)
+  ...MIRAE_ACCOUNTS.flatMap(acc =>
+    acc.holdings.map(h => ({
+      ...h,
+      broker: '미래에셋',
+      account: acc.name,
+      accountIcon: acc.icon,
+      ticker: h.name, // 미래에셋은 name을 ticker로 사용
+    }))
+  ),
+]
+
 // 매도 예정/완료 종목 (비중 미포함)
 const PENDING_SALES = []
 
@@ -562,6 +583,13 @@ export default function PortfolioPage() {
     status: 'all', // all, invested, notInvested, needBuy, overBuy
     alert: 'all',  // all, danger, warning, caution, profit
     sort: 'weight', // weight, name, gain, per
+  })
+
+  // 보유 종목 필터 상태
+  const [holdingsFilter, setHoldingsFilter] = useState({
+    broker: 'all', // all, 토스증권, 미래에셋
+    account: 'all', // all, 해외주식, 연금저축계좌, ISA (중개형), etc.
+    sort: 'value', // value, gain, name
   })
 
   // 현재 분기 포트폴리오
@@ -1077,186 +1105,6 @@ export default function PortfolioPage() {
         </div>
       </div>
 
-      {/* 보유종목 - 증권사별 */}
-      <div style={{
-        padding: '20px',
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        border: '1px solid #E5E8EB',
-        marginBottom: '24px',
-      }}>
-        {/* 섹션 헤더 */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '20px' }}>💼</span>
-            <span style={{ fontSize: '18px', fontWeight: '700', color: '#191F28' }}>보유종목</span>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>
-              ₩{(TOSS_HOLDINGS.reduce((sum, h) => sum + h.currentKRW, 0) + MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.totalKRW, 0)).toLocaleString()}
-            </div>
-            <div style={{ fontSize: '12px', color: (TOSS_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0) + MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0)) >= 0 ? '#00C853' : '#F04438' }}>
-              {(TOSS_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0) + MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0)) >= 0 ? '+' : ''}
-              ₩{(TOSS_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0) + MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0)).toLocaleString()}
-            </div>
-          </div>
-        </div>
-
-        {/* ===== 토스증권 ===== */}
-        <div style={{
-          backgroundColor: '#F0F7FF',
-          borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '20px',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '18px' }}>📱</span>
-              <span style={{ fontSize: '15px', fontWeight: '700', color: '#191F28' }}>토스증권</span>
-              <span style={{ fontSize: '12px', color: '#3182F6', backgroundColor: '#E8F3FF', padding: '2px 8px', borderRadius: '4px' }}>해외주식</span>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '14px', fontWeight: '700', color: '#191F28' }}>
-                ₩{TOSS_HOLDINGS.reduce((sum, h) => sum + h.currentKRW, 0).toLocaleString()}
-              </div>
-              <div style={{ fontSize: '11px', color: TOSS_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0) >= 0 ? '#00C853' : '#F04438' }}>
-                {TOSS_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0) >= 0 ? '+' : ''}
-                ₩{TOSS_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0).toLocaleString()}
-              </div>
-            </div>
-          </div>
-
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', backgroundColor: 'white', borderRadius: '8px' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #E5E8EB' }}>
-                <th style={{ padding: '8px', textAlign: 'left', color: '#8B95A1', fontWeight: '500' }}>종목</th>
-                <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>보유</th>
-                <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>평가금액</th>
-                <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>손익</th>
-              </tr>
-            </thead>
-            <tbody>
-              {TOSS_HOLDINGS.map((item, idx) => (
-                <tr key={idx} style={{ borderBottom: '1px solid #F2F4F6' }}>
-                  <td style={{ padding: '8px' }}>
-                    <div style={{ fontWeight: '600', fontSize: '12px' }}>{item.ticker}</div>
-                    <div style={{ fontSize: '10px', color: '#8B95A1' }}>{item.name}</div>
-                  </td>
-                  <td style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontSize: '11px' }}>
-                    {item.shares.toFixed(4)}주
-                  </td>
-                  <td style={{ padding: '8px', textAlign: 'right', fontWeight: '600', fontSize: '12px' }}>
-                    ₩{item.currentKRW.toLocaleString()}
-                  </td>
-                  <td style={{ padding: '8px', textAlign: 'right' }}>
-                    <span style={{ color: item.gainKRW >= 0 ? '#00C853' : '#F04438', fontWeight: '600', fontSize: '12px' }}>
-                      {item.gainKRW >= 0 ? '+' : ''}{item.gainKRW.toLocaleString()}
-                    </span>
-                    <div style={{ fontSize: '10px', color: item.gainPercent >= 0 ? '#00C853' : '#F04438' }}>
-                      ({item.gainPercent >= 0 ? '+' : ''}{item.gainPercent}%)
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ===== 미래에셋증권 ===== */}
-        <div style={{
-          backgroundColor: '#FFF8E1',
-          borderRadius: '12px',
-          padding: '16px',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '18px' }}>🏦</span>
-              <span style={{ fontSize: '15px', fontWeight: '700', color: '#191F28' }}>미래에셋증권</span>
-              <span style={{ fontSize: '12px', color: '#F57C00', backgroundColor: '#FFE0B2', padding: '2px 8px', borderRadius: '4px' }}>5개 계좌</span>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '14px', fontWeight: '700', color: '#191F28' }}>
-                ₩{MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.totalKRW, 0).toLocaleString()}
-              </div>
-              <div style={{ fontSize: '11px', color: MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0) >= 0 ? '#00C853' : '#F04438' }}>
-                {MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0) >= 0 ? '+' : ''}
-                ₩{MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.gainKRW, 0).toLocaleString()}
-              </div>
-            </div>
-          </div>
-
-          {/* 미래에셋 계좌별 */}
-          {MIRAE_ACCOUNTS.map((account) => (
-          <div key={account.id} style={{ marginBottom: '20px' }}>
-            {/* 계좌 헤더 */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '12px',
-              backgroundColor: '#F7F8FA',
-              borderRadius: '8px',
-              marginBottom: '8px',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '16px' }}>{account.icon}</span>
-                <div>
-                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{account.name}</div>
-                  <div style={{ fontSize: '11px', color: '#8B95A1' }}>{account.accountNo}</div>
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '15px', fontWeight: '700', color: '#191F28' }}>
-                  ₩{account.totalKRW.toLocaleString()}
-                </div>
-                <div style={{ fontSize: '12px', color: account.gainKRW >= 0 ? '#00C853' : '#F04438' }}>
-                  {account.gainKRW >= 0 ? '▲' : '▼'} {Math.abs(account.gainKRW).toLocaleString()}원 ({account.gainKRW >= 0 ? '+' : ''}{account.gainPercent}%)
-                </div>
-              </div>
-            </div>
-
-            {/* 종목 테이블 */}
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #E5E8EB' }}>
-                  <th style={{ padding: '8px', textAlign: 'left', color: '#8B95A1', fontWeight: '500' }}>종목</th>
-                  <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>수량</th>
-                  <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>평가금액</th>
-                  <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>매입금액</th>
-                  <th style={{ padding: '8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>손익</th>
-                </tr>
-              </thead>
-              <tbody>
-                {account.holdings.map((item, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #F2F4F6' }}>
-                    <td style={{ padding: '10px 8px', fontWeight: '600' }}>{item.name}</td>
-                    <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1' }}>
-                      {item.shares > 0 ? `${item.shares}주` : '-'}
-                    </td>
-                    <td style={{ padding: '10px 8px', textAlign: 'right', fontWeight: '600' }}>
-                      ₩{item.currentKRW.toLocaleString()}
-                    </td>
-                    <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1' }}>
-                      ₩{item.investedKRW.toLocaleString()}
-                    </td>
-                    <td style={{ padding: '10px 8px', textAlign: 'right' }}>
-                      <span style={{ color: item.gainKRW >= 0 ? '#00C853' : '#F04438', fontWeight: '600' }}>
-                        {item.gainKRW >= 0 ? '+' : ''}{item.gainKRW.toLocaleString()}
-                      </span>
-                      <div style={{ fontSize: '11px', color: item.gainPercent >= 0 ? '#00C853' : '#F04438' }}>
-                        ({item.gainPercent >= 0 ? '+' : ''}{item.gainPercent}%)
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
-
-        </div>
-      </div>
-
       {/* 공모주 청약 */}
       <div style={{
         padding: '20px',
@@ -1407,11 +1255,13 @@ export default function PortfolioPage() {
       </div>
 
       <div style={styles.mainGrid}>
-        {/* 종목 테이블 */}
+        {/* 보유 종목 테이블 (토스 + 미래에셋 통합) */}
         <div style={styles.tableCard}>
           <div style={styles.tableHeader}>
             <span style={styles.tableTitle}>보유 종목</span>
-            <span style={{ fontSize: '13px', color: '#8B95A1' }}>{PORTFOLIO.length}개 종목 · 목표 ₩{TARGET_TOTAL.toLocaleString()}</span>
+            <span style={{ fontSize: '13px', color: '#8B95A1' }}>
+              {ALL_HOLDINGS.length}개 종목 · 토스 {TOSS_HOLDINGS.length}개 + 미래에셋 {MIRAE_ACCOUNTS.reduce((acc, a) => acc + a.holdings.length, 0)}개
+            </span>
           </div>
 
           {/* 필터 */}
@@ -1424,17 +1274,15 @@ export default function PortfolioPage() {
             alignItems: 'center',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '12px', color: '#8B95A1' }}>투자상태:</span>
+              <span style={{ fontSize: '12px', color: '#8B95A1' }}>증권사:</span>
               {[
                 { value: 'all', label: '전체' },
-                { value: 'invested', label: '보유중' },
-                { value: 'notInvested', label: '미투자' },
-                { value: 'needBuy', label: '추가매수' },
-                { value: 'overBuy', label: '초과' },
+                { value: '토스증권', label: '토스증권' },
+                { value: '미래에셋', label: '미래에셋' },
               ].map(opt => (
                 <button
                   key={opt.value}
-                  onClick={() => setFilter({ ...filter, status: opt.value })}
+                  onClick={() => setHoldingsFilter({ ...holdingsFilter, broker: opt.value })}
                   style={{
                     padding: '4px 10px',
                     borderRadius: '6px',
@@ -1442,8 +1290,8 @@ export default function PortfolioPage() {
                     fontSize: '12px',
                     fontWeight: '500',
                     cursor: 'pointer',
-                    backgroundColor: filter.status === opt.value ? '#3182F6' : '#F2F4F6',
-                    color: filter.status === opt.value ? 'white' : '#4E5968',
+                    backgroundColor: holdingsFilter.broker === opt.value ? '#3182F6' : '#F2F4F6',
+                    color: holdingsFilter.broker === opt.value ? 'white' : '#4E5968',
                   }}
                 >
                   {opt.label}
@@ -1452,38 +1300,10 @@ export default function PortfolioPage() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '12px', color: '#8B95A1' }}>상태:</span>
-              {[
-                { value: 'all', label: '전체' },
-                { value: 'danger', label: '🚨 손절' },
-                { value: 'warning', label: '⚠️ 주의' },
-                { value: 'caution', label: '📉 관찰' },
-                { value: 'profit', label: '🔥 수익' },
-              ].map(opt => (
-                <button
-                  key={opt.value}
-                  onClick={() => setFilter({ ...filter, alert: opt.value })}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    backgroundColor: filter.alert === opt.value ? '#3182F6' : '#F2F4F6',
-                    color: filter.alert === opt.value ? 'white' : '#4E5968',
-                  }}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '12px', color: '#8B95A1' }}>정렬:</span>
+              <span style={{ fontSize: '12px', color: '#8B95A1' }}>계좌:</span>
               <select
-                value={filter.sort}
-                onChange={(e) => setFilter({ ...filter, sort: e.target.value })}
+                value={holdingsFilter.account}
+                onChange={(e) => setHoldingsFilter({ ...holdingsFilter, account: e.target.value })}
                 style={{
                   padding: '4px 8px',
                   borderRadius: '6px',
@@ -1493,249 +1313,227 @@ export default function PortfolioPage() {
                   cursor: 'pointer',
                 }}
               >
-                <option value="weight">목표비중순</option>
-                <option value="invested">투자금액순</option>
+                <option value="all">전체</option>
+                <option value="해외주식">해외주식 (토스)</option>
+                <option value="연금저축계좌">연금저축 (미래)</option>
+                <option value="ISA (중개형)">ISA (미래)</option>
+                <option value="종합_주식">종합_주식 (미래)</option>
+                <option value="비상금 CMA">비상금 CMA</option>
+                <option value="하우가 가족여행 CMA">가족여행 CMA</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '12px', color: '#8B95A1' }}>정렬:</span>
+              <select
+                value={holdingsFilter.sort}
+                onChange={(e) => setHoldingsFilter({ ...holdingsFilter, sort: e.target.value })}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  border: '1px solid #E5E8EB',
+                  fontSize: '12px',
+                  color: '#4E5968',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="value">평가금액순</option>
                 <option value="gain">수익률순</option>
-                <option value="per">PER순</option>
                 <option value="name">이름순</option>
               </select>
             </div>
           </div>
-          <div>
-            <table style={{ ...styles.table, tableLayout: 'fixed' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ ...styles.table, tableLayout: 'fixed', minWidth: '900px' }}>
               <thead>
                 <tr>
-                  <th style={{ ...styles.th, width: '140px' }}>종목</th>
-                  <th style={{ ...styles.thRight, width: '60px' }}>목표</th>
-                  <th style={{ ...styles.thRight, width: '80px' }}>목표금액</th>
-                  <th style={{ ...styles.thRight, width: '80px' }}>투자금액</th>
-                  <th style={{ ...styles.thRight, width: '90px' }}>추가매수</th>
-                  <th style={{ ...styles.thRight, width: '70px' }}>현재가</th>
-                  <th style={{ ...styles.thRight, width: '70px' }}>매수후고점</th>
-                  <th style={{ ...styles.thRight, width: '65px' }}>고점대비</th>
-                  <th style={{ ...styles.thRight, width: '50px' }}>PER</th>
-                  <th style={{ ...styles.thRight, width: '50px' }}>PBR</th>
-                  <th style={{ ...styles.thRight, width: '80px' }}>평가금액</th>
-                  <th style={{ ...styles.thRight, width: '80px' }}>손익</th>
-                  <th style={{ ...styles.thRight, width: '60px' }}>수익률</th>
-                  <th style={{ ...styles.th, width: '90px' }}>상태</th>
+                  <th style={{ ...styles.th, width: '130px' }}>증권사/계좌</th>
+                  <th style={{ ...styles.th, width: '160px' }}>종목명</th>
+                  <th style={{ ...styles.thRight, width: '70px' }}>수량</th>
+                  <th style={{ ...styles.thRight, width: '100px' }}>매입금액</th>
+                  <th style={{ ...styles.thRight, width: '100px' }}>평가금액</th>
+                  <th style={{ ...styles.thRight, width: '90px' }}>손익</th>
+                  <th style={{ ...styles.thRight, width: '80px' }}>수익률</th>
                 </tr>
               </thead>
               <tbody>
-                {PORTFOLIO
+                {ALL_HOLDINGS
                   // 필터 적용
                   .filter(item => {
-                    const targetAmount = TARGET_TOTAL * (item.targetWeight / 100)
-                    const needToBuy = targetAmount - item.investedKRW
-                    const myGainPercent = item.investedKRW > 0 ? (item.gainKRW / item.investedKRW) * 100 : 0
-                    const stockData = data[item.ticker]
-                    const dropFromHigh = getDropFromHighByItem(item, stockData)
-
-                    // 투자상태 필터
-                    if (filter.status === 'invested' && item.investedKRW === 0) return false
-                    if (filter.status === 'notInvested' && item.investedKRW > 0) return false
-                    if (filter.status === 'needBuy' && needToBuy <= 0) return false
-                    if (filter.status === 'overBuy' && needToBuy >= 0) return false
-
-                    // 상태 필터
-                    if (filter.alert === 'danger' && !(item.investedKRW > 0 && dropFromHigh <= -15)) return false
-                    if (filter.alert === 'warning' && !(item.investedKRW > 0 && dropFromHigh > -15 && dropFromHigh <= -10)) return false
-                    if (filter.alert === 'caution' && !(item.investedKRW > 0 && dropFromHigh > -10 && dropFromHigh <= -5)) return false
-                    if (filter.alert === 'profit' && !(item.investedKRW > 0 && myGainPercent >= 5)) return false
-
+                    if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
+                    if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
                     return true
                   })
                   // 정렬 적용
                   .sort((a, b) => {
-                    if (filter.sort === 'weight') return b.targetWeight - a.targetWeight
-                    if (filter.sort === 'invested') return b.investedKRW - a.investedKRW
-                    if (filter.sort === 'gain') {
-                      const gainA = a.investedKRW > 0 ? (a.gainKRW / a.investedKRW) * 100 : -999
-                      const gainB = b.investedKRW > 0 ? (b.gainKRW / b.investedKRW) * 100 : -999
-                      return gainB - gainA
-                    }
-                    if (filter.sort === 'per') {
-                      const perA = a.per || 999
-                      const perB = b.per || 999
-                      return perA - perB
-                    }
-                    if (filter.sort === 'name') return a.name.localeCompare(b.name)
+                    if (holdingsFilter.sort === 'value') return b.currentKRW - a.currentKRW
+                    if (holdingsFilter.sort === 'gain') return b.gainPercent - a.gainPercent
+                    if (holdingsFilter.sort === 'name') return a.name.localeCompare(b.name)
                     return 0
                   })
-                  .map(item => {
-                  const stockData = data[item.ticker]
-                  // 실제 손익률 계산
-                  const myGainPercent = item.investedKRW > 0 ? (item.gainKRW / item.investedKRW) * 100 : 0
-                  // 고점대비 계산 (새 함수 사용)
-                  const dropFromHigh = getDropFromHighByItem(item, stockData)
-                  const highSinceBuy = getHighSinceBuyByItem(item, stockData)
-                  const alertType = item.investedKRW > 0 ? getAlertType(dropFromHigh) : 'normal'
-                  const statusInfo = item.investedKRW > 0 ? getStatusIcon(dropFromHigh, myGainPercent) : null
-                  const cost = item.investedKRW
-                  const currentValue = cost + item.gainKRW
-                  // 목표 금액 및 추가 매수 필요 금액
-                  const targetAmount = TARGET_TOTAL * (item.targetWeight / 100)
-                  const needToBuy = targetAmount - item.investedKRW
-                  const isNotInvested = item.investedKRW === 0
-
-                  return (
-                    <tr key={item.ticker} style={{
-                      ...styles.warningRow(alertType),
-                      backgroundColor: isNotInvested ? '#FFFBEB' : styles.warningRow(alertType).backgroundColor,
-                      opacity: isNotInvested ? 0.9 : 1,
-                    }}>
-                      <td style={styles.td}>
-                        <div style={styles.tickerCell}>
-                          <div style={styles.tickerDot(SECTOR_COLORS[item.ticker] || '#8B95A1')} />
-                          <div style={styles.tickerInfo}>
-                            <span style={styles.tickerSymbol}>{item.displayTicker}</span>
-                            <span style={styles.tickerName}>{item.name}</span>
+                  .map((item, idx) => {
+                    const gainPercent = item.gainPercent
+                    // 매입금액 계산 (토스: currentKRW - gainKRW, 미래에셋: investedKRW)
+                    const investedAmount = item.investedKRW !== undefined ? item.investedKRW : (item.currentKRW - item.gainKRW)
+                    return (
+                      <tr key={`${item.broker}-${item.account}-${item.name}-${idx}`}>
+                        {/* 증권사/계좌 */}
+                        <td style={styles.td}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              color: item.broker === '토스증권' ? '#3182F6' : '#FF6B35',
+                            }}>
+                              {item.broker}
+                            </span>
+                            <span style={{ fontSize: '11px', color: '#8B95A1' }}>
+                              {item.accountIcon} {item.account}
+                            </span>
                           </div>
-                        </div>
-                      </td>
-                      {/* 목표비중 */}
-                      <td style={styles.tdRight}>
-                        <strong>{item.targetWeight}%</strong>
-                      </td>
-                      {/* 목표금액 */}
-                      <td style={styles.tdRight}>
-                        ₩{targetAmount.toLocaleString()}
-                      </td>
-                      {/* 투자금액 */}
-                      <td style={styles.tdRight}>
-                        <span style={{ color: isNotInvested ? '#F57F17' : '#191F28' }}>
-                          {isNotInvested ? '미투자' : `₩${item.investedKRW.toLocaleString()}`}
-                        </span>
-                      </td>
-                      {/* 추가매수 */}
-                      <td style={styles.tdRight}>
-                        <span style={{
-                          color: needToBuy > 0 ? '#3182F6' : needToBuy < 0 ? '#F04438' : '#00C853',
-                          fontWeight: '600',
-                          fontSize: '12px',
-                        }}>
-                          {needToBuy > 0 ? `+₩${Math.round(needToBuy).toLocaleString()}` :
-                           needToBuy < 0 ? `초과 ₩${Math.abs(Math.round(needToBuy)).toLocaleString()}` : '완료'}
-                        </span>
-                      </td>
-                      {/* 현재가 */}
-                      <td style={styles.tdRight}>
-                        <span style={styles.priceValue}>
-                          {stockData?.price ? (
-                            <>
-                              {item.currency === 'KRW' ? '₩' : '$'}
-                              {stockData.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                            </>
+                        </td>
+                        {/* 종목명 */}
+                        <td style={styles.td}>
+                          <div style={styles.tickerCell}>
+                            <div style={styles.tickerInfo}>
+                              <span style={styles.tickerSymbol}>
+                                {item.ticker || item.name}
+                              </span>
+                              <span style={styles.tickerName}>
+                                {item.ticker && item.ticker !== item.name ? item.name : ''}
+                                {item.type === 'crypto' && ' (암호화폐)'}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        {/* 수량 */}
+                        <td style={styles.tdRight}>
+                          {item.shares > 0 ? (
+                            <span style={{ fontWeight: '500', fontSize: '13px' }}>
+                              {item.shares < 1 ? item.shares.toFixed(4) : item.shares.toLocaleString()}
+                            </span>
                           ) : '-'}
-                        </span>
-                      </td>
-                      {/* 매수후고점 */}
-                      <td style={styles.tdRight}>
-                        {item.investedKRW > 0 && highSinceBuy ? (
-                          <span style={{ color: '#8B95A1', fontSize: '12px' }}>
-                            {item.currency === 'KRW' ? '₩' : '$'}
-                            {highSinceBuy.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                        </td>
+                        {/* 매입금액 */}
+                        <td style={styles.tdRight}>
+                          <span style={{ color: '#8B95A1', fontSize: '13px' }}>
+                            ₩{Math.round(investedAmount).toLocaleString()}
                           </span>
-                        ) : '-'}
-                      </td>
-                      {/* 고점대비 */}
-                      <td style={styles.tdRight}>
-                        {item.investedKRW > 0 ? (
-                          <span style={{
-                            color: dropFromHigh >= 0 ? '#00C853' : dropFromHigh >= -5 ? '#FF9800' : dropFromHigh >= -10 ? '#F57F17' : '#F04438',
-                            fontWeight: '600',
-                            fontSize: '12px',
-                          }}>
-                            {dropFromHigh >= 0 ? '+' : ''}{dropFromHigh.toFixed(1)}%
+                        </td>
+                        {/* 평가금액 */}
+                        <td style={styles.tdRight}>
+                          <span style={{ fontWeight: '600' }}>
+                            ₩{Math.round(item.currentKRW).toLocaleString()}
                           </span>
-                        ) : '-'}
-                      </td>
-                      {/* PER */}
-                      <td style={styles.tdRight}>
-                        {item.per ? (
-                          <span style={{
-                            ...styles.metricBadge,
-                            backgroundColor: item.per > 50 ? '#FFEBEE' : item.per < 20 ? '#E8F5E9' : '#F2F4F6',
-                            color: item.per > 50 ? '#F04438' : item.per < 20 ? '#00C853' : '#4E5968',
-                          }}>{item.per.toFixed(1)}</span>
-                        ) : '-'}
-                      </td>
-                      {/* PBR */}
-                      <td style={styles.tdRight}>
-                        {item.pbr ? (
-                          <span style={{
-                            ...styles.metricBadge,
-                            backgroundColor: item.pbr > 10 ? '#FFEBEE' : item.pbr < 3 ? '#E8F5E9' : '#F2F4F6',
-                            color: item.pbr > 10 ? '#F04438' : item.pbr < 3 ? '#00C853' : '#4E5968',
-                          }}>{item.pbr.toFixed(1)}</span>
-                        ) : '-'}
-                      </td>
-                      {/* 평가금액 */}
-                      <td style={styles.tdRight}>
-                        {item.investedKRW > 0 ? `₩${Math.round(currentValue).toLocaleString()}` : '-'}
-                      </td>
-                      {/* 손익금액 */}
-                      <td style={styles.tdRight}>
-                        {item.investedKRW > 0 ? (
+                        </td>
+                        {/* 손익 */}
+                        <td style={styles.tdRight}>
                           <span style={{
                             color: item.gainKRW > 0 ? '#00C853' : item.gainKRW < 0 ? '#F04438' : '#8B95A1',
-                            fontWeight: '600'
+                            fontWeight: '600',
+                            fontSize: '13px',
                           }}>
-                            {item.gainKRW >= 0 ? '+' : ''}₩{item.gainKRW.toLocaleString()}
+                            {item.gainKRW >= 0 ? '+' : ''}₩{Math.round(item.gainKRW).toLocaleString()}
                           </span>
-                        ) : '-'}
-                      </td>
-                      {/* 수익률 */}
-                      <td style={styles.tdRight}>
-                        {item.investedKRW > 0 ? (
+                        </td>
+                        {/* 수익률 */}
+                        <td style={styles.tdRight}>
                           <span style={{
-                            color: myGainPercent > 0 ? '#00C853' : myGainPercent < 0 ? '#F04438' : '#8B95A1',
-                            fontWeight: '600'
-                          }}>
-                            {myGainPercent > 0 ? '+' : ''}{myGainPercent.toFixed(2)}%
-                          </span>
-                        ) : '-'}
-                      </td>
-                      {/* 상태 */}
-                      <td style={styles.td}>
-                        {isNotInvested ? (
-                          <span style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
+                            display: 'inline-block',
                             padding: '4px 8px',
                             borderRadius: '6px',
-                            fontSize: '11px',
+                            fontSize: '12px',
                             fontWeight: '600',
-                            backgroundColor: '#FFF8E1',
-                            color: '#F57F17',
+                            backgroundColor: gainPercent >= 5 ? '#E8F5E9' : gainPercent > 0 ? '#F0FFF4' : gainPercent < 0 ? '#FFEBEE' : '#F2F4F6',
+                            color: gainPercent > 0 ? '#00C853' : gainPercent < 0 ? '#F04438' : '#8B95A1',
                           }}>
-                            ⏳ 매수예정
+                            {gainPercent >= 5 && '🔥 '}
+                            {gainPercent > 0 ? '+' : ''}{gainPercent.toFixed(2)}%
                           </span>
-                        ) : statusInfo ? (
-                          <span style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            padding: '4px 8px',
-                            borderRadius: '6px',
-                            fontSize: '11px',
-                            fontWeight: '600',
-                            backgroundColor: statusInfo.color === '#F04438' ? '#FFEBEE' :
-                                           statusInfo.color === '#F57F17' ? '#FFF8E1' :
-                                           statusInfo.color === '#FF9800' ? '#FFF3E0' : '#E8F5E9',
-                            color: statusInfo.color,
-                          }}>
-                            {statusInfo.icon} {statusInfo.label}
-                          </span>
-                        ) : (
-                          <span style={{ color: '#8B95A1', fontSize: '12px' }}>—</span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
+                        </td>
+                      </tr>
+                    )
+                  })}
               </tbody>
             </table>
+          </div>
+          {/* 합계 */}
+          <div style={{
+            padding: '16px 20px',
+            borderTop: '1px solid #E5E8EB',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#F7F8FA',
+          }}>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>
+              합계 ({ALL_HOLDINGS
+                .filter(item => {
+                  if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
+                  if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
+                  return true
+                }).length}개 종목)
+            </span>
+            <div style={{ display: 'flex', gap: '24px' }}>
+              <span style={{ fontSize: '14px', color: '#4E5968' }}>
+                평가금액: <strong style={{ color: '#191F28' }}>
+                  ₩{Math.round(ALL_HOLDINGS
+                    .filter(item => {
+                      if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
+                      if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
+                      return true
+                    })
+                    .reduce((acc, item) => acc + item.currentKRW, 0)).toLocaleString()}
+                </strong>
+              </span>
+              <span style={{ fontSize: '14px', color: '#4E5968' }}>
+                손익: <strong style={{
+                  color: ALL_HOLDINGS
+                    .filter(item => {
+                      if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
+                      if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
+                      return true
+                    })
+                    .reduce((acc, item) => acc + item.gainKRW, 0) >= 0 ? '#00C853' : '#F04438'
+                }}>
+                  {ALL_HOLDINGS
+                    .filter(item => {
+                      if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
+                      if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
+                      return true
+                    })
+                    .reduce((acc, item) => acc + item.gainKRW, 0) >= 0 ? '+' : ''}
+                  ₩{Math.round(ALL_HOLDINGS
+                    .filter(item => {
+                      if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
+                      if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
+                      return true
+                    })
+                    .reduce((acc, item) => acc + item.gainKRW, 0)).toLocaleString()}
+                </strong>
+              </span>
+            </div>
+          </div>
+          {/* 범례 */}
+          <div style={{
+            padding: '16px 20px',
+            borderTop: '1px solid #E5E8EB',
+            backgroundColor: '#FAFAFA',
+          }}>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '16px',
+              fontSize: '12px',
+              color: '#4E5968',
+            }}>
+              <span><strong style={{ color: '#00C853' }}>🔥</strong> = 내 수익 +5% 이상</span>
+              <span><strong style={{ color: '#F57F17' }}>⚠️</strong> = 매수후고점 대비 -10% 이상</span>
+              <span><strong style={{ color: '#F04438' }}>🚨</strong> = 매수후고점 대비 -15% 이상 (손절 고려)</span>
+              <span><strong>PER</strong> = 주가수익비율</span>
+              <span><strong>PBR</strong> = 주가순자산비율</span>
+              <span><strong>ROE</strong> = 자기자본이익률 (15%+ 우량)</span>
+            </div>
           </div>
         </div>
 
