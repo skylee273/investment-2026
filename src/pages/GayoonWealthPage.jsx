@@ -71,7 +71,7 @@ const TRACKED_ASSETS = [
     currentKRW: 2638715,
     gainKRW: -143319,
     gainPercent: -5.15,
-    note: '한화증권 · 9주',
+    note: '미래에셋 · 9주',
   },
   {
     id: 'bitcoin',
@@ -94,14 +94,13 @@ const FIXED_ASSETS = [
   { id: 'youth-account', name: '청년 도약 계좌', icon: '🚀', currentKRW: 16800000, note: '5년 만기 · 6%+정부기여금' },
   { id: 'housing', name: '청약저축', icon: '🏠', currentKRW: 6220000, note: '1순위 충족 · 2.3%' },
   { id: 'isa', name: 'ISA', icon: '📈', currentKRW: 20041099, investedKRW: 19999709, gainKRW: 41390, gainPercent: 0.21, note: '삼성증권 · +0.21%' },
-  { id: 'pension', name: '연금저축', icon: '🧓', currentKRW: 3999404, investedKRW: 4000204, gainKRW: -800, gainPercent: -0.02, note: '한화증권 · -0.02%' },
+  { id: 'pension', name: '연금저축', icon: '🧓', currentKRW: 3999404, investedKRW: 4000204, gainKRW: -800, gainPercent: -0.02, note: '미래에셋 · -0.02%' },
 ]
 
 // 2. 비변동성 자산 (투자 중인 자산 + 받을 돈) - S&P500, 아마존, 비트코인, 가족받을돈, 전세보증금
+// 아마존, 비트코인은 TRACKED_ASSETS에서 실시간 추적 (중복 방지)
 const STABLE_ASSETS = [
   { id: 'sp500-dividend', name: 'S&P500 + 배당주', icon: '📈', currentKRW: 24796498, investedKRW: 22758816, gainKRW: 2037682, gainPercent: 8.96, note: '삼성증권 · +8.96%', type: 'stock' },
-  { id: 'amazon', name: '아마존 (AMZN)', icon: '🛒', currentKRW: 2638715, investedKRW: 2782034, gainKRW: -143319, gainPercent: -5.15, note: '한화증권 · 9주', type: 'stock' },
-  { id: 'bitcoin', name: '비트코인 (BTC)', icon: '₿', currentKRW: 990775, investedKRW: 999500, gainKRW: -8724, gainPercent: -0.87, note: '업비트 · 0.0102 BTC', type: 'crypto' },
   { id: 'family', name: '가족 받을 돈', icon: '👨‍👩‍👧', currentKRW: 20000000, note: '6월 수령 예정', type: 'receivable' },
   { id: 'deposit', name: '전세 보증금', icon: '🏢', currentKRW: 45000000, note: '7월 수령 예정', type: 'receivable' },
 ]
@@ -153,7 +152,7 @@ const GAYOON_ALL_HOLDINGS = [
     gainPercent: 12.74,
     risk: 2,
   },
-  // 한화증권 - 아마존
+  // 미래에셋 - 아마존
   {
     ticker: 'AMZN',
     name: '아마존',
@@ -204,7 +203,7 @@ const GAYOON_ALL_HOLDINGS = [
     gainPercent: 1.00,
     risk: 1,
   },
-  // 한화증권 - 연금저축
+  // 미래에셋 - 연금저축
   {
     ticker: 'KODEX200',
     name: 'KODEX 200',
