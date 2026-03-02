@@ -825,6 +825,99 @@ export default function GayoonWealthPage() {
           items={PENSION_EXTRA_PORTFOLIO}
         />
       </div>
+
+      {/* 월 매수 가이드 */}
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '12px' }}>📅 월 매수 가이드</h3>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '16px',
+        marginBottom: '24px',
+      }}>
+        {/* IRP 월 25만원 */}
+        <div style={{
+          padding: '20px',
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          border: '1px solid #E5E8EB',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <span style={{ fontSize: '20px' }}>🏦</span>
+            <div>
+              <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>IRP 월 매수</div>
+              <div style={{ fontSize: '13px', color: '#3182F6', fontWeight: '600' }}>매월 25만원</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {IRP_PORTFOLIO.map(item => {
+              const amount = Math.round(250000 * item.targetWeight / 100)
+              return (
+                <div key={item.ticker} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '10px 12px',
+                  backgroundColor: '#F7F8FA',
+                  borderRadius: '8px',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28' }}>
+                      {item.name.replace('TIGER ', '').replace('KODEX ', '')}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.targetWeight}%</div>
+                  </div>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#3182F6' }}>
+                    ₩{amount.toLocaleString()}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* 추가 연금저축 월 60만원 */}
+        <div style={{
+          padding: '20px',
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          border: '1px solid #E5E8EB',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <span style={{ fontSize: '20px' }}>💰</span>
+            <div>
+              <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>추가 연금저축 월 매수</div>
+              <div style={{ fontSize: '13px', color: '#E65100', fontWeight: '600' }}>매월 60만원 (예정)</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {PENSION_EXTRA_PORTFOLIO.map(item => {
+              const amount = Math.round(600000 * item.targetWeight / 100)
+              return (
+                <div key={item.ticker} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '10px 12px',
+                  backgroundColor: '#F7F8FA',
+                  borderRadius: '8px',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28' }}>
+                      {item.name.replace('TIGER ', '').replace('KODEX ', '')}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.targetWeight}%</div>
+                  </div>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#E65100' }}>
+                    ₩{amount.toLocaleString()}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
