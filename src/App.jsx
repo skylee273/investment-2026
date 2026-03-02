@@ -1,0 +1,33 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { DataProvider } from './contexts/DataContext'
+import Layout from './components/Layout/Layout'
+import PortfolioPage from './pages/PortfolioPage'
+import WhalesPage from './pages/WhalesPage'
+import LearnPage from './pages/LearnPage'
+import GayoonWealthPage from './pages/GayoonWealthPage'
+import PortfolioBattlePage from './pages/PortfolioBattlePage'
+import PortfolioReportPage from './pages/PortfolioReportPage'
+import TaxGuidePage from './pages/TaxGuidePage'
+
+function App() {
+  return (
+    <DataProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<PortfolioPage />} />
+            <Route path="portfolio" element={<PortfolioPage />} />
+            <Route path="whales" element={<WhalesPage />} />
+            <Route path="learn" element={<LearnPage />} />
+            <Route path="gayoon" element={<GayoonWealthPage />} />
+            <Route path="gayoon/report" element={<PortfolioReportPage />} />
+            <Route path="battle" element={<PortfolioBattlePage />} />
+            <Route path="tax" element={<TaxGuidePage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </DataProvider>
+  )
+}
+
+export default App
