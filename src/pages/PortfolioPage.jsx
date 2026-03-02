@@ -131,6 +131,8 @@ const CATEGORY_COLORS = {
   '국내중소': '#F97316',
   '채권': '#6B7280',
   'ETF': '#3B82F6',
+  '신흥국': '#10B981',
+  '금': '#FBBF24',
 }
 
 // 토스증권 해외주식 포트폴리오 (카테고리별)
@@ -147,7 +149,7 @@ const TOSS_PORTFOLIO = [
 
 // 연금저축 포트폴리오
 const PENSION_PORTFOLIO = [
-  { ticker: '069500', name: 'KODEX 200', category: '국내대형', targetWeight: 80, risk: 2 },
+  { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 80, risk: 2 },
   { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20, risk: 3 },
 ]
 
@@ -163,6 +165,24 @@ const STOCK_PORTFOLIO = [
   { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 60, risk: 3 },
   { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 23, risk: 3 },
   { ticker: '484790', name: '1Q 미국S&P500미국채혼합', category: 'ETF', targetWeight: 15, risk: 2 },
+]
+
+// IRP 포트폴리오 (25만원) - 위험자산 70% + 안전자산 30%
+const IRP_PORTFOLIO = [
+  { ticker: '133690', name: 'TIGER 미국나스닥100', category: 'S&P500', targetWeight: 35, risk: 4 },
+  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 21, risk: 3 },
+  { ticker: '195980', name: 'TIGER MSCI신흥국', category: '신흥국', targetWeight: 14, risk: 5 },
+  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 30, risk: 1 },
+]
+
+// 추가 연금저축 포트폴리오 (900만원 목표)
+const PENSION_EXTRA_PORTFOLIO = [
+  { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 25, risk: 2 },
+  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 20, risk: 3 },
+  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 20, risk: 1 },
+  { ticker: '133690', name: 'TIGER 미국나스닥100', category: 'S&P500', targetWeight: 15, risk: 4 },
+  { ticker: '195980', name: 'TIGER MSCI신흥국', category: '신흥국', targetWeight: 10, risk: 5 },
+  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 10, risk: 3 },
 ]
 
 // 별 5개 위험도 표시
@@ -1379,6 +1399,28 @@ export default function PortfolioPage() {
           gainKRW={MIRAE_ACCOUNTS.find(a => a.id === 'stock')?.gainKRW || 0}
           gainPercent={MIRAE_ACCOUNTS.find(a => a.id === 'stock')?.gainPercent || 0}
           items={STOCK_PORTFOLIO}
+        />
+
+        {/* IRP */}
+        <PortfolioChart
+          icon="🏦"
+          title="IRP"
+          amount={250000}
+          gainKRW={0}
+          gainPercent={0}
+          status="진행중"
+          statusColor={{ bg: '#E8F3FF', text: '#3182F6' }}
+          items={IRP_PORTFOLIO}
+        />
+
+        {/* 추가 연금저축 */}
+        <PortfolioChart
+          icon="💰"
+          title="추가 연금저축"
+          amount={9000000}
+          status="예정"
+          statusColor={{ bg: '#FFF3E0', text: '#E65100' }}
+          items={PENSION_EXTRA_PORTFOLIO}
         />
       </div>
 
