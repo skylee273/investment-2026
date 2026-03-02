@@ -1135,10 +1135,12 @@ export default function GayoonWealthPage() {
                           borderRadius: '6px',
                           fontSize: '12px',
                           fontWeight: '600',
-                          backgroundColor: gainPercent >= 5 ? '#E8F5E9' : gainPercent > 0 ? '#F0FFF4' : gainPercent < 0 ? '#FFEBEE' : '#F2F4F6',
-                          color: gainPercent > 0 ? '#00C853' : gainPercent < 0 ? '#F04438' : '#8B95A1',
+                          backgroundColor: gainPercent >= 5 ? '#E8F5E9' : gainPercent > 0 ? '#F0FFF4' : gainPercent <= -15 ? '#FFCDD2' : gainPercent <= -10 ? '#FFE0B2' : gainPercent < 0 ? '#FFEBEE' : '#F2F4F6',
+                          color: gainPercent > 0 ? '#00C853' : gainPercent <= -15 ? '#D32F2F' : gainPercent <= -10 ? '#F57C00' : gainPercent < 0 ? '#F04438' : '#8B95A1',
                         }}>
                           {gainPercent >= 5 && '🔥 '}
+                          {gainPercent <= -15 && '🚨 '}
+                          {gainPercent > -15 && gainPercent <= -10 && '⚠️ '}
                           {gainPercent > 0 ? '+' : ''}{gainPercent.toFixed(2)}%
                         </span>
                       </td>
