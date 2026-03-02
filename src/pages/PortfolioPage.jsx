@@ -114,6 +114,228 @@ const MIRAE_ACCOUNTS = [
 // 미래에셋 전체 보유 종목 (기존 코드 호환용)
 const MIRAE_HOLDINGS = MIRAE_ACCOUNTS.flatMap(acc => acc.holdings)
 
+// ===== 포트폴리오 구성 (가윤 달리오 스타일) =====
+
+// 카테고리별 색상
+const CATEGORY_COLORS = {
+  'Big Tech': '#3182F6',
+  '빅테크': '#3182F6',
+  'S&P500': '#6366F1',
+  '금융': '#10B981',
+  '에너지': '#F59E0B',
+  '반도체': '#EC4899',
+  '헬스케어': '#8B5CF6',
+  'AI/SW': '#06B6D4',
+  '암호화폐': '#F97316',
+  '국내대형': '#EF4444',
+  '국내중소': '#F97316',
+  '채권': '#6B7280',
+  'ETF': '#3B82F6',
+}
+
+// 토스증권 해외주식 포트폴리오 (카테고리별)
+const TOSS_PORTFOLIO = [
+  { ticker: 'AMZN', name: '아마존', category: 'Big Tech', targetWeight: 52, risk: 4 },
+  { ticker: 'ADA', name: '에이다', category: '암호화폐', targetWeight: 9, risk: 5 },
+  { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 9, risk: 3 },
+  { ticker: 'MSFT', name: '마이크로소프트', category: 'Big Tech', targetWeight: 6, risk: 3 },
+  { ticker: 'CVX', name: '셰브론', category: '에너지', targetWeight: 4, risk: 3 },
+  { ticker: 'META', name: '메타', category: 'Big Tech', targetWeight: 3, risk: 4 },
+  { ticker: 'GOOGL+BAC+AXP', name: '기타 (알파벳A, 금융)', category: '금융', targetWeight: 9, risk: 3 },
+  { ticker: 'SPY+기타', name: 'ETF/기타', category: 'ETF', targetWeight: 8, risk: 2 },
+]
+
+// 연금저축 포트폴리오
+const PENSION_PORTFOLIO = [
+  { ticker: '069500', name: 'KODEX 200', category: '국내대형', targetWeight: 80, risk: 2 },
+  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20, risk: 3 },
+]
+
+// ISA 포트폴리오
+const ISA_PORTFOLIO = [
+  { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 40, risk: 1 },
+  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 39, risk: 3 },
+  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 21, risk: 3 },
+]
+
+// 종합_주식 포트폴리오
+const STOCK_PORTFOLIO = [
+  { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 60, risk: 3 },
+  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 23, risk: 3 },
+  { ticker: '484790', name: '1Q 미국S&P500미국채혼합', category: 'ETF', targetWeight: 15, risk: 2 },
+]
+
+// 별 5개 위험도 표시
+const RiskStars = ({ risk }) => {
+  const stars = []
+  for (let i = 1; i <= 5; i++) {
+    stars.push(
+      <span key={i} style={{ color: i <= risk ? '#F59E0B' : '#E5E8EB', fontSize: '10px' }}>★</span>
+    )
+  }
+  return <span style={{ display: 'inline-flex', gap: '1px' }}>{stars}</span>
+}
+
+// 포트폴리오 차트 컴포넌트
+function PortfolioChart({ icon, title, amount, gainKRW, gainPercent, status, statusColor, items }) {
+  // 안정자산 비율 계산 (risk <= 2: 안정, risk >= 3: 위험)
+  const safeAssetWeight = items
+    .filter(item => item.risk <= 2)
+    .reduce((sum, item) => sum + item.targetWeight, 0)
+  const riskAssetWeight = 100 - safeAssetWeight
+
+  // 평균 위험도 계산
+  const avgRisk = items.reduce((sum, item) => sum + (item.risk * item.targetWeight), 0) / 100
+
+  return (
+    <div style={{
+      padding: '20px',
+      backgroundColor: 'white',
+      borderRadius: '16px',
+      border: '1px solid #E5E8EB',
+    }}>
+      {/* 헤더 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '20px' }}>{icon}</span>
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28' }}>{title}</div>
+            <div style={{ fontSize: '13px', color: '#8B95A1' }}>{(amount / 10000).toLocaleString()}만원</div>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          {gainKRW !== undefined && (
+            <div style={{
+              fontSize: '13px',
+              fontWeight: '600',
+              color: gainKRW >= 0 ? '#00C853' : '#F04438',
+            }}>
+              {gainKRW >= 0 ? '+' : ''}{gainKRW.toLocaleString()}원 ({gainPercent >= 0 ? '+' : ''}{gainPercent.toFixed(2)}%)
+            </div>
+          )}
+          {status && (
+            <div style={{
+              display: 'inline-block',
+              padding: '4px 10px',
+              backgroundColor: statusColor?.bg || '#F2F4F6',
+              borderRadius: '6px',
+              fontSize: '11px',
+              fontWeight: '600',
+              color: statusColor?.text || '#4E5968',
+              marginTop: '4px',
+            }}>
+              {status}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 위험/안정 자산 비율 */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '12px',
+        padding: '10px 12px',
+        backgroundColor: '#F7F8FA',
+        borderRadius: '8px',
+      }}>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#EF4444' }} />
+            <span style={{ fontSize: '12px', color: '#4E5968' }}>위험 {riskAssetWeight}%</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+            <span style={{ fontSize: '12px', color: '#4E5968' }}>안정 {safeAssetWeight}%</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontSize: '11px', color: '#8B95A1' }}>평균</span>
+          <RiskStars risk={Math.round(avgRisk)} />
+        </div>
+      </div>
+
+      {/* 스택 바 차트 */}
+      <div style={{
+        display: 'flex',
+        height: '28px',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        marginBottom: '12px',
+      }}>
+        {items.map((item, index) => {
+          const color = CATEGORY_COLORS[item.category] || '#9CA3AF'
+          return (
+            <div
+              key={item.ticker}
+              style={{
+                width: `${item.targetWeight}%`,
+                backgroundColor: color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '10px',
+                fontWeight: '600',
+                borderRight: index < items.length - 1 ? '1px solid rgba(255,255,255,0.3)' : 'none',
+              }}
+              title={`${item.name}: ${item.targetWeight}%`}
+            >
+              {item.targetWeight >= 10 ? `${item.targetWeight}%` : item.targetWeight}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* 자산별 상세 */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {items.map(item => {
+          const color = CATEGORY_COLORS[item.category] || '#9CA3AF'
+          const itemAmount = Math.round(amount * item.targetWeight / 100)
+          const isSafe = item.risk <= 2
+          return (
+            <div key={item.ticker} style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 10px',
+              backgroundColor: isSafe ? '#F0FDF4' : '#FFFBEB',
+              borderRadius: '8px',
+              fontSize: '11px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '2px',
+                  backgroundColor: color,
+                  flexShrink: 0,
+                }} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ color: '#4E5968', fontWeight: '600' }}>
+                      {item.name.replace('TIGER ', '').replace('KODEX ', '')}
+                    </span>
+                    <RiskStars risk={item.risk} />
+                  </div>
+                  <span style={{ color: '#8B95A1', fontSize: '10px' }}>{item.category}</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                <span style={{ color: '#6B7684', fontSize: '12px' }}>{item.targetWeight}%</span>
+                <span style={{ color: '#191F28', fontWeight: '700', fontSize: '12px', minWidth: '50px', textAlign: 'right' }}>
+                  {(itemAmount / 10000).toFixed(1)}만
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // 전체 보유 종목 통합 (토스 + 미래에셋)
 const ALL_HOLDINGS = [
   // 토스증권
@@ -1103,6 +1325,61 @@ export default function PortfolioPage() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* 포트폴리오 구성 */}
+      <div style={{ marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '12px' }}>📊 포트폴리오 구성</h3>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '16px',
+        marginBottom: '24px',
+      }}>
+        {/* 토스증권 해외주식 */}
+        <PortfolioChart
+          icon="📱"
+          title="토스증권 해외주식"
+          amount={TOSS_HOLDINGS.reduce((sum, h) => sum + h.currentKRW, 0)}
+          gainKRW={TOSS_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0)}
+          gainPercent={(() => {
+            const totalInvested = TOSS_HOLDINGS.reduce((sum, h) => sum + (h.currentKRW - h.gainKRW), 0)
+            const totalGain = TOSS_HOLDINGS.reduce((sum, h) => sum + h.gainKRW, 0)
+            return totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0
+          })()}
+          items={TOSS_PORTFOLIO}
+        />
+
+        {/* 연금저축 */}
+        <PortfolioChart
+          icon="🧓"
+          title="연금저축계좌"
+          amount={MIRAE_ACCOUNTS.find(a => a.id === 'pension')?.totalKRW || 0}
+          gainKRW={MIRAE_ACCOUNTS.find(a => a.id === 'pension')?.gainKRW || 0}
+          gainPercent={MIRAE_ACCOUNTS.find(a => a.id === 'pension')?.gainPercent || 0}
+          items={PENSION_PORTFOLIO}
+        />
+
+        {/* ISA */}
+        <PortfolioChart
+          icon="📊"
+          title="ISA (중개형)"
+          amount={MIRAE_ACCOUNTS.find(a => a.id === 'isa')?.totalKRW || 0}
+          gainKRW={MIRAE_ACCOUNTS.find(a => a.id === 'isa')?.gainKRW || 0}
+          gainPercent={MIRAE_ACCOUNTS.find(a => a.id === 'isa')?.gainPercent || 0}
+          items={ISA_PORTFOLIO}
+        />
+
+        {/* 종합_주식 */}
+        <PortfolioChart
+          icon="📈"
+          title="종합_주식"
+          amount={MIRAE_ACCOUNTS.find(a => a.id === 'stock')?.totalKRW || 0}
+          gainKRW={MIRAE_ACCOUNTS.find(a => a.id === 'stock')?.gainKRW || 0}
+          gainPercent={MIRAE_ACCOUNTS.find(a => a.id === 'stock')?.gainPercent || 0}
+          items={STOCK_PORTFOLIO}
+        />
       </div>
 
       {/* 공모주 청약 */}
