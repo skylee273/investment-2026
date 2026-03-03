@@ -1441,39 +1441,39 @@ export default function GayoonWealthPage() {
 
         {/* 테이블 */}
         <div style={{ overflowX: isMobile ? 'hidden' : 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? 'auto' : '800px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? 'auto' : '900px', tableLayout: 'fixed' }}>
             <thead>
               <tr>
-                {!isMobile && <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '100px' }}>계좌</th>}
+                {!isMobile && <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '90px' }}>계좌</th>}
                 <th
                   onClick={() => toggleSort('name')}
-                  style={{ padding: isMobile ? '8px 4px 8px 8px' : '12px 16px', textAlign: 'left', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'name' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none' }}
+                  style={{ padding: isMobile ? '8px 4px 8px 8px' : '12px 16px', textAlign: 'left', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'name' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none', width: isMobile ? 'auto' : '200px' }}
                 >
                   종목명<SortArrow column="name" />
                 </th>
                 <th
                   onClick={() => toggleSort('invested')}
-                  style={{ padding: isMobile ? '8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'invested' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none' }}
+                  style={{ padding: isMobile ? '8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'invested' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none', width: isMobile ? 'auto' : '130px' }}
                 >
                   매입<SortArrow column="invested" />
                 </th>
                 <th
                   onClick={() => toggleSort('value')}
-                  style={{ padding: isMobile ? '8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'value' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none' }}
+                  style={{ padding: isMobile ? '8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'value' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none', width: isMobile ? 'auto' : '130px' }}
                 >
                   평가<SortArrow column="value" />
                 </th>
                 {!isMobile && (
                   <th
                     onClick={() => toggleSort('gainKRW')}
-                    style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: holdingsFilter.sort === 'gainKRW' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '90px', cursor: 'pointer', userSelect: 'none' }}
+                    style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '600', color: holdingsFilter.sort === 'gainKRW' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '130px', cursor: 'pointer', userSelect: 'none' }}
                   >
                     손익<SortArrow column="gainKRW" />
                   </th>
                 )}
                 <th
                   onClick={() => toggleSort('gain')}
-                  style={{ padding: isMobile ? '8px 8px 8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'gain' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none' }}
+                  style={{ padding: isMobile ? '8px 8px 8px 2px' : '12px 16px', textAlign: 'right', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: holdingsFilter.sort === 'gain' ? '#3182F6' : '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', cursor: 'pointer', userSelect: 'none', width: isMobile ? 'auto' : '100px' }}
                 >
                   수익률<SortArrow column="gain" />
                 </th>
@@ -1529,8 +1529,8 @@ export default function GayoonWealthPage() {
                       </td>
                       {/* 손익 - PC만 */}
                       {!isMobile && (
-                        <td style={{ padding: '14px 16px', fontSize: '13px', fontWeight: '600', borderBottom: '1px solid #F2F4F6', textAlign: 'right', color: item.gainKRW > 0 ? '#00C853' : item.gainKRW < 0 ? '#F04438' : '#8B95A1' }}>
-                          {item.gainKRW >= 0 ? '+' : ''}₩{Math.round(item.gainKRW).toLocaleString()}
+                        <td style={{ padding: '14px 16px', fontSize: '13px', fontWeight: '600', borderBottom: '1px solid #F2F4F6', textAlign: 'right', color: item.gainKRW > 0 ? '#00C853' : item.gainKRW < 0 ? '#F04438' : '#8B95A1', whiteSpace: 'nowrap' }}>
+                          {item.gainKRW >= 0 ? '+' : '-'}₩{Math.abs(Math.round(item.gainKRW)).toLocaleString()}
                         </td>
                       )}
                       {/* 수익률 */}
