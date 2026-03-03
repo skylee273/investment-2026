@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { fetchPortfolioPrices, clearPriceCache } from '../services/stockApi'
+import { fetchPortfolioPrices, fetchMultipleStockPrices, fetchExchangeRate, clearPriceCache } from '../services/stockApi'
 
 // 2026년 분기별 포트폴리오
 // targetWeight: 목표비중(%), investedKRW: 투자원금(원), gainKRW: 현재 평가손익(원)
@@ -820,6 +820,9 @@ export default function PortfolioPage() {
   const [trackingData, setTrackingData] = useState(() => loadTrackingData())
   // trackingData 구조: { [quarter]: { [ticker]: { avgPrice, highSinceBuy, buyDate } } }
 
+  // 토스 보유종목 실시간 시세 (ADA 제외, 미국 주식만)
+  const [tossPrices, setTossPrices] = useState({})
+
   // 모바일 감지
   const [isMobile, setIsMobile] = useState(false)
 
@@ -982,6 +985,56 @@ export default function PortfolioPage() {
     }, 60000)
     return () => clearInterval(interval)
   }, [refreshData])
+
+  // 토스 보유종목 실시간 시세 가져오기 (미국 주식만)
+  const fetchTossPrices = useCallback(async () => {
+    try {
+      // 미국 주식 티커만 추출 (ADA 암호화폐 제외)
+      const usTickers = TOSS_HOLDINGS
+        .filter(h => h.type !== 'crypto')
+        .map(h => h.ticker)
+
+      if (usTickers.length === 0) return
+
+      const [prices, rate] = await Promise.all([
+        fetchMultipleStockPrices(usTickers),
+        fetchExchangeRate()
+      ])
+
+      setTossPrices(prices)
+      setExchangeRate(rate)
+      console.log('[PortfolioPage] TOSS prices updated:', Object.keys(prices).length, 'stocks')
+    } catch (err) {
+      console.error('[PortfolioPage] TOSS prices fetch error:', err)
+    }
+  }, [])
+
+  // 토스 시세 초기 로드 + 자동 새로고침 (60초)
+  useEffect(() => {
+    fetchTossPrices()
+    const interval = setInterval(fetchTossPrices, 60000)
+    return () => clearInterval(interval)
+  }, [fetchTossPrices])
+
+  // 실시간 보유 종목 계산 (TOSS_HOLDINGS에 실시간 시세 반영)
+  const liveHoldings = ALL_HOLDINGS.map(item => {
+    // 토스증권 미국 주식만 실시간 시세 적용
+    if (item.broker === '토스증권' && item.type !== 'crypto' && tossPrices[item.ticker]) {
+      const priceData = tossPrices[item.ticker]
+      const investedKRW = item.currentKRW - item.gainKRW // 원래 투자금 (원본 데이터 기준)
+      const currentKRW = item.shares * priceData.price * exchangeRate
+      const gainKRW = currentKRW - investedKRW
+      const gainPercent = investedKRW > 0 ? (gainKRW / investedKRW) * 100 : 0
+      return {
+        ...item,
+        currentKRW: Math.round(currentKRW),
+        gainKRW: Math.round(gainKRW),
+        gainPercent: Math.round(gainPercent * 100) / 100,
+        isLive: true
+      }
+    }
+    return item
+  })
 
   // 매수 후 고점 대비 하락률 계산 (분기별)
   const getDropFromHigh = (ticker) => {
@@ -1641,7 +1694,12 @@ export default function PortfolioPage() {
           }}>
             <span style={{ ...styles.tableTitle, fontSize: isMobile ? '14px' : '16px' }}>보유 종목</span>
             <span style={{ fontSize: isMobile ? '11px' : '13px', color: '#8B95A1' }}>
-              {ALL_HOLDINGS.length}개 종목 · 토스 {TOSS_HOLDINGS.length}개 + 미래에셋 {MIRAE_ACCOUNTS.reduce((acc, a) => acc + a.holdings.length, 0)}개
+              {liveHoldings.length}개 종목 · 토스 {TOSS_HOLDINGS.length}개 + 미래에셋 {MIRAE_ACCOUNTS.reduce((acc, a) => acc + a.holdings.length, 0)}개
+              {Object.keys(tossPrices).length > 0 && (
+                <span style={{ marginLeft: '8px', color: '#00C853', fontWeight: '500' }}>
+                  🔴 라이브
+                </span>
+              )}
             </span>
           </div>
 
@@ -1728,34 +1786,34 @@ export default function PortfolioPage() {
             <table style={{ ...styles.table, tableLayout: 'fixed', minWidth: '900px' }}>
               <thead>
                 <tr>
-                  <th style={{ ...styles.th, width: '130px' }}>증권사/계좌</th>
+                  <th style={{ ...styles.th, width: '120px' }}>증권사/계좌</th>
                   <th
-                    style={{ ...styles.th, width: '160px', cursor: 'pointer' }}
+                    style={{ ...styles.th, width: '130px', cursor: 'pointer' }}
                     onClick={() => toggleSort('name')}
                   >
                     종목명<SortArrow column="name" />
                   </th>
-                  <th style={{ ...styles.thRight, width: '70px' }}>수량</th>
+                  <th style={{ ...styles.thRight, width: '60px' }}>수량</th>
                   <th
-                    style={{ ...styles.thRight, width: '100px', cursor: 'pointer' }}
+                    style={{ ...styles.thRight, width: '95px', cursor: 'pointer' }}
                     onClick={() => toggleSort('invested')}
                   >
                     매입금액<SortArrow column="invested" />
                   </th>
                   <th
-                    style={{ ...styles.thRight, width: '100px', cursor: 'pointer' }}
+                    style={{ ...styles.thRight, width: '110px', cursor: 'pointer' }}
                     onClick={() => toggleSort('value')}
                   >
                     평가금액<SortArrow column="value" />
                   </th>
                   <th
-                    style={{ ...styles.thRight, width: '90px', cursor: 'pointer' }}
+                    style={{ ...styles.thRight, width: '115px', cursor: 'pointer' }}
                     onClick={() => toggleSort('gainKRW')}
                   >
                     손익<SortArrow column="gainKRW" />
                   </th>
                   <th
-                    style={{ ...styles.thRight, width: '80px', cursor: 'pointer' }}
+                    style={{ ...styles.thRight, width: '90px', cursor: 'pointer' }}
                     onClick={() => toggleSort('gain')}
                   >
                     수익률<SortArrow column="gain" />
@@ -1763,7 +1821,7 @@ export default function PortfolioPage() {
                 </tr>
               </thead>
               <tbody>
-                {ALL_HOLDINGS
+                {liveHoldings
                   // 필터 적용
                   .filter(item => {
                     if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
@@ -1809,6 +1867,14 @@ export default function PortfolioPage() {
                             <div style={styles.tickerInfo}>
                               <span style={styles.tickerSymbol}>
                                 {item.ticker || item.name}
+                                {item.isLive && (
+                                  <span style={{
+                                    marginLeft: '6px',
+                                    fontSize: '9px',
+                                    color: '#00C853',
+                                    fontWeight: '500'
+                                  }}>●</span>
+                                )}
                               </span>
                               <span style={styles.tickerName}>
                                 {item.ticker && item.ticker !== item.name ? item.name : ''}
@@ -1844,7 +1910,7 @@ export default function PortfolioPage() {
                             fontWeight: '600',
                             fontSize: '13px',
                           }}>
-                            {item.gainKRW >= 0 ? '+' : ''}₩{Math.round(item.gainKRW).toLocaleString()}
+                            {item.gainKRW >= 0 ? '+' : '-'}₩{Math.abs(Math.round(item.gainKRW)).toLocaleString()}
                           </span>
                         </td>
                         {/* 수익률 */}
@@ -1880,7 +1946,7 @@ export default function PortfolioPage() {
             backgroundColor: '#F7F8FA',
           }}>
             <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '600', color: '#191F28' }}>
-              합계 ({ALL_HOLDINGS
+              합계 ({liveHoldings
                 .filter(item => {
                   if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
                   if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
@@ -1890,7 +1956,7 @@ export default function PortfolioPage() {
             <div style={{ display: 'flex', gap: isMobile ? '12px' : '24px', flexWrap: 'wrap' }}>
               <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#4E5968' }}>
                 평가금액: <strong style={{ color: '#191F28' }}>
-                  ₩{Math.round(ALL_HOLDINGS
+                  ₩{Math.round(liveHoldings
                     .filter(item => {
                       if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
                       if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
@@ -1901,7 +1967,7 @@ export default function PortfolioPage() {
               </span>
               <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#4E5968' }}>
                 손익: <strong style={{
-                  color: ALL_HOLDINGS
+                  color: liveHoldings
                     .filter(item => {
                       if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
                       if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
@@ -1909,14 +1975,14 @@ export default function PortfolioPage() {
                     })
                     .reduce((acc, item) => acc + item.gainKRW, 0) >= 0 ? '#00C853' : '#F04438'
                 }}>
-                  {ALL_HOLDINGS
+                  {liveHoldings
                     .filter(item => {
                       if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
                       if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
                       return true
                     })
                     .reduce((acc, item) => acc + item.gainKRW, 0) >= 0 ? '+' : ''}
-                  ₩{Math.round(ALL_HOLDINGS
+                  ₩{Math.round(liveHoldings
                     .filter(item => {
                       if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
                       if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
@@ -1927,7 +1993,7 @@ export default function PortfolioPage() {
               </span>
               {/* 총 수익률 */}
               {(() => {
-                const filtered = ALL_HOLDINGS.filter(item => {
+                const filtered = liveHoldings.filter(item => {
                   if (holdingsFilter.broker !== 'all' && item.broker !== holdingsFilter.broker) return false
                   if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
                   return true

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { fetchMultipleStockPrices, fetchExchangeRate } from '../services/stockApi'
 import { useNavigate } from 'react-router-dom'
 
 // 분기별 포트폴리오
@@ -536,15 +537,31 @@ export default function GayoonWealthPage() {
     return 125000000 // 기본값 1.25억
   }
 
-  const [prices, setPrices] = useState({ btc: getCachedPrices(), usdkrw: 1450 })
+  const [prices, setPrices] = useState({ btc: getCachedPrices(), usdkrw: 1450, stocks: {} })
   const [loading, setLoading] = useState(false)
   const [lastUpdate, setLastUpdate] = useState(null)
 
+  // 미국 주식 티커 목록
+  const US_STOCK_TICKERS = ['VOO', 'SCHD', 'AMZN']
+
   // 실시간 시세 가져오기 (5분마다, 에러 방지)
   useEffect(() => {
-    const fetchPrices = async () => {
+    const fetchAllPrices = async () => {
+      setLoading(true)
       try {
-        // BTC 가격 (CoinGecko) - 에러 시 캐시 사용
+        // 1. 미국 주식 시세 (Yahoo Finance)
+        const [stockPrices, exchangeRate] = await Promise.all([
+          fetchMultipleStockPrices(US_STOCK_TICKERS),
+          fetchExchangeRate()
+        ])
+
+        setPrices(prev => ({
+          ...prev,
+          stocks: stockPrices,
+          usdkrw: exchangeRate
+        }))
+
+        // 2. BTC 가격 (CoinGecko) - 에러 시 캐시 사용
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 5000) // 5초 타임아웃
 
@@ -566,9 +583,10 @@ export default function GayoonWealthPage() {
             }))
 
             setPrices(prev => ({ ...prev, btc: btcPrice }))
-            setLastUpdate(new Date())
           }
         }
+
+        setLastUpdate(new Date())
       } catch (error) {
         // 에러 시 조용히 무시 (캐시된 값 사용)
         console.log('시세 조회 스킵:', error.name)
@@ -578,10 +596,10 @@ export default function GayoonWealthPage() {
     }
 
     // 첫 로드 시 약간 지연 후 fetch (rate limit 방지)
-    const initialDelay = setTimeout(fetchPrices, 1000)
+    const initialDelay = setTimeout(fetchAllPrices, 1000)
 
     // 5분마다 갱신 (rate limit 방지)
-    const interval = setInterval(fetchPrices, 300000)
+    const interval = setInterval(fetchAllPrices, 300000)
 
     return () => {
       clearTimeout(initialDelay)
@@ -589,36 +607,107 @@ export default function GayoonWealthPage() {
     }
   }, [])
 
-  // 실시간 자산 계산 (이미 계산된 손익 데이터 사용)
+  // 실시간 자산 계산 (주식 + 비트코인)
   const trackedAssetsWithReturns = TRACKED_ASSETS.map(asset => {
-    // 비트코인은 실시간 가격 사용 (선택사항)
+    // 비트코인은 실시간 가격 사용
     if (asset.type === 'crypto' && prices.btc) {
       const currentValue = asset.btcAmount * prices.btc
       const gainKRW = currentValue - asset.investedKRW
       const returnRate = (gainKRW / asset.investedKRW) * 100
       return { ...asset, currentKRW: currentValue, gainKRW, returnRate }
     }
+    // 아마존은 실시간 가격 사용
+    if (asset.id === 'amazon' && prices.stocks?.AMZN) {
+      const stockData = prices.stocks.AMZN
+      const currentValue = asset.shares * stockData.price * prices.usdkrw
+      const gainKRW = currentValue - asset.investedKRW
+      const returnRate = (gainKRW / asset.investedKRW) * 100
+      return { ...asset, currentKRW: Math.round(currentValue), gainKRW: Math.round(gainKRW), returnRate }
+    }
     // 나머지는 기존 데이터 사용
     return { ...asset, returnRate: asset.gainPercent }
+  })
+
+  // STABLE_ASSETS 실시간 업데이트 (S&P500 + 배당주)
+  const updatedStableAssets = STABLE_ASSETS.map(asset => {
+    if (asset.id === 'sp500-dividend' && prices.stocks?.VOO && prices.stocks?.SCHD) {
+      // VOO + SCHD 합산 (실시간)
+      const vooData = prices.stocks.VOO
+      const schdData = prices.stocks.SCHD
+      // VOO: 약 32주, SCHD: 약 55주 (기존 데이터 기반 추정)
+      const vooShares = 32
+      const schdShares = 55
+      const vooValue = vooShares * vooData.price * prices.usdkrw
+      const schdValue = schdShares * schdData.price * prices.usdkrw
+      const currentValue = vooValue + schdValue
+      const gainKRW = currentValue - asset.investedKRW
+      const gainPercent = (gainKRW / asset.investedKRW) * 100
+      return {
+        ...asset,
+        currentKRW: Math.round(currentValue),
+        gainKRW: Math.round(gainKRW),
+        gainPercent: Math.round(gainPercent * 100) / 100,
+        note: `삼성증권 · ${gainPercent >= 0 ? '+' : ''}${gainPercent.toFixed(2)}% (실시간)`,
+      }
+    }
+    return asset
   })
 
   const quarterInfo = QUARTERLY_PORTFOLIOS[currentQuarter]
   const PORTFOLIO = quarterInfo?.portfolio || []
   const isLive = lastUpdate !== null
 
-  // 총 투자 원금 계산
-  const TOTAL_INVESTMENT = GAYOON_ALL_HOLDINGS.reduce((sum, item) => sum + item.investedKRW, 0)
+  // GAYOON_ALL_HOLDINGS 실시간 업데이트
+  const liveHoldings = GAYOON_ALL_HOLDINGS.map(item => {
+    // VOO
+    if (item.ticker === 'VOO' && prices.stocks?.VOO) {
+      const stockData = prices.stocks.VOO
+      const shares = item.investedKRW / (stockData.previousClose * prices.usdkrw) // 역산 추정
+      const currentKRW = shares * stockData.price * prices.usdkrw
+      const gainKRW = currentKRW - item.investedKRW
+      const gainPercent = (gainKRW / item.investedKRW) * 100
+      return { ...item, currentKRW: Math.round(currentKRW), gainKRW: Math.round(gainKRW), gainPercent: Math.round(gainPercent * 100) / 100, isLive: true }
+    }
+    // SCHD
+    if (item.ticker === 'SCHD' && prices.stocks?.SCHD) {
+      const stockData = prices.stocks.SCHD
+      const shares = item.investedKRW / (stockData.previousClose * prices.usdkrw)
+      const currentKRW = shares * stockData.price * prices.usdkrw
+      const gainKRW = currentKRW - item.investedKRW
+      const gainPercent = (gainKRW / item.investedKRW) * 100
+      return { ...item, currentKRW: Math.round(currentKRW), gainKRW: Math.round(gainKRW), gainPercent: Math.round(gainPercent * 100) / 100, isLive: true }
+    }
+    // AMZN
+    if (item.ticker === 'AMZN' && prices.stocks?.AMZN) {
+      const stockData = prices.stocks.AMZN
+      const currentKRW = item.shares * stockData.price * prices.usdkrw
+      const gainKRW = currentKRW - item.investedKRW
+      const gainPercent = (gainKRW / item.investedKRW) * 100
+      return { ...item, currentKRW: Math.round(currentKRW), gainKRW: Math.round(gainKRW), gainPercent: Math.round(gainPercent * 100) / 100, isLive: true }
+    }
+    // BTC
+    if (item.ticker === 'BTC' && prices.btc) {
+      const currentKRW = item.btcAmount * prices.btc
+      const gainKRW = currentKRW - item.investedKRW
+      const gainPercent = (gainKRW / item.investedKRW) * 100
+      return { ...item, currentKRW: Math.round(currentKRW), gainKRW: Math.round(gainKRW), gainPercent: Math.round(gainPercent * 100) / 100, isLive: true }
+    }
+    return item
+  })
 
-  // 총 자산 계산 (새 구조)
+  // 총 투자 원금 계산
+  const TOTAL_INVESTMENT = liveHoldings.reduce((sum, item) => sum + item.investedKRW, 0)
+
+  // 총 자산 계산 (새 구조) - 실시간 반영
   const totalTracked = trackedAssetsWithReturns.reduce((sum, item) => sum + (item.currentKRW || 0), 0)
   const totalFixed = FIXED_ASSETS.reduce((sum, item) => sum + item.currentKRW, 0)
-  const totalStable = STABLE_ASSETS.reduce((sum, item) => sum + item.currentKRW, 0) + totalTracked
+  const totalStable = updatedStableAssets.reduce((sum, item) => sum + item.currentKRW, 0) + totalTracked
   const totalLiquid = LIQUID_ASSETS.reduce((sum, item) => sum + item.currentKRW, 0)
-  const totalReceivables = STABLE_ASSETS.filter(a => a.type === 'receivable').reduce((sum, item) => sum + item.currentKRW, 0)
+  const totalReceivables = updatedStableAssets.filter(a => a.type === 'receivable').reduce((sum, item) => sum + item.currentKRW, 0)
   const totalCurrentAssets = totalFixed + totalStable + totalLiquid - totalReceivables // 받을돈 중복 제거
 
-  // 총 손익 계산
-  const totalGainHoldings = GAYOON_ALL_HOLDINGS.reduce((sum, item) => sum + (item.gainKRW || 0), 0)
+  // 총 손익 계산 (실시간)
+  const totalGainHoldings = liveHoldings.reduce((sum, item) => sum + (item.gainKRW || 0), 0)
   const totalGainPercent = TOTAL_INVESTMENT > 0 ? (totalGainHoldings / TOTAL_INVESTMENT) * 100 : 0
 
   return (
@@ -1269,14 +1358,8 @@ export default function GayoonWealthPage() {
         }}>
           <span style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28' }}>전체 보유 종목</span>
           <span style={{ fontSize: '13px', color: '#8B95A1' }}>
-            {(() => {
-              // 비트코인 실시간 가격 반영
-              const btcItem = GAYOON_ALL_HOLDINGS.find(h => h.ticker === 'BTC')
-              const btcCurrentValue = btcItem ? btcItem.btcAmount * (prices.btc || 125000000) : 0
-              const btcInvested = btcItem ? btcItem.investedKRW : 0
-              const otherTotal = GAYOON_ALL_HOLDINGS.filter(h => h.ticker !== 'BTC').reduce((acc, h) => acc + h.currentKRW, 0)
-              return GAYOON_ALL_HOLDINGS.length
-            })()}개 종목
+            {liveHoldings.length}개 종목
+            {isLive && <span style={{ marginLeft: '6px', color: '#00C853', fontSize: '11px' }}>● 실시간</span>}
           </span>
         </div>
 
@@ -1397,18 +1480,7 @@ export default function GayoonWealthPage() {
               </tr>
             </thead>
             <tbody>
-              {GAYOON_ALL_HOLDINGS
-                // 비트코인 실시간 가격 반영
-                .map(item => {
-                  if (item.isCrypto && item.ticker === 'BTC') {
-                    const btcPrice = prices.btc || 125000000
-                    const currentValue = item.btcAmount * btcPrice
-                    const gainKRW = currentValue - item.investedKRW
-                    const gainPercent = (gainKRW / item.investedKRW) * 100
-                    return { ...item, currentKRW: currentValue, gainKRW, gainPercent }
-                  }
-                  return item
-                })
+              {liveHoldings
                 // 필터 적용
                 .filter(item => {
                   if (holdingsFilter.account !== 'all' && item.account !== holdingsFilter.account) return false
@@ -1497,65 +1569,33 @@ export default function GayoonWealthPage() {
           backgroundColor: '#F7F8FA',
         }}>
           <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '600', color: '#191F28' }}>
-            합계 ({GAYOON_ALL_HOLDINGS
+            합계 ({liveHoldings
               .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
               .length}개 종목)
           </span>
           <div style={{ display: 'flex', gap: isMobile ? '12px' : '24px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#4E5968' }}>
               평가금액: <strong style={{ color: '#191F28' }}>
-                ₩{Math.round(GAYOON_ALL_HOLDINGS
-                  .map(item => {
-                    if (item.isCrypto && item.ticker === 'BTC') {
-                      return { ...item, currentKRW: item.btcAmount * (prices.btc || 125000000) }
-                    }
-                    return item
-                  })
+                ₩{Math.round(liveHoldings
                   .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
                   .reduce((acc, item) => acc + item.currentKRW, 0)).toLocaleString()}
               </strong>
             </span>
             <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#4E5968' }}>
-              손익: <strong style={{
-                color: (() => {
-                  const totalGain = GAYOON_ALL_HOLDINGS
-                    .map(item => {
-                      if (item.isCrypto && item.ticker === 'BTC') {
-                        const currentValue = item.btcAmount * (prices.btc || 125000000)
-                        return { ...item, gainKRW: currentValue - item.investedKRW }
-                      }
-                      return item
-                    })
-                    .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
-                    .reduce((acc, item) => acc + item.gainKRW, 0)
-                  return totalGain >= 0 ? '#00C853' : '#F04438'
-                })()
-              }}>
-                {(() => {
-                  const totalGain = GAYOON_ALL_HOLDINGS
-                    .map(item => {
-                      if (item.isCrypto && item.ticker === 'BTC') {
-                        const currentValue = item.btcAmount * (prices.btc || 125000000)
-                        return { ...item, gainKRW: currentValue - item.investedKRW }
-                      }
-                      return item
-                    })
-                    .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
-                    .reduce((acc, item) => acc + item.gainKRW, 0)
-                  return `${totalGain >= 0 ? '+' : ''}₩${Math.round(totalGain).toLocaleString()}`
-                })()}
-              </strong>
+              손익: {(() => {
+                const totalGain = liveHoldings
+                  .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
+                  .reduce((acc, item) => acc + item.gainKRW, 0)
+                return (
+                  <strong style={{ color: totalGain >= 0 ? '#00C853' : '#F04438' }}>
+                    {totalGain >= 0 ? '+' : ''}₩{Math.round(totalGain).toLocaleString()}
+                  </strong>
+                )
+              })()}
             </span>
             <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#4E5968' }}>
               수익률: {(() => {
-                const filtered = GAYOON_ALL_HOLDINGS
-                  .map(item => {
-                    if (item.isCrypto && item.ticker === 'BTC') {
-                      const currentValue = item.btcAmount * (prices.btc || 125000000)
-                      return { ...item, currentKRW: currentValue, gainKRW: currentValue - item.investedKRW }
-                    }
-                    return item
-                  })
+                const filtered = liveHoldings
                   .filter(item => holdingsFilter.account === 'all' || item.account === holdingsFilter.account)
                 const totalInvested = filtered.reduce((acc, item) => acc + item.investedKRW, 0)
                 const totalGain = filtered.reduce((acc, item) => acc + item.gainKRW, 0)
