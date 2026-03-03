@@ -130,10 +130,12 @@ const GAYOON_PORTFOLIOS = {
     name: 'ISA',
     icon: '📊',
     target: [
-      { ticker: 'PLUS', name: 'PLUS 신흥국MSCI', category: '신흥국', targetWeight: 35 },
-      { ticker: 'TIGER', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 30 },
-      { ticker: 'KODEX', name: 'KODEX 금액티브', category: '금', targetWeight: 30 },
-      { ticker: 'SP500', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 5 },
+      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 25 },
+      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 25 },
+      { ticker: '133690', name: 'TIGER 미국나스닥100', category: 'S&P500', targetWeight: 15 },
+      { ticker: '195980', name: 'TIGER MSCI신흥국', category: '신흥국', targetWeight: 15 },
+      { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10 },
+      { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10 },
     ],
     holdings: [
       { ticker: 'PLUS신흥국', name: 'PLUS 신흥국MSCI(합성 H)', currentKRW: 2991835, category: '신흥국' },

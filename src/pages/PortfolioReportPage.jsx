@@ -50,9 +50,10 @@ const PORTFOLIOS = {
     amount: 20000000,
     status: '완료',
     taxBenefit: '비과세 200만원 + 9.9% 분리과세',
-    description: '해외주식 중심 장기 투자',
+    description: '해외주식 + 국내주식 분산 투자',
     items: [
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 50, risk: 3 },
+      { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 25, risk: 3 },
+      { ticker: '069500', name: 'KODEX 코스피200', category: '국내주식', targetWeight: 25, risk: 2 },
       { ticker: '133690', name: 'TIGER 미국나스닥100', category: '해외주식', targetWeight: 15, risk: 4 },
       { ticker: '195980', name: 'TIGER MSCI신흥국', category: '해외주식', targetWeight: 15, risk: 5 },
       { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10, risk: 1 },
