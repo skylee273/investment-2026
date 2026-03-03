@@ -1,6 +1,46 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+// 실제 보유 종목 (2026.03.02 기준)
+const ACTUAL_HOLDINGS = {
+  isa: {
+    investedKRW: 6985235,  // PLUS신흥국 + TIGER미국채 + KODEX금
+    currentKRW: 7026625,
+    gainKRW: 41390,
+    gainPercent: 0.59,
+    holdings: [
+      { name: 'PLUS 신흥국MSCI', investedKRW: 2997060, currentKRW: 2991835, gainKRW: -5225, gainPercent: -0.17 },
+      { name: 'TIGER 미국채10년선물', investedKRW: 2003535, currentKRW: 2030310, gainKRW: 26775, gainPercent: 1.34 },
+      { name: 'KODEX 금액티브', investedKRW: 1984640, currentKRW: 2004480, gainKRW: 19840, gainPercent: 1.00 },
+    ],
+  },
+  pension: {
+    investedKRW: 1977045,
+    currentKRW: 1976520,
+    gainKRW: -525,
+    gainPercent: -0.03,
+    holdings: [
+      { name: 'KODEX 200', investedKRW: 1977045, currentKRW: 1976520, gainKRW: -525, gainPercent: -0.03 },
+    ],
+  },
+  irp: {
+    investedKRW: 200000,
+    currentKRW: 273323,
+    gainKRW: 73323,
+    gainPercent: 36.66,
+    holdings: [
+      { name: 'IRP 투자상품', investedKRW: 200000, currentKRW: 273323, gainKRW: 73323, gainPercent: 36.66 },
+    ],
+  },
+  pensionExtra: {
+    investedKRW: 0,
+    currentKRW: 0,
+    gainKRW: 0,
+    gainPercent: 0,
+    holdings: [],
+  },
+}
+
 // 포트폴리오 데이터 (GayoonWealthPage와 동일)
 const PORTFOLIOS = {
   isa: {
@@ -266,6 +306,7 @@ export default function PortfolioReportPage() {
   const [activeTab, setActiveTab] = useState('isa')
 
   const portfolio = PORTFOLIOS[activeTab]
+  const actual = ACTUAL_HOLDINGS[activeTab]
   const safeWeight = portfolio.items.filter(i => i.risk <= 2).reduce((s, i) => s + i.targetWeight, 0)
   const riskWeight = 100 - safeWeight
   const avgRisk = portfolio.items.reduce((s, i) => s + (i.risk * i.targetWeight), 0) / 100
@@ -283,15 +324,29 @@ export default function PortfolioReportPage() {
 
       {/* 탭 */}
       <div style={styles.tabs}>
-        {Object.values(PORTFOLIOS).map(p => (
-          <button
-            key={p.id}
-            style={styles.tab(activeTab === p.id)}
-            onClick={() => setActiveTab(p.id)}
-          >
-            {p.icon} {p.name} ({(p.amount / 10000).toLocaleString()}만)
-          </button>
-        ))}
+        {Object.values(PORTFOLIOS).map(p => {
+          const a = ACTUAL_HOLDINGS[p.id]
+          return (
+            <button
+              key={p.id}
+              style={styles.tab(activeTab === p.id)}
+              onClick={() => setActiveTab(p.id)}
+            >
+              {p.icon} {p.name}
+              {a.currentKRW > 0 && (
+                <span style={{
+                  marginLeft: '6px',
+                  color: activeTab === p.id
+                    ? (a.gainPercent >= 0 ? '#B2FF59' : '#FF8A80')
+                    : (a.gainPercent >= 0 ? '#00C853' : '#F04438'),
+                  fontWeight: '700',
+                }}>
+                  {a.gainPercent >= 0 ? '+' : ''}{a.gainPercent.toFixed(1)}%
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {/* 포트폴리오 요약 */}
@@ -322,7 +377,20 @@ export default function PortfolioReportPage() {
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '24px', fontWeight: '700', color: '#191F28' }}>
-              {(portfolio.amount / 10000).toLocaleString()}만원
+              ₩{actual.currentKRW.toLocaleString()}
+            </div>
+            {actual.currentKRW > 0 && (
+              <div style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: actual.gainKRW >= 0 ? '#00C853' : '#F04438',
+                marginTop: '4px',
+              }}>
+                {actual.gainKRW >= 0 ? '+' : '-'}₩{Math.abs(actual.gainKRW).toLocaleString()} ({actual.gainPercent >= 0 ? '+' : ''}{actual.gainPercent.toFixed(2)}%)
+              </div>
+            )}
+            <div style={{ fontSize: '11px', color: '#8B95A1', marginTop: '4px' }}>
+              매입 ₩{actual.investedKRW.toLocaleString()}
             </div>
             <div style={{ fontSize: '12px', color: '#3182F6', marginTop: '4px' }}>{portfolio.taxBenefit}</div>
           </div>
@@ -400,6 +468,55 @@ export default function PortfolioReportPage() {
             )
           })}
         </div>
+
+        {/* 실제 보유 종목 */}
+        {actual.holdings.length > 0 && (
+          <div style={{ marginTop: '20px', borderTop: '1px solid #E5E8EB', paddingTop: '20px' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28', marginBottom: '12px' }}>
+              📊 실제 보유 종목
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {actual.holdings.map((h, idx) => (
+                <div key={idx} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 16px',
+                  backgroundColor: '#F7F8FA',
+                  borderRadius: '10px',
+                }}>
+                  <span style={{ fontSize: '13px', fontWeight: '500', color: '#191F28' }}>{h.name}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <span style={{ fontSize: '13px', color: '#8B95A1' }}>
+                      ₩{h.currentKRW.toLocaleString()}
+                    </span>
+                    <span style={{
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: h.gainKRW >= 0 ? '#00C853' : '#F04438',
+                      minWidth: '80px',
+                      textAlign: 'right',
+                    }}>
+                      {h.gainKRW >= 0 ? '+' : '-'}₩{Math.abs(h.gainKRW).toLocaleString()}
+                    </span>
+                    <span style={{
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      backgroundColor: h.gainPercent >= 0 ? '#E8F5E9' : '#FFEBEE',
+                      color: h.gainPercent >= 0 ? '#00C853' : '#F04438',
+                      minWidth: '60px',
+                      textAlign: 'center',
+                    }}>
+                      {h.gainPercent >= 0 ? '+' : ''}{h.gainPercent.toFixed(2)}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ETF 상세 카드 */}
