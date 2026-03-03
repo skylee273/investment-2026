@@ -1,278 +1,100 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // 포트폴리오 대결 2026
-// 기간: 2026.02 ~ 2027.02 (1년)
+// 기간: 2026.02.22 ~ 2026.12.24 (10개월)
+// 최종 업데이트: 2026.03.03
 
 const BATTLE_INFO = {
   startDate: '2026-02-22',
   endDate: '2026-12-24',
   prize: '치킨 사주기 🍗',
+  lastUpdate: '2026.03.03',
 }
 
-// 하늘 포트폴리오 요약
-const HANEUL_PORTFOLIO = {
-  name: '하늘',
-  emoji: '☁️',
-  color: '#3182F6',
-  strategy: '개별주 + ETF 혼합',
-  totalInvestment: 1000000,
-  currentValue: 1000000,
-  monthlyData: [
-    { month: '2월', value: 1000000, return: 0 },
-  ],
-  holdings: [
-    { name: 'KODEX 200', weight: 30 },
-    { name: 'KODEX 코스닥150', weight: 13 },
-    { name: 'GOOG', weight: 12 },
-    { name: 'TIGER S&P 500', weight: 10 },
-    { name: 'TIGER 혼합50', weight: 10 },
-    { name: 'CVX', weight: 10 },
-    { name: 'AMZN', weight: 10 },
-    { name: 'ADA', weight: 5 },
-  ],
-}
+// ========== 하우가 패밀리 (하늘) 실제 데이터 - 2026.03.03 기준 ==========
+const HAUGA_HOLDINGS = [
+  // 토스증권 해외주식 (18개 종목)
+  { ticker: 'ADA', name: '에이다 (카르다노)', currentKRW: 63529, investedKRW: 60077, gainPercent: 5.75 },
+  { ticker: 'AMZN', name: '아마존', currentKRW: 357500, investedKRW: 405609, gainPercent: -11.8 },
+  { ticker: 'GOOG', name: '알파벳 C', currentKRW: 61640, investedKRW: 63640, gainPercent: -3.1 },
+  { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 42545, investedKRW: 47589, gainPercent: -10.5 },
+  { ticker: 'CVX', name: '셰브론', currentKRW: 28864, investedKRW: 26635, gainPercent: 8.3 },
+  { ticker: 'META', name: '메타', currentKRW: 22607, investedKRW: 23669, gainPercent: -4.4 },
+  { ticker: 'AXP', name: '아메리칸 익스프레스', currentKRW: 21474, investedKRW: 25591, gainPercent: -16.0 },
+  { ticker: 'BAC', name: '뱅크오브아메리카', currentKRW: 18877, investedKRW: 20701, gainPercent: -8.8 },
+  { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 17793, investedKRW: 19726, gainPercent: -9.7 },
+  { ticker: 'SPY', name: 'SPY', currentKRW: 17155, investedKRW: 17703, gainPercent: -3.0 },
+  { ticker: 'MP', name: 'MP 머티리얼스', currentKRW: 7964, investedKRW: 8854, gainPercent: -10.0 },
+  { ticker: 'ISRG', name: '인튜이티브 서지컬', currentKRW: 7656, investedKRW: 7881, gainPercent: -2.8 },
+  { ticker: 'QCOM', name: '퀄컴', currentKRW: 7193, investedKRW: 7882, gainPercent: -8.7 },
+  { ticker: 'PLTR', name: '팔란티어', currentKRW: 3097, investedKRW: 2970, gainPercent: 4.2 },
+  { ticker: 'TSLA', name: '테슬라', currentKRW: 2765, investedKRW: 2968, gainPercent: -6.8 },
+  { ticker: 'AVGO', name: '브로드컴', currentKRW: 2640, investedKRW: 2972, gainPercent: -11.1 },
+  { ticker: 'VRT', name: '버티브 홀딩스', currentKRW: 1933, investedKRW: 1993, gainPercent: -3.0 },
+  { ticker: 'VST', name: '비스트라 에너지', currentKRW: 955, investedKRW: 985, gainPercent: -3.0 },
+  // 미래에셋 - 연금저축
+  { ticker: 'KODEX200_P', name: 'KODEX 200 (연금)', currentKRW: 658840, investedKRW: 617700, gainPercent: 6.66 },
+  { ticker: 'KODEX150_P', name: 'KODEX 코스닥150 (연금)', currentKRW: 105500, investedKRW: 101300, gainPercent: 4.15 },
+  // 미래에셋 - ISA
+  { ticker: 'KODEX150_I', name: 'KODEX 코스닥150 (ISA)', currentKRW: 105500, investedKRW: 101075, gainPercent: 4.38 },
+  { ticker: 'TIGER_BOND', name: 'TIGER 미국채10년 (ISA)', currentKRW: 199050, investedKRW: 198375, gainPercent: 0.34 },
+  { ticker: 'TIGER_SP_I', name: 'TIGER 미국S&P500 (ISA)', currentKRW: 196520, investedKRW: 196840, gainPercent: -0.16 },
+  // 미래에셋 - 종합_주식
+  { ticker: 'GOOG_S', name: '알파벳 C (종합)', currentKRW: 443632, investedKRW: 442635, gainPercent: 0.23 },
+  { ticker: 'TIGER_SP_S', name: 'TIGER 미국S&P500 (종합)', currentKRW: 171955, investedKRW: 174090, gainPercent: -1.23 },
+  { ticker: '1Q_HYB', name: '1Q 미국S&P500미국채혼합', currentKRW: 113550, investedKRW: 116250, gainPercent: -2.32 },
+  // 미래에셋 - CMA
+  { ticker: 'CMA_E', name: '비상금 CMA', currentKRW: 600179, investedKRW: 600032, gainPercent: 0.02 },
+  { ticker: 'CMA_F', name: '가족여행 CMA', currentKRW: 410119, investedKRW: 410000, gainPercent: 0.03 },
+]
 
-// 가윤 포트폴리오 요약
-const GAYOON_PORTFOLIO = {
-  name: '가윤',
-  emoji: '🐰',
-  color: '#00C853',
-  strategy: '리밸런싱 기반 ETF',
-  totalInvestment: 1000000,
-  currentValue: 1000000,
-  monthlyData: [
-    { month: '2월', value: 1000000, return: 0 },
-  ],
-  holdings: [
-    { name: 'S&P500 ETF', weight: 40 },
-    { name: 'KODEX 200', weight: 20 },
-    { name: 'KODEX 코스닥150', weight: 10 },
-    { name: 'KODEX 국고채10년', weight: 10 },
-    { name: 'TIGER 미국채10년', weight: 10 },
-    { name: 'KODEX 골드', weight: 10 },
-  ],
-}
+// ========== 가윤 달리오 실제 데이터 - 2026.03.03 기준 ==========
+const GAYOON_HOLDINGS = [
+  // 삼성증권 - S&P500 + 배당주
+  { ticker: 'VOO', name: 'Vanguard S&P500 ETF', currentKRW: 19577473, investedKRW: 18034965, gainPercent: 8.55 },
+  { ticker: 'VOO_P', name: 'VOO (소수점)', currentKRW: 656352, investedKRW: 676691, gainPercent: -3.01 },
+  { ticker: 'SCHD', name: 'Schwab 배당주 ETF', currentKRW: 4562673, investedKRW: 4047160, gainPercent: 12.74 },
+  // 미래에셋 - 아마존
+  { ticker: 'AMZN', name: '아마존', currentKRW: 2638715, investedKRW: 2782034, gainPercent: -5.15 },
+  // 삼성증권 - ISA
+  { ticker: 'PLUS_EM', name: 'PLUS 신흥국MSCI', currentKRW: 2991835, investedKRW: 2997060, gainPercent: -0.17 },
+  { ticker: 'TIGER_BD', name: 'TIGER 미국채10년', currentKRW: 2030310, investedKRW: 2003535, gainPercent: 1.34 },
+  { ticker: 'KODEX_G', name: 'KODEX 금액티브', currentKRW: 2004480, investedKRW: 1984640, gainPercent: 1.00 },
+  // 미래에셋 - 연금저축
+  { ticker: 'KODEX200', name: 'KODEX 200', currentKRW: 1976520, investedKRW: 1977045, gainPercent: -0.03 },
+  // IRP
+  { ticker: 'IRP', name: 'IRP 투자상품', currentKRW: 273323, investedKRW: 200000, gainPercent: 36.66 },
+  // CMA
+  { ticker: 'CMA', name: '삼성신종MMF (CMA)', currentKRW: 6631937, investedKRW: 6630776, gainPercent: 0.02 },
+  // 비트코인
+  { ticker: 'BTC', name: '비트코인', currentKRW: 990775, investedKRW: 999500, gainPercent: -0.87 },
+]
 
-const styles = {
-  container: {
-    maxWidth: '100%',
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: '32px',
-  },
-  title: {
-    fontSize: '32px',
-    fontWeight: '800',
-    color: '#191F28',
-    margin: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '12px',
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#8B95A1',
-    marginTop: '8px',
-  },
-  vsContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '24px',
-    marginBottom: '32px',
-  },
-  playerCard: (color, isWinning) => ({
-    flex: 1,
-    maxWidth: '400px',
-    backgroundColor: 'white',
-    borderRadius: '20px',
-    padding: '24px',
-    border: isWinning ? `3px solid ${color}` : '1px solid #E5E8EB',
-    boxShadow: isWinning ? `0 8px 32px ${color}30` : 'none',
-    transition: 'all 0.3s',
-  }),
-  playerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '16px',
-  },
-  playerEmoji: {
-    fontSize: '40px',
-  },
-  playerName: {
-    fontSize: '24px',
-    fontWeight: '700',
-    color: '#191F28',
-  },
-  playerStrategy: {
-    fontSize: '12px',
-    color: '#8B95A1',
-  },
-  vsText: {
-    fontSize: '32px',
-    fontWeight: '900',
-    color: '#F04438',
-    textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
-  },
-  statRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 0',
-    borderBottom: '1px solid #F2F4F6',
-  },
-  statLabel: {
-    fontSize: '13px',
-    color: '#8B95A1',
-  },
-  statValue: {
-    fontSize: '16px',
-    fontWeight: '700',
-    color: '#191F28',
-  },
-  returnValue: (isPositive) => ({
-    fontSize: '20px',
-    fontWeight: '800',
-    color: isPositive ? '#00C853' : isPositive === false ? '#F04438' : '#8B95A1',
-  }),
-  progressSection: {
-    backgroundColor: 'white',
-    borderRadius: '16px',
-    padding: '24px',
-    border: '1px solid #E5E8EB',
-    marginBottom: '24px',
-  },
-  sectionTitle: {
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#191F28',
-    marginBottom: '20px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  battleBar: {
-    height: '48px',
-    backgroundColor: '#F2F4F6',
-    borderRadius: '24px',
-    display: 'flex',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  battleBarLeft: (percent, color) => ({
-    width: `${percent}%`,
-    backgroundColor: color,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingLeft: '16px',
-    color: 'white',
-    fontWeight: '700',
-    fontSize: '14px',
-    transition: 'width 0.5s ease',
-  }),
-  battleBarRight: (percent, color) => ({
-    width: `${percent}%`,
-    backgroundColor: color,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingRight: '16px',
-    color: 'white',
-    fontWeight: '700',
-    fontSize: '14px',
-    transition: 'width 0.5s ease',
-  }),
-  holdingsGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '24px',
-    marginBottom: '24px',
-  },
-  holdingsCard: {
-    backgroundColor: 'white',
-    borderRadius: '16px',
-    padding: '20px',
-    border: '1px solid #E5E8EB',
-  },
-  holdingsTitle: (color) => ({
-    fontSize: '16px',
-    fontWeight: '700',
-    color: color,
-    marginBottom: '16px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  }),
-  holdingItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '8px 0',
-    borderBottom: '1px solid #F2F4F6',
-    fontSize: '13px',
-  },
-  dDayCard: {
-    backgroundColor: '#FFF9E6',
-    borderRadius: '16px',
-    padding: '24px',
-    border: '1px solid #FFE082',
-    textAlign: 'center',
-    marginBottom: '24px',
-  },
-  dDayValue: {
-    fontSize: '48px',
-    fontWeight: '800',
-    color: '#F57F17',
-  },
-  dDayLabel: {
-    fontSize: '14px',
-    color: '#856404',
-    marginTop: '8px',
-  },
-  rulesCard: {
-    backgroundColor: '#F0F7FF',
-    borderRadius: '16px',
-    padding: '20px',
-    border: '1px solid #BBDEFB',
-  },
-  rulesTitle: {
-    fontSize: '16px',
-    fontWeight: '700',
-    color: '#3182F6',
-    marginBottom: '12px',
-  },
-  rulesList: {
-    fontSize: '13px',
-    color: '#4E5968',
-    lineHeight: '2',
-  },
-  winnerBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '4px 12px',
-    backgroundColor: '#FFE082',
-    borderRadius: '20px',
-    fontSize: '12px',
-    fontWeight: '700',
-    color: '#F57F17',
-  },
-  tieText: {
-    textAlign: 'center',
-    fontSize: '16px',
-    color: '#8B95A1',
-    padding: '20px',
-  },
+// 수익률 계산
+const calculatePortfolioStats = (holdings) => {
+  const totalCurrent = holdings.reduce((sum, h) => sum + h.currentKRW, 0)
+  const totalInvested = holdings.reduce((sum, h) => sum + h.investedKRW, 0)
+  const totalGain = totalCurrent - totalInvested
+  const returnPercent = totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0
+  return { totalCurrent, totalInvested, totalGain, returnPercent }
 }
 
 export default function PortfolioBattlePage() {
-  // 수익률 계산
-  const haneulReturn = ((HANEUL_PORTFOLIO.currentValue - HANEUL_PORTFOLIO.totalInvestment) / HANEUL_PORTFOLIO.totalInvestment) * 100
-  const gayoonReturn = ((GAYOON_PORTFOLIO.currentValue - GAYOON_PORTFOLIO.totalInvestment) / GAYOON_PORTFOLIO.totalInvestment) * 100
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // 실시간 계산
+  const haugaStats = calculatePortfolioStats(HAUGA_HOLDINGS)
+  const gayoonStats = calculatePortfolioStats(GAYOON_HOLDINGS)
+
+  const haneulReturn = haugaStats.returnPercent
+  const gayoonReturn = gayoonStats.returnPercent
 
   // 승자 결정
   const getWinner = () => {
@@ -281,6 +103,7 @@ export default function PortfolioBattlePage() {
     return 'tie'
   }
   const winner = getWinner()
+  const gap = Math.abs(haneulReturn - gayoonReturn)
 
   // D-day 계산
   const today = new Date()
@@ -294,10 +117,254 @@ export default function PortfolioBattlePage() {
   const passedDays = (today - startDate) / (1000 * 60 * 60 * 24)
   const progressPercent = Math.min(Math.max((passedDays / totalDays) * 100, 0), 100)
 
-  // 대결 바 비율 계산
-  const totalReturn = Math.abs(haneulReturn) + Math.abs(gayoonReturn)
-  const haneulBarPercent = totalReturn === 0 ? 50 : (Math.max(haneulReturn, 0) / (Math.max(haneulReturn, 0) + Math.max(gayoonReturn, 0)) * 100) || 50
-  const gayoonBarPercent = 100 - haneulBarPercent
+  // 주요 보유 종목 (비중 기준 상위 5개)
+  const getTopHoldings = (holdings, stats) => {
+    return [...holdings]
+      .sort((a, b) => b.currentKRW - a.currentKRW)
+      .slice(0, 5)
+      .map(h => ({
+        name: h.name.replace('Vanguard ', '').replace('Schwab ', '').replace(' ETF', ''),
+        weight: ((h.currentKRW / stats.totalCurrent) * 100).toFixed(1),
+        gainPercent: h.gainPercent,
+      }))
+  }
+
+  const haugaTop = getTopHoldings(HAUGA_HOLDINGS, haugaStats)
+  const gayoonTop = getTopHoldings(GAYOON_HOLDINGS, gayoonStats)
+
+  const styles = {
+    container: {
+      maxWidth: '100%',
+    },
+    header: {
+      textAlign: 'center',
+      marginBottom: '24px',
+    },
+    title: {
+      fontSize: isMobile ? '24px' : '32px',
+      fontWeight: '800',
+      color: '#191F28',
+      margin: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '12px',
+    },
+    subtitle: {
+      fontSize: '14px',
+      color: '#8B95A1',
+      marginTop: '8px',
+    },
+    updateBadge: {
+      display: 'inline-block',
+      padding: '4px 10px',
+      backgroundColor: '#E8F5E9',
+      borderRadius: '6px',
+      fontSize: '12px',
+      fontWeight: '600',
+      color: '#2E7D32',
+      marginTop: '8px',
+    },
+    dDayCard: {
+      backgroundColor: '#FFF9E6',
+      borderRadius: '16px',
+      padding: '20px',
+      border: '1px solid #FFE082',
+      textAlign: 'center',
+      marginBottom: '24px',
+    },
+    dDayValue: {
+      fontSize: isMobile ? '36px' : '48px',
+      fontWeight: '800',
+      color: '#F57F17',
+    },
+    dDayLabel: {
+      fontSize: '14px',
+      color: '#856404',
+      marginTop: '8px',
+    },
+    vsContainer: {
+      display: 'flex',
+      alignItems: isMobile ? 'stretch' : 'center',
+      justifyContent: 'center',
+      gap: isMobile ? '12px' : '24px',
+      marginBottom: '24px',
+      flexDirection: isMobile ? 'column' : 'row',
+    },
+    playerCard: (color, isWinning) => ({
+      flex: 1,
+      maxWidth: isMobile ? '100%' : '400px',
+      backgroundColor: 'white',
+      borderRadius: '20px',
+      padding: '20px',
+      border: isWinning ? `3px solid ${color}` : '1px solid #E5E8EB',
+      boxShadow: isWinning ? `0 8px 32px ${color}30` : 'none',
+      transition: 'all 0.3s',
+    }),
+    playerHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginBottom: '16px',
+    },
+    playerEmoji: {
+      fontSize: '36px',
+    },
+    playerName: {
+      fontSize: '20px',
+      fontWeight: '700',
+      color: '#191F28',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+    },
+    playerStrategy: {
+      fontSize: '12px',
+      color: '#8B95A1',
+    },
+    winnerBadge: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '4px',
+      padding: '4px 10px',
+      backgroundColor: '#FFE082',
+      borderRadius: '20px',
+      fontSize: '11px',
+      fontWeight: '700',
+      color: '#F57F17',
+    },
+    statRow: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '10px 0',
+      borderBottom: '1px solid #F2F4F6',
+    },
+    statLabel: {
+      fontSize: '13px',
+      color: '#8B95A1',
+    },
+    statValue: {
+      fontSize: '15px',
+      fontWeight: '700',
+      color: '#191F28',
+    },
+    returnValue: (isPositive) => ({
+      fontSize: '22px',
+      fontWeight: '800',
+      color: isPositive > 0 ? '#00C853' : isPositive < 0 ? '#F04438' : '#8B95A1',
+    }),
+    vsText: {
+      fontSize: isMobile ? '24px' : '32px',
+      fontWeight: '900',
+      color: '#F04438',
+      textAlign: 'center',
+      padding: isMobile ? '8px 0' : '0',
+    },
+    progressSection: {
+      backgroundColor: 'white',
+      borderRadius: '16px',
+      padding: '20px',
+      border: '1px solid #E5E8EB',
+      marginBottom: '24px',
+    },
+    sectionTitle: {
+      fontSize: '16px',
+      fontWeight: '700',
+      color: '#191F28',
+      marginBottom: '16px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+    },
+    battleBar: {
+      height: '48px',
+      backgroundColor: '#F2F4F6',
+      borderRadius: '24px',
+      display: 'flex',
+      overflow: 'hidden',
+      position: 'relative',
+    },
+    battleBarHalf: (color, isLeft) => ({
+      width: '50%',
+      backgroundColor: color,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: isLeft ? 'flex-start' : 'flex-end',
+      padding: isLeft ? '0 0 0 16px' : '0 16px 0 0',
+      color: 'white',
+      fontWeight: '700',
+      fontSize: '14px',
+    }),
+    holdingsGrid: {
+      display: 'grid',
+      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+      gap: '16px',
+      marginBottom: '24px',
+    },
+    holdingsCard: {
+      backgroundColor: 'white',
+      borderRadius: '16px',
+      padding: '16px',
+      border: '1px solid #E5E8EB',
+    },
+    holdingsTitle: (color) => ({
+      fontSize: '14px',
+      fontWeight: '700',
+      color: color,
+      marginBottom: '12px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+    }),
+    holdingItem: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '8px 0',
+      borderBottom: '1px solid #F2F4F6',
+      fontSize: '13px',
+    },
+    holdingReturn: (isPositive) => ({
+      fontSize: '12px',
+      fontWeight: '600',
+      color: isPositive >= 0 ? '#00C853' : '#F04438',
+    }),
+    gapCard: {
+      backgroundColor: winner === 'tie' ? '#F7F8FA' : winner === 'haneul' ? '#E8F3FF' : '#E8F5E9',
+      borderRadius: '16px',
+      padding: '20px',
+      marginBottom: '24px',
+      textAlign: 'center',
+    },
+    gapValue: {
+      fontSize: '28px',
+      fontWeight: '800',
+      color: winner === 'haneul' ? '#3182F6' : '#00C853',
+    },
+    gapLabel: {
+      fontSize: '14px',
+      color: '#6B7684',
+      marginTop: '8px',
+    },
+    rulesCard: {
+      backgroundColor: '#F0F7FF',
+      borderRadius: '16px',
+      padding: '20px',
+      border: '1px solid #BBDEFB',
+    },
+    rulesTitle: {
+      fontSize: '16px',
+      fontWeight: '700',
+      color: '#3182F6',
+      marginBottom: '12px',
+    },
+    rulesList: {
+      fontSize: '13px',
+      color: '#4E5968',
+      lineHeight: '2',
+    },
+  }
 
   return (
     <div style={styles.container}>
@@ -309,8 +376,11 @@ export default function PortfolioBattlePage() {
           <span>🏆</span>
         </h1>
         <p style={styles.subtitle}>
-          2026.02.22 ~ 2026.12.24 · 10개월간 수익률 대결 · 상품: {BATTLE_INFO.prize}
+          2026.02.22 ~ 2026.12.24 · 10개월 수익률 대결 · 상품: {BATTLE_INFO.prize}
         </p>
+        <div style={styles.updateBadge}>
+          🔄 최종 업데이트: {BATTLE_INFO.lastUpdate}
+        </div>
       </div>
 
       {/* D-Day */}
@@ -336,33 +406,58 @@ export default function PortfolioBattlePage() {
         </div>
       </div>
 
+      {/* 격차 카드 */}
+      <div style={styles.gapCard}>
+        {winner === 'tie' ? (
+          <>
+            <div style={{ fontSize: '28px', marginBottom: '8px' }}>🤝</div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: '#6B7684' }}>현재 동점!</div>
+          </>
+        ) : (
+          <>
+            <div style={styles.gapValue}>
+              {winner === 'haneul' ? '☁️ 하늘' : '🐰 가윤'} 선두!
+            </div>
+            <div style={styles.gapLabel}>
+              {gap.toFixed(2)}%p 차이로 앞서고 있습니다
+            </div>
+          </>
+        )}
+      </div>
+
       {/* VS 카드 */}
       <div style={styles.vsContainer}>
         {/* 하늘 */}
-        <div style={styles.playerCard(HANEUL_PORTFOLIO.color, winner === 'haneul')}>
+        <div style={styles.playerCard('#3182F6', winner === 'haneul')}>
           <div style={styles.playerHeader}>
-            <span style={styles.playerEmoji}>{HANEUL_PORTFOLIO.emoji}</span>
+            <span style={styles.playerEmoji}>☁️</span>
             <div>
               <div style={styles.playerName}>
-                {HANEUL_PORTFOLIO.name}
-                {winner === 'haneul' && <span style={{ ...styles.winnerBadge, marginLeft: '8px' }}>👑 선두</span>}
+                하우가 패밀리
+                {winner === 'haneul' && <span style={styles.winnerBadge}>👑 선두</span>}
               </div>
-              <div style={styles.playerStrategy}>{HANEUL_PORTFOLIO.strategy}</div>
+              <div style={styles.playerStrategy}>개별주 + ETF 혼합 전략</div>
             </div>
           </div>
 
           <div style={styles.statRow}>
             <span style={styles.statLabel}>투자원금</span>
-            <span style={styles.statValue}>₩{HANEUL_PORTFOLIO.totalInvestment.toLocaleString()}</span>
+            <span style={styles.statValue}>₩{haugaStats.totalInvested.toLocaleString()}</span>
           </div>
           <div style={styles.statRow}>
             <span style={styles.statLabel}>현재가치</span>
-            <span style={styles.statValue}>₩{HANEUL_PORTFOLIO.currentValue.toLocaleString()}</span>
+            <span style={styles.statValue}>₩{haugaStats.totalCurrent.toLocaleString()}</span>
           </div>
-          <div style={{ ...styles.statRow, borderBottom: 'none' }}>
+          <div style={styles.statRow}>
+            <span style={styles.statLabel}>평가손익</span>
+            <span style={{ ...styles.statValue, color: haugaStats.totalGain >= 0 ? '#00C853' : '#F04438' }}>
+              {haugaStats.totalGain >= 0 ? '+' : ''}{haugaStats.totalGain.toLocaleString()}원
+            </span>
+          </div>
+          <div style={{ ...styles.statRow, borderBottom: 'none', paddingTop: '16px' }}>
             <span style={styles.statLabel}>수익률</span>
-            <span style={styles.returnValue(haneulReturn > 0 ? true : haneulReturn < 0 ? false : null)}>
-              {haneulReturn > 0 ? '+' : ''}{haneulReturn.toFixed(2)}%
+            <span style={styles.returnValue(haneulReturn)}>
+              {haneulReturn >= 0 ? '+' : ''}{haneulReturn.toFixed(2)}%
             </span>
           </div>
         </div>
@@ -371,90 +466,98 @@ export default function PortfolioBattlePage() {
         <div style={styles.vsText}>VS</div>
 
         {/* 가윤 */}
-        <div style={styles.playerCard(GAYOON_PORTFOLIO.color, winner === 'gayoon')}>
+        <div style={styles.playerCard('#00C853', winner === 'gayoon')}>
           <div style={styles.playerHeader}>
-            <span style={styles.playerEmoji}>{GAYOON_PORTFOLIO.emoji}</span>
+            <span style={styles.playerEmoji}>🐰</span>
             <div>
               <div style={styles.playerName}>
-                {GAYOON_PORTFOLIO.name}
-                {winner === 'gayoon' && <span style={{ ...styles.winnerBadge, marginLeft: '8px' }}>👑 선두</span>}
+                가윤 달리오
+                {winner === 'gayoon' && <span style={styles.winnerBadge}>👑 선두</span>}
               </div>
-              <div style={styles.playerStrategy}>{GAYOON_PORTFOLIO.strategy}</div>
+              <div style={styles.playerStrategy}>ETF 리밸런싱 전략</div>
             </div>
           </div>
 
           <div style={styles.statRow}>
             <span style={styles.statLabel}>투자원금</span>
-            <span style={styles.statValue}>₩{GAYOON_PORTFOLIO.totalInvestment.toLocaleString()}</span>
+            <span style={styles.statValue}>₩{gayoonStats.totalInvested.toLocaleString()}</span>
           </div>
           <div style={styles.statRow}>
             <span style={styles.statLabel}>현재가치</span>
-            <span style={styles.statValue}>₩{GAYOON_PORTFOLIO.currentValue.toLocaleString()}</span>
+            <span style={styles.statValue}>₩{gayoonStats.totalCurrent.toLocaleString()}</span>
           </div>
-          <div style={{ ...styles.statRow, borderBottom: 'none' }}>
+          <div style={styles.statRow}>
+            <span style={styles.statLabel}>평가손익</span>
+            <span style={{ ...styles.statValue, color: gayoonStats.totalGain >= 0 ? '#00C853' : '#F04438' }}>
+              {gayoonStats.totalGain >= 0 ? '+' : ''}{gayoonStats.totalGain.toLocaleString()}원
+            </span>
+          </div>
+          <div style={{ ...styles.statRow, borderBottom: 'none', paddingTop: '16px' }}>
             <span style={styles.statLabel}>수익률</span>
-            <span style={styles.returnValue(gayoonReturn > 0 ? true : gayoonReturn < 0 ? false : null)}>
-              {gayoonReturn > 0 ? '+' : ''}{gayoonReturn.toFixed(2)}%
+            <span style={styles.returnValue(gayoonReturn)}>
+              {gayoonReturn >= 0 ? '+' : ''}{gayoonReturn.toFixed(2)}%
             </span>
           </div>
         </div>
       </div>
 
-      {/* 현재 상황 */}
+      {/* 대결 현황 바 */}
       <div style={styles.progressSection}>
         <div style={styles.sectionTitle}>
-          <span>📊</span> 현재 대결 상황
+          <span>📊</span> 수익률 비교
         </div>
-
-        {winner === 'tie' ? (
-          <div style={styles.tieText}>
-            🤝 현재 동점입니다! 대결은 이제 시작!
+        <div style={styles.battleBar}>
+          <div style={styles.battleBarHalf('#3182F6', true)}>
+            ☁️ {haneulReturn >= 0 ? '+' : ''}{haneulReturn.toFixed(2)}%
           </div>
-        ) : (
-          <div style={styles.battleBar}>
-            <div style={styles.battleBarLeft(haneulBarPercent, HANEUL_PORTFOLIO.color)}>
-              {HANEUL_PORTFOLIO.emoji} {haneulReturn.toFixed(1)}%
-            </div>
-            <div style={styles.battleBarRight(gayoonBarPercent, GAYOON_PORTFOLIO.color)}>
-              {gayoonReturn.toFixed(1)}% {GAYOON_PORTFOLIO.emoji}
-            </div>
+          <div style={styles.battleBarHalf('#00C853', false)}>
+            {gayoonReturn >= 0 ? '+' : ''}{gayoonReturn.toFixed(2)}% 🐰
           </div>
-        )}
-
+        </div>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          marginTop: '12px',
-          fontSize: '13px',
+          marginTop: '8px',
+          fontSize: '12px',
           color: '#8B95A1',
         }}>
-          <span>{HANEUL_PORTFOLIO.name}</span>
-          <span>{GAYOON_PORTFOLIO.name}</span>
+          <span>하우가 패밀리 ({HAUGA_HOLDINGS.length}개 종목)</span>
+          <span>가윤 달리오 ({GAYOON_HOLDINGS.length}개 종목)</span>
         </div>
       </div>
 
-      {/* 보유 종목 비교 */}
+      {/* 주요 보유 종목 비교 */}
       <div style={styles.holdingsGrid}>
         <div style={styles.holdingsCard}>
-          <div style={styles.holdingsTitle(HANEUL_PORTFOLIO.color)}>
-            {HANEUL_PORTFOLIO.emoji} {HANEUL_PORTFOLIO.name} 포트폴리오
+          <div style={styles.holdingsTitle('#3182F6')}>
+            ☁️ 하우가 TOP 5
           </div>
-          {HANEUL_PORTFOLIO.holdings.map((item, idx) => (
+          {haugaTop.map((item, idx) => (
             <div key={idx} style={styles.holdingItem}>
               <span>{item.name}</span>
-              <span style={{ fontWeight: '600' }}>{item.weight}%</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontWeight: '600' }}>{item.weight}%</span>
+                <span style={styles.holdingReturn(item.gainPercent)}>
+                  {item.gainPercent >= 0 ? '+' : ''}{item.gainPercent.toFixed(1)}%
+                </span>
+              </div>
             </div>
           ))}
         </div>
 
         <div style={styles.holdingsCard}>
-          <div style={styles.holdingsTitle(GAYOON_PORTFOLIO.color)}>
-            {GAYOON_PORTFOLIO.emoji} {GAYOON_PORTFOLIO.name} 포트폴리오
+          <div style={styles.holdingsTitle('#00C853')}>
+            🐰 가윤 TOP 5
           </div>
-          {GAYOON_PORTFOLIO.holdings.map((item, idx) => (
+          {gayoonTop.map((item, idx) => (
             <div key={idx} style={styles.holdingItem}>
               <span>{item.name}</span>
-              <span style={{ fontWeight: '600' }}>{item.weight}%</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontWeight: '600' }}>{item.weight}%</span>
+                <span style={styles.holdingReturn(item.gainPercent)}>
+                  {item.gainPercent >= 0 ? '+' : ''}{item.gainPercent.toFixed(1)}%
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -465,8 +568,8 @@ export default function PortfolioBattlePage() {
         <div style={styles.rulesTitle}>📋 대결 규칙</div>
         <div style={styles.rulesList}>
           <div>1. 기간: 2026.02.22 ~ 2026.12.24 (10개월)</div>
-          <div>2. 기준: 동일 원금 대비 수익률</div>
-          <div>3. 승리 조건: 1년 후 더 높은 수익률</div>
+          <div>2. 기준: 투자원금 대비 수익률 (실시간 계산)</div>
+          <div>3. 승리 조건: 종료일 기준 더 높은 수익률</div>
           <div>4. 상품: 패자가 승자에게 {BATTLE_INFO.prize}</div>
           <div>5. 중간 리밸런싱/매매 자유</div>
         </div>
