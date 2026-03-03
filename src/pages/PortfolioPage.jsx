@@ -1018,8 +1018,8 @@ export default function PortfolioPage() {
 
   // 실시간 보유 종목 계산 (TOSS_HOLDINGS에 실시간 시세 반영)
   const liveHoldings = ALL_HOLDINGS.map(item => {
-    // 토스증권 미국 주식만 실시간 시세 적용
-    if (item.broker === '토스증권' && item.type !== 'crypto' && tossPrices[item.ticker]) {
+    // 토스증권 미국 주식만 실시간 시세 적용 (shares가 있는 경우만)
+    if (item.broker === '토스증권' && item.type !== 'crypto' && item.shares > 0 && tossPrices[item.ticker]) {
       const priceData = tossPrices[item.ticker]
       const investedKRW = item.currentKRW - item.gainKRW // 원래 투자금 (원본 데이터 기준)
       const currentKRW = item.shares * priceData.price * exchangeRate

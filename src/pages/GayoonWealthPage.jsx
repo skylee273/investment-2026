@@ -657,41 +657,24 @@ export default function GayoonWealthPage() {
   const PORTFOLIO = quarterInfo?.portfolio || []
   const isLive = lastUpdate !== null
 
-  // GAYOON_ALL_HOLDINGS 실시간 업데이트
+  // GAYOON_ALL_HOLDINGS 실시간 업데이트 (shares가 있는 종목만)
   const liveHoldings = GAYOON_ALL_HOLDINGS.map(item => {
-    // VOO
-    if (item.ticker === 'VOO' && prices.stocks?.VOO) {
-      const stockData = prices.stocks.VOO
-      const shares = item.investedKRW / (stockData.previousClose * prices.usdkrw) // 역산 추정
-      const currentKRW = shares * stockData.price * prices.usdkrw
-      const gainKRW = currentKRW - item.investedKRW
-      const gainPercent = (gainKRW / item.investedKRW) * 100
-      return { ...item, currentKRW: Math.round(currentKRW), gainKRW: Math.round(gainKRW), gainPercent: Math.round(gainPercent * 100) / 100, isLive: true }
-    }
-    // SCHD
-    if (item.ticker === 'SCHD' && prices.stocks?.SCHD) {
-      const stockData = prices.stocks.SCHD
-      const shares = item.investedKRW / (stockData.previousClose * prices.usdkrw)
-      const currentKRW = shares * stockData.price * prices.usdkrw
-      const gainKRW = currentKRW - item.investedKRW
-      const gainPercent = (gainKRW / item.investedKRW) * 100
-      return { ...item, currentKRW: Math.round(currentKRW), gainKRW: Math.round(gainKRW), gainPercent: Math.round(gainPercent * 100) / 100, isLive: true }
-    }
-    // AMZN
-    if (item.ticker === 'AMZN' && prices.stocks?.AMZN) {
+    // AMZN - shares가 있음 (9주)
+    if (item.ticker === 'AMZN' && item.shares && prices.stocks?.AMZN) {
       const stockData = prices.stocks.AMZN
       const currentKRW = item.shares * stockData.price * prices.usdkrw
       const gainKRW = currentKRW - item.investedKRW
       const gainPercent = (gainKRW / item.investedKRW) * 100
       return { ...item, currentKRW: Math.round(currentKRW), gainKRW: Math.round(gainKRW), gainPercent: Math.round(gainPercent * 100) / 100, isLive: true }
     }
-    // BTC
-    if (item.ticker === 'BTC' && prices.btc) {
+    // BTC - btcAmount가 있음
+    if (item.ticker === 'BTC' && item.btcAmount && prices.btc) {
       const currentKRW = item.btcAmount * prices.btc
       const gainKRW = currentKRW - item.investedKRW
       const gainPercent = (gainKRW / item.investedKRW) * 100
       return { ...item, currentKRW: Math.round(currentKRW), gainKRW: Math.round(gainKRW), gainPercent: Math.round(gainPercent * 100) / 100, isLive: true }
     }
+    // VOO, SCHD 등은 shares 정보가 없으므로 원본 데이터 유지
     return item
   })
 
