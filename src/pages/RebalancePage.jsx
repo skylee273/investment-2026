@@ -130,8 +130,8 @@ const GAYOON_PORTFOLIOS = {
     name: 'ISA',
     icon: '📊',
     target: [
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 25 },
-      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 25 },
+      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 30 },
+      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 20 },
       { ticker: '133690', name: 'TIGER 미국나스닥100', category: 'S&P500', targetWeight: 15 },
       { ticker: '195980', name: 'TIGER MSCI신흥국', category: '신흥국', targetWeight: 15 },
       { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10 },

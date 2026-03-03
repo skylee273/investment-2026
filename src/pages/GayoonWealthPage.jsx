@@ -27,10 +27,10 @@ const TAX_ACCOUNTS = [
   { id: 'pension-extra', name: '추가 연금저축', icon: '💰', targetKRW: 9000000, currentKRW: 0, depositDay: 25, note: '과세이연 · 월 60만원', status: '진행중' },
 ]
 
-// ISA 포트폴리오 (2,000만원) - S&P 25% / KODEX 200 25% / 나스닥 15% / 신흥국 15% / 금 10% / 채권 10%
+// ISA 포트폴리오 (2,000만원) - 코스피 30% / S&P 20% / 나스닥 15% / 신흥국 15% / 금 10% / 채권 10%
 const ISA_PORTFOLIO = [
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 25, risk: 3 },
-  { ticker: '069500', name: 'KODEX 코스피200', category: '국내주식', targetWeight: 25, risk: 2 },
+  { ticker: '069500', name: 'KODEX 코스피200', category: '국내주식', targetWeight: 30, risk: 2 },
+  { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 20, risk: 3 },
   { ticker: '133690', name: 'TIGER 미국나스닥100', category: '해외주식', targetWeight: 15, risk: 4 },
   { ticker: '195980', name: 'TIGER MSCI신흥국', category: '해외주식', targetWeight: 15, risk: 5 },
   { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10, risk: 1 },
