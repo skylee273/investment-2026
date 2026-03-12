@@ -138,9 +138,10 @@ const GAYOON_PORTFOLIOS = {
       { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10 },
     ],
     holdings: [
-      { ticker: 'PLUS신흥국', name: 'PLUS 신흥국MSCI(합성 H)', currentKRW: 2991835, category: '신흥국' },
-      { ticker: 'TIGER미국채', name: 'TIGER 미국채10년선물', currentKRW: 2030310, category: '채권' },
-      { ticker: 'KODEX금', name: 'KODEX 금액티브', currentKRW: 2004480, category: '금' },
+      // 현재 보유: 총 7,026,625원
+      { ticker: '195980', name: 'PLUS 신흥국MSCI (→ TIGER 신흥국)', currentKRW: 2991835, category: '신흥국' },
+      { ticker: '305080', name: 'TIGER 미국채10년선물', currentKRW: 2030310, category: '채권' },
+      { ticker: '472150', name: 'KODEX 금액티브', currentKRW: 2004480, category: '금' },
     ],
   },
   pension: {
