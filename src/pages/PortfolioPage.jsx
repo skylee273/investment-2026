@@ -1728,55 +1728,6 @@ export default function PortfolioPage() {
           </div>
         </div>
 
-        {/* 비중 차트 */}
-        <div style={{
-          ...styles.chartCard,
-          flexDirection: isMobile ? 'column' : 'row',
-          gap: isMobile ? '20px' : '40px',
-          padding: isMobile ? '16px' : '24px',
-        }}>
-          <div style={{ width: isMobile ? '100%' : 'auto', display: 'flex', flexDirection: 'column', alignItems: isMobile ? 'center' : 'flex-start' }}>
-            <div style={styles.chartTitle}>목표 포트폴리오 비중</div>
-            <div style={{ ...styles.pieContainer, width: isMobile ? '160px' : '200px', height: isMobile ? '160px' : '200px' }}>
-              <div style={getPieChartStyle(PORTFOLIO)} />
-              <div style={{ ...styles.pieCenter, width: isMobile ? '80px' : '100px', height: isMobile ? '80px' : '100px' }}>
-                <div style={{ ...styles.pieCenterValue, fontSize: isMobile ? '14px' : '16px' }}>₩{(TARGET_TOTAL / 10000).toFixed(0)}만</div>
-                <div style={styles.pieCenterLabel}>목표 투자금</div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{
-            ...styles.legendList,
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-            gap: isMobile ? '8px' : '12px',
-          }}>
-            {PORTFOLIO
-              .sort((a, b) => b.targetWeight - a.targetWeight)
-              .map(item => {
-                const isInvested = item.investedKRW > 0
-                return (
-                  <div key={item.ticker} style={{
-                    ...styles.legendItem,
-                    opacity: isInvested ? 1 : 0.6,
-                  }}>
-                    <div style={styles.legendLeft}>
-                      <div style={styles.legendDot(SECTOR_COLORS[item.ticker] || '#8B95A1')} />
-                      <span style={{
-                        ...styles.legendName,
-                        fontWeight: isInvested ? 'normal' : '500',
-                        color: isInvested ? '#4E5968' : '#F57F17',
-                      }}>
-                        {item.name}
-                        {!isInvested && ' ⏳'}
-                      </span>
-                    </div>
-                    <span style={styles.legendValue}>{item.targetWeight}%</span>
-                  </div>
-                )
-              })}
-          </div>
-        </div>
       </div>
 
       {/* 알림 섹션 */}
