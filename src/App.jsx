@@ -10,8 +10,8 @@ import PortfolioReportPage from './pages/PortfolioReportPage'
 import TaxGuidePage from './pages/TaxGuidePage'
 import HaugaHousePage from './pages/HaugaHousePage'
 import RebalancePage from './pages/RebalancePage'
-import DividendsPage from './pages/DividendsPage'
 import MonthlyReportPage from './pages/MonthlyReportPage'
+import GuruPortfolioPage from './pages/GuruPortfolioPage'
 
 function App() {
   return (
@@ -29,8 +29,8 @@ function App() {
             <Route path="tax" element={<TaxGuidePage />} />
             <Route path="house" element={<HaugaHousePage />} />
             <Route path="rebalance" element={<RebalancePage />} />
-            <Route path="dividends" element={<DividendsPage />} />
             <Route path="monthly" element={<MonthlyReportPage />} />
+            <Route path="gurus" element={<GuruPortfolioPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -53,12 +53,20 @@ const IRP_PORTFOLIO = [
 
 // 추가 연금저축 포트폴리오 (900만원)
 const PENSION_EXTRA_PORTFOLIO = [
-  { ticker: '069500', name: 'KODEX 코스피200', category: '국내주식', targetWeight: 25, risk: 2 },
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 20, risk: 3 },
-  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 20, risk: 1 },
-  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '해외주식', targetWeight: 15, risk: 4 },
-  { ticker: '195980', name: 'TIGER MSCI신흥국', category: '해외주식', targetWeight: 10, risk: 5 },
-  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내주식', targetWeight: 10, risk: 3 },
+  { ticker: '456600', name: 'TIGER 미국달러SOFR금리액티브(합성)', category: '달러', targetWeight: 30, risk: 1 },
+  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 40, risk: 3 },
+  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '나스닥', targetWeight: 20, risk: 4 },
+  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10, risk: 1 },
+]
+
+// 배당주 매월 1주 포트폴리오 (1년 1000만원)
+const DIVIDEND_MONTHLY_PORTFOLIO = [
+  { ticker: 'GOOG', name: '알파벳 C (구글)', category: '기술', targetWeight: 17, risk: 3 },
+  { ticker: 'KO', name: '코카콜라', category: '필수소비재', targetWeight: 17, risk: 2 },
+  { ticker: 'AMZN', name: '아마존', category: '기술', targetWeight: 17, risk: 3 },
+  { ticker: 'CVX', name: '쉐브론', category: '에너지', targetWeight: 17, risk: 3 },
+  { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 16, risk: 5 },
+  { ticker: 'VST', name: '비스트라 에너지', category: '에너지', targetWeight: 16, risk: 4 },
 ]
 
 // 실시간 추적 자산 (매입가 기준 수익률 계산)
@@ -302,7 +310,7 @@ const RiskStars = ({ risk }) => {
 }
 
 // 포트폴리오 차트 컴포넌트
-function PortfolioChart({ icon, title, amount, status, statusColor, items, isMobile = false }) {
+function PortfolioChart({ icon, title, subtitle, amount, status, statusColor, items, isMobile = false }) {
   // 안정자산 비율 계산 (risk <= 2: 안정, risk >= 3: 위험)
   const safeAssetWeight = items
     .filter(item => item.risk <= 2)
@@ -325,7 +333,8 @@ function PortfolioChart({ icon, title, amount, status, statusColor, items, isMob
           <span style={{ fontSize: isMobile ? '18px' : '20px' }}>{icon}</span>
           <div>
             <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28' }}>{title}</div>
-            <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#8B95A1' }}>{(amount / 10000).toLocaleString()}만원</div>
+            {subtitle && <div style={{ fontSize: '11px', color: '#3182F6', marginBottom: '2px' }}>{subtitle}</div>}
+            <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#8B95A1' }}>{amount > 0 ? `${(amount / 10000).toLocaleString()}만원` : '전략 포트폴리오'}</div>
           </div>
         </div>
         <div style={{
@@ -1218,6 +1227,18 @@ export default function GayoonWealthPage() {
           items={PENSION_EXTRA_PORTFOLIO}
           isMobile={isMobile}
         />
+
+        {/* 배당주 매월 1주 */}
+        <PortfolioChart
+          icon="📅"
+          title="배당주 매월 1주"
+          amount={10000000}
+          status="1년 1000만"
+          statusColor={{ bg: '#E8F5E9', text: '#2E7D32' }}
+          items={DIVIDEND_MONTHLY_PORTFOLIO}
+          subtitle="가장 많이 떨어진 종목 매수"
+          isMobile={isMobile}
+        />
       </div>
 
       {/* 월 매수 가이드 */}
@@ -1310,6 +1331,50 @@ export default function GayoonWealthPage() {
                     </div>
                   </div>
                   <div style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: '#E65100' }}>
+                    ₩{amount.toLocaleString()}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* 배당주 매월 1주 */}
+        <div style={{
+          padding: isMobile ? '14px' : '20px',
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          border: '1px solid #E5E8EB',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isMobile ? '12px' : '16px' }}>
+            <span style={{ fontSize: isMobile ? '18px' : '20px' }}>📅</span>
+            <div>
+              <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28' }}>배당주 매월 1주</div>
+              <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#2E7D32', fontWeight: '600' }}>매월 약 83만원 (가장 많이 떨어진 종목)</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '6px' : '8px' }}>
+            {DIVIDEND_MONTHLY_PORTFOLIO.map(item => {
+              const amount = Math.round(833333 * item.targetWeight / 100)
+              return (
+                <div key={item.ticker} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: isMobile ? '8px 10px' : '10px 12px',
+                  backgroundColor: '#F7F8FA',
+                  borderRadius: '8px',
+                }}>
+                  <div>
+                    <div style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '600', color: '#191F28' }}>
+                      {item.name}
+                    </div>
+                    <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#8B95A1' }}>
+                      <span style={{ backgroundColor: '#E8F5E9', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', color: '#2E7D32', fontWeight: '600', fontSize: isMobile ? '9px' : '11px' }}>{item.ticker}</span>
+                      {item.targetWeight}%
+                    </div>
+                  </div>
+                  <div style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: '#2E7D32' }}>
                     ₩{amount.toLocaleString()}
                   </div>
                 </div>
