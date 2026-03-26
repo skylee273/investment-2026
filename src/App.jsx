@@ -7,6 +7,7 @@ import GayoonWealthPage from './pages/GayoonWealthPage'
 import PortfolioBattlePage from './pages/PortfolioBattlePage'
 import PortfolioReportPage from './pages/PortfolioReportPage'
 import TaxGuidePage from './pages/TaxGuidePage'
+import RiaGuidePage from './pages/RiaGuidePage'
 import HaugaHousePage from './pages/HaugaHousePage'
 import RebalancePage from './pages/RebalancePage'
 import MonthlyReportPage from './pages/MonthlyReportPage'
@@ -26,6 +27,7 @@ function App() {
             <Route path="gayoon/report" element={<PortfolioReportPage />} />
             <Route path="battle" element={<PortfolioBattlePage />} />
             <Route path="tax" element={<TaxGuidePage />} />
+            <Route path="ria" element={<RiaGuidePage />} />
             <Route path="house" element={<HaugaHousePage />} />
             <Route path="rebalance" element={<RebalancePage />} />
             <Route path="monthly" element={<MonthlyReportPage />} />
