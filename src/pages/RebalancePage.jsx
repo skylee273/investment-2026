@@ -183,6 +183,7 @@ const getExpertOpinions = (category, action, diff) => {
 
 // ========== 2026년 3월 시장 상황 (실시간 데이터 기반) ==========
 const MARKET_CONTEXT = {
+  // 기존 핵심 지표
   cape: 39.0,                    // 쉴러 P/E - 역대 2위 (닷컴버블 다음)
   sp500YTD: -11,                 // 2026년 YTD 수익률
   buffettCash: 3730,             // 버핏 현금 보유량 (억 달러)
@@ -190,6 +191,41 @@ const MARKET_CONTEXT = {
   marketPhase: 'correction',     // 조정장
   valuationLevel: 'overvalued',  // 고평가
   fearGreed: 35,                 // 공포 구간
+
+  // === 미국 경제 ===
+  fedRate: '3.5-3.75%',          // Fed 기준금리 (동결)
+  gdpGrowth: 2.4,                // GDP 성장률 %
+  pceInflation: 2.7,             // PCE 인플레이션 (목표 2% 상회)
+  unemployment: 4.1,             // 실업률 %
+
+  // === 트럼프 관세 전쟁 ===
+  tariffImpact: 1500,            // 가구당 연간 부담 $
+  chinaTariff: 38.5,             // 중국 관세율 % (20%→38.5%)
+  tariffNote: '1993년 이후 최대', // 역사적 의미
+
+  // === 유가 / 에너지 ===
+  wti: 99,                       // WTI 원유 $/배럴
+  brent: 112,                    // 브렌트유 $/배럴
+  oilChange: '+35%',             // 유가 상승률
+  hormuzStatus: 'risk',          // 호르무즈 해협 상태 (봉쇄 위기)
+
+  // === 달러 / 환율 ===
+  dxy: 99.65,                    // 달러 인덱스 (2년래 최저)
+  usdKrw: 1460,                  // 원달러 환율
+  usdKrwRange: '1,425~1,500',    // 환율 변동 범위
+  dollarTrend: 'weak',           // 달러 약세
+
+  // === 지정학적 리스크: 이란 전쟁 ===
+  iranWar: true,                 // 전쟁 발발 여부
+  warStartDate: '2026-02-28',    // 전쟁 시작일
+  warParties: '미국-이스라엘 vs 이란', // 전쟁 당사자
+  sp500WarImpact: -2,            // 공습 당일 S&P 500 반응 %
+
+  // === 한국 시장 ===
+  kospiHigh: 3059.54,            // KOSPI 사상 최고 (2월)
+  kospiCurrent: 2500,            // KOSPI 현재 수준
+  kospiChange: -18,              // 고점 대비 %
+  foreignSell: 9,                // 3월 외국인 순매도 (조원)
 }
 
 // 시장 상황을 고려한 냉철한 의견
@@ -401,6 +437,296 @@ const GAYOON_ALL_HOLDINGS = [
   // 업비트 암호화폐
   { name: '비트코인', ticker: 'BTC', currentKRW: 1091846, category: '암호화폐', account: '업비트' },
 ]
+
+// ========== 종합 시장 분석 대시보드 컴포넌트 ==========
+function MarketAnalysisDashboard({ isMobile }) {
+  const [activeTab, setActiveTab] = useState('economy')
+
+  const tabs = [
+    { id: 'economy', icon: '🇺🇸', label: '경제' },
+    { id: 'geopolitics', icon: '⚔️', label: '지정학' },
+    { id: 'tariff', icon: '📦', label: '관세' },
+    { id: 'dollar', icon: '💵', label: '달러' },
+    { id: 'korea', icon: '🇰🇷', label: '한국' },
+  ]
+
+  const tabContent = {
+    economy: {
+      title: '미국 경제 현황',
+      subtitle: 'Fed는 인플레이션이 완전히 잡히지 않아 금리 인하를 서두르지 않습니다.',
+      metrics: [
+        { label: 'Fed 기준금리', value: MARKET_CONTEXT.fedRate, status: '동결', color: '#3B82F6' },
+        { label: 'GDP 성장률', value: `${MARKET_CONTEXT.gdpGrowth}%`, status: '양호', color: '#10B981' },
+        { label: 'PCE 인플레이션', value: `${MARKET_CONTEXT.pceInflation}%`, status: '목표 상회', color: '#F59E0B' },
+        { label: '실업률', value: `${MARKET_CONTEXT.unemployment}%`, status: '양호', color: '#10B981' },
+      ],
+      insight: '경제는 안정적이나 인플레이션 우려로 추가 금리 인하는 기대하기 어렵습니다.',
+    },
+    geopolitics: {
+      title: '지정학적 리스크: 이란 전쟁',
+      subtitle: '2026년 2월 28일 미국-이스라엘 연합군 이란 공습 개시',
+      metrics: [
+        { label: '전쟁 시작', value: '2/28', status: '진행 중', color: '#EF4444' },
+        { label: '유가 반응', value: MARKET_CONTEXT.oilChange, status: '급등', color: '#EF4444' },
+        { label: '브렌트유', value: `$${MARKET_CONTEXT.brent}`, status: '/배럴', color: '#F59E0B' },
+        { label: 'S&P 반응', value: `${MARKET_CONTEXT.sp500WarImpact}%`, status: '공습일', color: '#EF4444' },
+      ],
+      insight: '호르무즈 해협 봉쇄 위기 - 세계 석유의 20%가 통과하는 전략적 요충지입니다.',
+      alert: true,
+    },
+    tariff: {
+      title: '트럼프 관세 전쟁',
+      subtitle: '1993년 이후 최대 규모의 세금 인상',
+      metrics: [
+        { label: '중국 관세율', value: `${MARKET_CONTEXT.chinaTariff}%`, status: '20%→38.5%', color: '#EF4444' },
+        { label: '가계 부담', value: `$${MARKET_CONTEXT.tariffImpact}`, status: '연간/가구', color: '#F59E0B' },
+        { label: '역사적 규모', value: '최대', status: "'93년 이후", color: '#8B5CF6' },
+        { label: '타격층', value: '저소득', status: '가장 큰 영향', color: '#EF4444' },
+      ],
+      insight: '관세 인상은 인플레이션 압력으로 작용하고, 소비 심리를 위축시킬 수 있습니다.',
+    },
+    dollar: {
+      title: '달러 / 환율 동향',
+      subtitle: '달러 약세 → 원자재 가격 상승 압력',
+      metrics: [
+        { label: '달러 인덱스', value: MARKET_CONTEXT.dxy, status: '2년래 최저', color: '#F59E0B' },
+        { label: 'USD/KRW', value: MARKET_CONTEXT.usdKrwRange, status: '변동성↑', color: '#3B82F6' },
+        { label: '달러 추세', value: '약세', status: '약세 지속', color: '#F59E0B' },
+        { label: '영향', value: '원자재↑', status: '수입물가↑', color: '#EF4444' },
+      ],
+      insight: '달러 약세는 원자재 가격 상승과 수입 물가 인상 요인입니다.',
+    },
+    korea: {
+      title: '한국 증시 현황',
+      subtitle: '외국인 대규모 자금 이탈 진행 중',
+      metrics: [
+        { label: 'KOSPI 고점', value: MARKET_CONTEXT.kospiHigh.toLocaleString(), status: '2월 사상최고', color: '#10B981' },
+        { label: 'KOSPI 현재', value: `~${MARKET_CONTEXT.kospiCurrent}`, status: '조정 중', color: '#F59E0B' },
+        { label: '고점 대비', value: `${MARKET_CONTEXT.kospiChange}%`, status: '하락', color: '#EF4444' },
+        { label: '외국인 매도', value: `${MARKET_CONTEXT.foreignSell}조`, status: '3월 순매도', color: '#EF4444' },
+      ],
+      insight: '반도체 수출 둔화 우려와 외국인 자금 이탈이 한국 증시에 부담입니다.',
+    },
+  }
+
+  const content = tabContent[activeTab]
+
+  return (
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '16px',
+      border: '2px solid #E5E8EB',
+      marginBottom: '24px',
+      overflow: 'hidden',
+    }}>
+      {/* 헤더 */}
+      <div style={{
+        padding: '20px',
+        borderBottom: '1px solid #E5E8EB',
+        backgroundColor: '#F8FAFC',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '8px',
+        }}>
+          <span style={{ fontSize: '24px' }}>📊</span>
+          <span style={{ fontSize: '18px', fontWeight: '700', color: '#191F28' }}>
+            2026년 3월 시장 종합 분석
+          </span>
+        </div>
+        <div style={{ fontSize: '13px', color: '#6B7684' }}>
+          "가윤 고객님, 지금 시장에서 무슨 일이 일어나고 있나요?"
+        </div>
+      </div>
+
+      {/* 탭 */}
+      <div style={{
+        display: 'flex',
+        borderBottom: '1px solid #E5E8EB',
+        backgroundColor: '#F8FAFC',
+        overflowX: 'auto',
+      }}>
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              flex: isMobile ? 'none' : 1,
+              padding: isMobile ? '12px 16px' : '14px 20px',
+              border: 'none',
+              backgroundColor: activeTab === tab.id ? 'white' : 'transparent',
+              borderBottom: activeTab === tab.id ? '2px solid #3182F6' : '2px solid transparent',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>{tab.icon}</span>
+            <span style={{
+              fontSize: '13px',
+              fontWeight: activeTab === tab.id ? '700' : '500',
+              color: activeTab === tab.id ? '#3182F6' : '#6B7684',
+            }}>
+              {tab.label}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* 탭 컨텐츠 */}
+      <div style={{ padding: '20px' }}>
+        {/* 경고 배너 (지정학 탭) */}
+        {content.alert && (
+          <div style={{
+            padding: '12px 16px',
+            backgroundColor: '#FEF2F2',
+            borderRadius: '10px',
+            border: '1px solid #FECACA',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}>
+            <span style={{ fontSize: '20px' }}>⚠️</span>
+            <div style={{ fontSize: '13px', color: '#991B1B', fontWeight: '600' }}>
+              이란 전쟁 발발 (2026.02.28~) - 호르무즈 해협 봉쇄 위기
+            </div>
+          </div>
+        )}
+
+        {/* 제목 */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '4px' }}>
+            {content.title}
+          </div>
+          <div style={{ fontSize: '12px', color: '#8B95A1' }}>
+            {content.subtitle}
+          </div>
+        </div>
+
+        {/* 메트릭 그리드 */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+          gap: '12px',
+          marginBottom: '16px',
+        }}>
+          {content.metrics.map((metric, idx) => (
+            <div key={idx} style={{
+              padding: '16px',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '12px',
+              textAlign: 'center',
+              borderTop: `3px solid ${metric.color}`,
+            }}>
+              <div style={{ fontSize: '11px', color: '#8B95A1', marginBottom: '6px' }}>
+                {metric.label}
+              </div>
+              <div style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                color: '#191F28',
+                marginBottom: '4px',
+              }}>
+                {metric.value}
+              </div>
+              <div style={{
+                fontSize: '10px',
+                color: metric.color,
+                fontWeight: '600',
+              }}>
+                {metric.status}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 인사이트 */}
+        <div style={{
+          padding: '14px 16px',
+          backgroundColor: '#FFFBEB',
+          borderRadius: '10px',
+          borderLeft: '3px solid #F59E0B',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+            <span style={{ fontSize: '16px' }}>💡</span>
+            <div style={{ fontSize: '13px', color: '#92400E', lineHeight: '1.5' }}>
+              {content.insight}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 종합 결론 */}
+      <div style={{
+        padding: '20px',
+        backgroundColor: '#0F172A',
+        color: 'white',
+      }}>
+        <div style={{
+          fontSize: '14px',
+          fontWeight: '700',
+          color: '#F59E0B',
+          marginBottom: '12px',
+        }}>
+          🎯 가윤 고객님을 위한 종합 결론
+        </div>
+        <div style={{
+          fontSize: '13px',
+          color: '#E2E8F0',
+          lineHeight: '1.7',
+          marginBottom: '16px',
+        }}>
+          지금 시장은 <strong style={{ color: '#F87171' }}>6가지 리스크 요인</strong>이 겹쳐 있습니다:
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+          gap: '10px',
+          marginBottom: '16px',
+        }}>
+          {[
+            { icon: '📊', text: 'CAPE 39', sub: '역사상 2위 고평가' },
+            { icon: '⚔️', text: '이란 전쟁', sub: '유가 35% 급등' },
+            { icon: '📦', text: '관세 전쟁', sub: '인플레 압력' },
+            { icon: '💵', text: '달러 약세', sub: '2년래 최저' },
+            { icon: '🏃', text: '외국인 9조 매도', sub: '한국 자금 이탈' },
+            { icon: '👴', text: '버핏 $3,730억', sub: '역대 최대 현금' },
+          ].map((item, idx) => (
+            <div key={idx} style={{
+              padding: '10px',
+              backgroundColor: '#1E293B',
+              borderRadius: '8px',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '16px', marginBottom: '4px' }}>{item.icon}</div>
+              <div style={{ fontSize: '12px', fontWeight: '600' }}>{item.text}</div>
+              <div style={{ fontSize: '10px', color: '#94A3B8' }}>{item.sub}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{
+          padding: '14px',
+          backgroundColor: '#1E293B',
+          borderRadius: '10px',
+          borderLeft: '3px solid #10B981',
+          fontSize: '14px',
+          fontWeight: '600',
+          color: '#10B981',
+        }}>
+          👉 결론: 버핏조차 역대 최대 현금을 쌓고 기다리고 있습니다.
+          지금은 <span style={{ color: '#F87171' }}>70% 수비</span>,
+          <span style={{ color: '#34D399' }}> 30% 선별 공격</span>이 정답입니다.
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function RebalancePage() {
   const [isMobile, setIsMobile] = useState(false)
@@ -865,6 +1191,9 @@ export default function RebalancePage() {
           </div>
         </div>
       </div>
+
+      {/* 종합 시장 분석 대시보드 */}
+      <MarketAnalysisDashboard isMobile={isMobile} />
 
       {/* 요약 카드 */}
       <div style={styles.summaryGrid}>
