@@ -994,6 +994,223 @@ export default function RebalancePage() {
         )}
       </div>
 
+      {/* 전문가 패널 */}
+      <div style={{
+        backgroundColor: '#0F172A',
+        borderRadius: '16px',
+        padding: '24px',
+        marginBottom: '20px',
+        color: 'white',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '24px',
+        }}>
+          <span style={{ fontSize: '24px' }}>👔</span>
+          <div>
+            <div style={{ fontSize: '18px', fontWeight: '700' }}>
+              전문가 패널 의견
+            </div>
+            <div style={{ fontSize: '12px', color: '#94A3B8' }}>
+              월가 3인방의 냉철한 시장 분석 · 2026년 3월
+            </div>
+          </div>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gap: '16px',
+        }}>
+          {/* 워렌 버핏 */}
+          <div style={{
+            backgroundColor: '#1E293B',
+            borderRadius: '12px',
+            padding: '20px',
+            borderTop: '3px solid #EF4444',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '12px',
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#374151',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+              }}>👴</div>
+              <div>
+                <div style={{ fontWeight: '700', fontSize: '14px' }}>워렌 버핏</div>
+                <div style={{ fontSize: '11px', color: '#94A3B8' }}>버크셔 해서웨이 회장</div>
+              </div>
+            </div>
+            <div style={{
+              padding: '8px 12px',
+              backgroundColor: '#EF4444',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: '600',
+              marginBottom: '12px',
+              textAlign: 'center',
+            }}>
+              🔴 극도로 보수적
+            </div>
+            <div style={{ fontSize: '12px', color: '#E2E8F0', lineHeight: '1.6', marginBottom: '12px' }}>
+              "나는 $3,730억 현금을 들고 있습니다. 애플과 BoA를 대량 매도했습니다. 시장이 비쌉니다. 지금은 사지 않는 것이 최선입니다."
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#94A3B8',
+              padding: '8px',
+              backgroundColor: '#0F172A',
+              borderRadius: '6px',
+            }}>
+              <strong>핵심:</strong> 현금 보유, 인내심, 기회 대기
+            </div>
+          </div>
+
+          {/* 빌 애크먼 */}
+          <div style={{
+            backgroundColor: '#1E293B',
+            borderRadius: '12px',
+            padding: '20px',
+            borderTop: '3px solid #F59E0B',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '12px',
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#374151',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+              }}>🦅</div>
+              <div>
+                <div style={{ fontWeight: '700', fontSize: '14px' }}>빌 애크먼</div>
+                <div style={{ fontSize: '11px', color: '#94A3B8' }}>퍼싱스퀘어 CEO</div>
+              </div>
+            </div>
+            <div style={{
+              padding: '8px 12px',
+              backgroundColor: '#F59E0B',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: '600',
+              marginBottom: '12px',
+              textAlign: 'center',
+              color: '#0F172A',
+            }}>
+              🟡 선별적 공격
+            </div>
+            <div style={{ fontSize: '12px', color: '#E2E8F0', lineHeight: '1.6', marginBottom: '12px' }}>
+              "YTD -13.9%지만 후회 없습니다. AI 빅테크(아마존, 메타, 알파벳)에 집중 베팅 중입니다. 하락은 좋은 기업을 싸게 살 기회입니다."
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#94A3B8',
+              padding: '8px',
+              backgroundColor: '#0F172A',
+              borderRadius: '6px',
+            }}>
+              <strong>핵심:</strong> 확신 있으면 하락 시 추가 매수
+            </div>
+          </div>
+
+          {/* 그렉 아벨 */}
+          <div style={{
+            backgroundColor: '#1E293B',
+            borderRadius: '12px',
+            padding: '20px',
+            borderTop: '3px solid #10B981',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '12px',
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#374151',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+              }}>🏛️</div>
+              <div>
+                <div style={{ fontWeight: '700', fontSize: '14px' }}>그렉 아벨</div>
+                <div style={{ fontSize: '11px', color: '#94A3B8' }}>버크셔 해서웨이 CEO</div>
+              </div>
+            </div>
+            <div style={{
+              padding: '8px 12px',
+              backgroundColor: '#10B981',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: '600',
+              marginBottom: '12px',
+              textAlign: 'center',
+              color: 'white',
+            }}>
+              🟢 전략적 대기
+            </div>
+            <div style={{ fontSize: '12px', color: '#E2E8F0', lineHeight: '1.6', marginBottom: '12px' }}>
+              "현금은 '기회비용'이 아니라 '드라이 파우더'입니다. 밸런스 시트는 적절한 순간에 배치될 전략적 자산입니다. 3월 자사주 매입 재개했습니다."
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#94A3B8',
+              padding: '8px',
+              backgroundColor: '#0F172A',
+              borderRadius: '6px',
+            }}>
+              <strong>핵심:</strong> 버핏보다 공격적, 기회 포착 준비
+            </div>
+          </div>
+        </div>
+
+        {/* 패널 합의 */}
+        <div style={{
+          marginTop: '20px',
+          padding: '16px',
+          backgroundColor: '#1E293B',
+          borderRadius: '12px',
+          border: '1px solid #334155',
+        }}>
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '700',
+            color: '#F59E0B',
+            marginBottom: '8px',
+          }}>
+            📋 3인 패널 합의점
+          </div>
+          <div style={{ fontSize: '12px', color: '#E2E8F0', lineHeight: '1.6' }}>
+            • <strong>공통:</strong> 시장은 고평가 상태, 조급함은 금물<br />
+            • <strong>버핏:</strong> 현금 유지가 최선 (CAPE 39 = 닷컴버블급)<br />
+            • <strong>애크먼:</strong> 확신 있는 AI 우량주는 분할 매수 가능<br />
+            • <strong>아벨:</strong> 현금은 무기, 추가 하락 시 공격적 매수 준비
+          </div>
+        </div>
+      </div>
+
       {/* 종합 의견 */}
       <div style={{
         backgroundColor: 'white',
@@ -1025,24 +1242,22 @@ export default function RebalancePage() {
           lineHeight: '1.8',
           whiteSpace: 'pre-line',
         }}>
-{`▎결론부터: 지금은 "공격"이 아니라 "수비"의 시간입니다.
+{`▎결론: 버핏(수비) + 애크먼(선별 공격) + 아벨(기회 대기) = 최적 전략
 
-CAPE 39는 역사상 두 번째로 높은 수치입니다. 첫 번째는 2000년 닷컴버블이었고, 그 후 S&P 500은 49% 폭락했습니다. 물론 역사가 반복된다는 보장은 없지만, 확률의 게임에서 지금은 유리한 패가 아닙니다.
+세 거장의 공통점은 "지금은 올인할 때가 아니다"입니다. 버핏은 역사상 최대 현금을 쌓았고, 애크먼은 -14% 손실에도 확신 있는 종목만 추가 매수하며, 아벨은 "드라이 파우더" 전략으로 기회를 노리고 있습니다.
 
-버핏이 $3,730억 현금을 쌓은 이유를 생각해보세요. 94세의 투자 귀재가 애플, 뱅크오브아메리카를 대량 매도하고 현금을 쌓았습니다. 그는 "비쌀 때 사지 않는 것"이 수익의 핵심임을 알고 있습니다.
+▎당신의 전략 (3인 합성):
+① 현금 20-30% 유지 - 버핏처럼 총알을 남겨두세요
+② 확신 종목만 분할 매수 - 애크먼처럼 AI 빅테크 중 확신 있는 것만
+③ 추가 하락 대비 - 아벨처럼 S&P -20~30%면 공격적 매수 준비
+④ 감정 배제 - 세 거장 모두 FOMO에 흔들리지 않습니다
 
-▎당신이 해야 할 것:
-① 현금 비중 유지/확대 - 현금은 "기회비용"이 아니라 "옵션"입니다
-② 분할 매수 - 한 번에 몰빵하지 말고 3-6개월에 걸쳐 분산
-③ 방어적 자산 확보 - 채권, 금, 배당주로 하방 리스크 헤지
-④ 고위험 자산 축소 - 암호화폐, 고PER 성장주 비중 조절
+▎피해야 할 것:
+✗ "바닥인 것 같다"는 희망적 사고
+✗ 전문가도 모르는 타이밍 맞추기
+✗ 하락장에서 패닉 셀링
 
-▎당신이 하지 말아야 할 것:
-✗ "지금 안 사면 더 오른다"는 FOMO에 휩쓸리기
-✗ 레버리지나 신용 사용
-✗ 단기 급등락에 감정적 대응
-
-시장은 언제나 다시 기회를 줍니다. S&P 500이 20-30% 더 빠지면, 그때 현금을 가진 당신이 진짜 승자가 됩니다. 인내심이 최고의 무기입니다.`}
+지금 당신이 가진 현금은 "기회비용"이 아니라 "옵션"입니다. 시장이 더 빠지면 그 현금이 최고의 무기가 됩니다.`}
         </div>
 
         <div style={{
@@ -1054,14 +1269,14 @@ CAPE 39는 역사상 두 번째로 높은 수치입니다. 첫 번째는 2000년
           alignItems: 'center',
           gap: '12px',
         }}>
-          <span style={{ fontSize: '20px' }}>👴</span>
+          <span style={{ fontSize: '20px' }}>💎</span>
           <div style={{
             fontSize: '13px',
             color: '#64748B',
             fontStyle: 'italic',
           }}>
-            "주식시장은 인내심 없는 사람의 돈을 인내심 있는 사람에게 이전하는 장치다."
-            <br />— 워렌 버핏
+            "시장에서 돈을 버는 것은 어렵지 않다. 어려운 것은 빠른 돈을 벌고 싶은 유혹을 이기는 것이다."
+            <br />— 찰리 멍거
           </div>
         </div>
       </div>
