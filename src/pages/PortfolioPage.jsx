@@ -381,6 +381,7 @@ const CASH_ACCOUNTS = [
   { id: 'isa', name: 'ISA', icon: '📈', targetKRW: 20000000, currentKRW: 500404, depositDay: 25, monthlyDeposit: 0, note: '비과세 200만원 한도 (3년 유지 필수)' },
   { id: 'irp', name: 'IRP', icon: '🏦', targetKRW: 3000000, currentKRW: 250069, depositDay: 25, monthlyDeposit: 0, note: '세액공제 300만원 한도' },
   { id: 'stocks', name: '일반 주식', icon: '📊', targetKRW: 0, currentKRW: 1335816, depositDay: null, note: '일반 증권계좌 (해외주식)' },
+  { id: 'crypto', name: '암호화폐 (BTC)', icon: '₿', targetKRW: 200000, currentKRW: 165490, depositDay: null, note: '업비트 · 비트코인' },
   { id: 'cma-trip', name: 'CMA (가족여행)', icon: '✈️', targetKRW: 1000000, currentKRW: 610106, depositDay: null, note: '하우가 가족여행' },
   { id: 'hanwha-insurance', name: '한화생명보험저축', icon: '🛡️', targetKRW: 30240000, currentKRW: 12390000, depositDay: null, monthlyDeposit: 210000, depositCount: 59, targetCount: 144, note: '월 21만원 × 59/144회 납입' },
   { id: 'housing', name: '청약저축', icon: '🏠', targetKRW: 3000000, currentKRW: 720000, depositDay: 25, monthlyDeposit: 20000, depositCount: 36, targetCount: 24, note: '1순위 달성 (36회 납입)' },
@@ -1418,11 +1419,13 @@ export default function PortfolioPage() {
             flexWrap: 'wrap',
             alignItems: 'center',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '12px', color: '#8B95A1' }}>증권사:</span>
               {[
                 { value: 'all', label: '전체' },
                 { value: '미래에셋', label: '미래에셋' },
+                { value: '토스증권', label: '토스증권' },
+                { value: '업비트', label: '업비트' },
               ].map(opt => (
                 <button
                   key={opt.value}
