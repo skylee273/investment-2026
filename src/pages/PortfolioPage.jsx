@@ -17,19 +17,19 @@ const REALIZED_GAINS = {
   ]
 }
 
-// 미래에셋증권 계좌별 보유 종목 (2026.03.02 기준)
+// 미래에셋증권 계좌별 보유 종목 (2026.03.29 기준)
 const MIRAE_ACCOUNTS = [
   {
     id: 'pension',
     name: '연금저축계좌',
     accountNo: '010-8784-7546-2',
     icon: '🧓',
-    totalKRW: 1468227,
-    gainKRW: 0,
-    gainPercent: 0,
+    totalKRW: 1393035,
+    gainKRW: -83440,
+    gainPercent: -5.65,
     holdings: [
-      { name: 'KODEX 200', shares: 7, currentKRW: 658840, investedKRW: 617700, gainKRW: 41140, gainPercent: 6.66 },
-      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 105500, investedKRW: 101300, gainKRW: 4200, gainPercent: 4.15 },
+      { name: 'KODEX 200', shares: 13, currentKRW: 1055925, investedKRW: 1131700, gainKRW: -75775, gainPercent: -6.70 },
+      { name: 'KODEX 코스닥150', shares: 17, currentKRW: 337110, investedKRW: 344775, gainKRW: -7665, gainPercent: -2.22 },
     ]
   },
   {
@@ -37,39 +37,71 @@ const MIRAE_ACCOUNTS = [
     name: 'ISA (중개형)',
     accountNo: '660-9824-0136-0',
     icon: '📊',
-    totalKRW: 504279,
-    gainKRW: 0,
-    gainPercent: 0,
+    totalKRW: 497385,
+    gainKRW: -5030,
+    gainPercent: -1.00,
     holdings: [
-      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 105500, investedKRW: 101075, gainKRW: 4425, gainPercent: 4.38 },
-      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 199050, investedKRW: 198375, gainKRW: 675, gainPercent: 0.34 },
-      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 196520, investedKRW: 196840, gainKRW: -320, gainPercent: -0.16 },
+      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 99150, investedKRW: 101075, gainKRW: -1925, gainPercent: -1.90 },
+      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 202875, investedKRW: 198375, gainKRW: 4500, gainPercent: 2.27 },
+      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 195360, investedKRW: 196840, gainKRW: -1480, gainPercent: -0.75 },
     ]
   },
   {
-    id: 'cma-emergency',
-    name: '비상금 CMA',
-    accountNo: '690-6340-5654-1',
+    id: 'stock',
+    name: '종합 (해외주식)',
+    accountNo: '종합계좌',
+    icon: '🌍',
+    totalKRW: 1435612,
+    gainKRW: 10954,
+    gainPercent: 0.77,
+    holdings: [
+      { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 170940, investedKRW: 174090, gainKRW: -3150, gainPercent: -1.81 },
+      { name: '1Q 미국S&P500미국채혼합', shares: 10, currentKRW: 116200, investedKRW: 116250, gainKRW: -50, gainPercent: -0.04 },
+      { name: '셰브론 (CVX)', shares: 2, currentKRW: 636068, investedKRW: 568711, gainKRW: 67357, gainPercent: 11.84 },
+      { name: '알파벳 C (GOOG)', shares: 1, currentKRW: 412337, investedKRW: 468022, gainKRW: -55685, gainPercent: -11.90 },
+      { name: '미국달러', shares: 0.18, currentKRW: 271, investedKRW: 271, gainKRW: 0, gainPercent: 0.00 },
+    ]
+  },
+  {
+    id: 'irp',
+    name: '이하늘 개인형IRP',
+    accountNo: 'IRP',
+    icon: '🏦',
+    totalKRW: 250069,
+    gainKRW: 0,
+    gainPercent: 0.00,
+    holdings: [
+      { name: 'IRP 예수금', shares: 0, currentKRW: 250069, investedKRW: 250069, gainKRW: 0, gainPercent: 0.00 },
+    ]
+  },
+  {
+    id: 'cma',
+    name: 'CMA',
+    accountNo: 'CMA',
     icon: '💰',
-    totalKRW: 600179,
-    gainKRW: 147,
+    totalKRW: 610106,
+    gainKRW: 106,
     gainPercent: 0.02,
     holdings: [
-      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 600179, investedKRW: 600032, gainKRW: 147, gainPercent: 0.02 },
+      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 610106, investedKRW: 610000, gainKRW: 106, gainPercent: 0.02 },
     ]
   },
-  {
-    id: 'cma-family',
-    name: '하우가 가족여행 CMA',
-    accountNo: '010-8784-7546-1',
-    icon: '✈️',
-    totalKRW: 410119,
-    gainKRW: 119,
-    gainPercent: 0.03,
-    holdings: [
-      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 410119, investedKRW: 410000, gainKRW: 119, gainPercent: 0.03 },
-    ]
-  },
+]
+
+// 토스증권 해외주식 보유 종목 (2026.03.29 기준)
+const TOSS_HOLDINGS = [
+  { name: '마이크로소프트 (MSFT)', currentKRW: 41152, investedKRW: 47590, gainKRW: -6437, gainPercent: -13.52 },
+  { name: '메타 (META)', currentKRW: 19672, investedKRW: 23670, gainKRW: -3997, gainPercent: -16.88 },
+  { name: '뱅크오브아메리카 (BAC)', currentKRW: 19012, investedKRW: 20702, gainKRW: -1689, gainPercent: -8.16 },
+  { name: '브로드컴 (AVGO)', currentKRW: 2686, investedKRW: 2973, gainKRW: -286, gainPercent: -9.64 },
+  { name: '비스트라 에너지 (VST)', currentKRW: 925, investedKRW: 986, gainKRW: -60, gainPercent: -6.16 },
+  { name: '아마존 (AMZN)', currentKRW: 365295, investedKRW: 405610, gainKRW: -40314, gainPercent: -9.93 },
+  { name: '알파벳 A (GOOGL)', currentKRW: 16903, investedKRW: 19727, gainKRW: -2823, gainPercent: -14.31 },
+  { name: '알파벳 C (GOOG)', currentKRW: 58467, investedKRW: 63641, gainKRW: -5173, gainPercent: -8.12 },
+  { name: '인튜이티브 서지컬 (ISRG)', currentKRW: 7313, investedKRW: 7882, gainKRW: -568, gainPercent: -7.21 },
+  { name: '퀄컴 (QCOM)', currentKRW: 6850, investedKRW: 7883, gainKRW: -1032, gainPercent: -13.09 },
+  { name: '테슬라 (TSLA)', currentKRW: 2687, investedKRW: 2969, gainKRW: -281, gainPercent: -9.48 },
+  { name: 'SPY', currentKRW: 16890, investedKRW: 17704, gainKRW: -813, gainPercent: -4.59 },
 ]
 
 // 미래에셋 전체 보유 종목 (기존 코드 호환용)
