@@ -222,19 +222,21 @@ body{
 .cta-text{font-size:14px;font-weight:600;line-height:1.5;}
 .cta-dont{padding:14px 18px;background:rgba(235,57,18,0.15);border-radius:12px;margin-bottom:8px;font-size:14px;font-weight:600;}
 
-.compare-wrap{padding:28px;background:var(--gray-06);border-radius:20px;box-shadow:var(--shadow-h2);}
+.compare-wrap{padding:28px;background:var(--gray-06);border-radius:20px;box-shadow:var(--shadow-h2);overflow-x:auto;}
 .compare-head{
-  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 1fr 0.8fr;min-width:600px;
   padding:14px 20px;font-size:12px;font-weight:700;color:var(--gray-04);
   border-bottom:2px solid var(--gray-05);
 }
+.compare-head.simple{grid-template-columns:2fr 1fr 1fr 1fr;}
 .compare-head span{cursor:pointer;}
 .compare-head span:hover{color:var(--hd-green-01);}
 .compare-row{
-  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 1fr 0.8fr;min-width:600px;
   padding:16px 20px;font-size:14px;font-weight:600;
   border-bottom:1px solid var(--gray-05);transition:background 0.2s;
 }
+.compare-row.simple{grid-template-columns:2fr 1fr 1fr 1fr;}
 .compare-row:hover{background:rgba(1,167,107,0.03);}
 .compare-row:last-child{border-bottom:none;}
 .cr-name{display:flex;align-items:center;gap:12px;}
@@ -244,6 +246,9 @@ body{
 .cr-account{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;background:#fff;color:var(--gray-02);display:inline-block;}
 .cr-amount{font-weight:700;color:var(--hd-black);text-align:right;}
 .cr-weight{font-weight:700;color:var(--hd-black);text-align:right;}
+.cr-gain{font-weight:700;text-align:right;}
+.cr-gain.positive{color:#059669;}
+.cr-gain.negative{color:#EB3912;}
 
 .conclusion{
   margin-top:24px;padding:24px;
@@ -400,11 +405,13 @@ body{
   </div>
   <p class="sh-sub">클릭하여 정렬 가능</p>
   <div class="compare-wrap">
-    <div class="compare-head">
+    <div class="compare-head" id="holdings-head">
       <span data-sort="name">종목</span>
       <span data-sort="account">계좌</span>
-      <span data-sort="amount" style="text-align:right;">금액 ▼</span>
-      <span data-sort="weight" style="text-align:right;">비중</span>
+      <span data-sort="invested" style="text-align:right;">매입금액</span>
+      <span data-sort="amount" style="text-align:right;">평가금액</span>
+      <span data-sort="gain" style="text-align:right;">손익</span>
+      <span data-sort="gainPercent" style="text-align:right;">수익률 ▼</span>
     </div>
     <div id="holdings-table"></div>
   </div>
@@ -504,22 +511,22 @@ const HAUGA_ALL_HOLDINGS = [
 ];
 
 const GAYOON_ALL_HOLDINGS = [
-  { name: 'Vanguard S&P500', ticker: 'VOO', currentKRW: 19317195, category: 'S&P500', account: '삼성' },
-  { name: 'VOO (소수점)', ticker: 'VOO_P', currentKRW: 647620, category: 'S&P500', account: '삼성' },
-  { name: 'Schwab 배당주', ticker: 'SCHD', currentKRW: 4584872, category: '배당주', account: '삼성' },
-  { name: '케이뱅크', ticker: 'KBANK', currentKRW: 62700, category: '국내주식', account: '삼성' },
-  { name: 'KODEX 200', ticker: 'KODEX200_ISA', currentKRW: 5117175, category: '국내주식', account: 'ISA' },
-  { name: 'TIGER S&P500', ticker: 'TIGER_SP_ISA', currentKRW: 4835160, category: 'S&P500', account: 'ISA' },
-  { name: 'TIGER 나스닥100', ticker: 'TIGER_NAS', currentKRW: 2857680, category: '나스닥', account: 'ISA' },
-  { name: 'PLUS 신흥국MSCI', ticker: 'PLUS_EM', currentKRW: 2695055, category: '신흥국', account: 'ISA' },
-  { name: 'TIGER 미국채10년', ticker: 'TIGER_BD', currentKRW: 2069325, category: '채권', account: 'ISA' },
-  { name: 'KODEX 금액티브', ticker: 'KODEX_G', currentKRW: 1806720, category: '금', account: 'ISA' },
-  { name: '아마존', ticker: 'AMZN', currentKRW: 2702213, category: 'Big Tech', account: '한투' },
-  { name: 'KODEX 200', ticker: 'KODEX200_P', currentKRW: 4467375, category: '국내주식', account: '연금' },
-  { name: 'KODEX 코스닥150', ticker: 'KODEX150_P', currentKRW: 1070820, category: '국내주식', account: '연금' },
-  { name: '발행어음CMA', ticker: 'CMA', currentKRW: 14030691, category: '현금성', account: 'CMA' },
-  { name: 'TDF2025', ticker: 'TDF2025', currentKRW: 265937, category: '연금', account: 'IRP' },
-  { name: '비트코인', ticker: 'BTC', currentKRW: 1091846, category: '암호화폐', account: '업비트' },
+  { name: 'Vanguard S&P500', ticker: 'VOO', investedKRW: 18034965, currentKRW: 19317195, gainKRW: 1282230, gainPercent: 7.11, category: 'S&P500', account: '삼성' },
+  { name: 'VOO (소수점)', ticker: 'VOO_P', investedKRW: 676691, currentKRW: 647620, gainKRW: -29071, gainPercent: -4.30, category: 'S&P500', account: '삼성' },
+  { name: 'Schwab 배당주', ticker: 'SCHD', investedKRW: 4047160, currentKRW: 4584872, gainKRW: 537712, gainPercent: 13.29, category: '배당주', account: '삼성' },
+  { name: '케이뱅크', ticker: 'KBANK', investedKRW: 83000, currentKRW: 62700, gainKRW: -20300, gainPercent: -24.46, category: '국내주식', account: '삼성' },
+  { name: 'KODEX 200', ticker: 'KODEX200_ISA', investedKRW: 5223390, currentKRW: 5117175, gainKRW: -106215, gainPercent: -2.03, category: '국내주식', account: 'ISA' },
+  { name: 'TIGER S&P500', ticker: 'TIGER_SP_ISA', investedKRW: 4888810, currentKRW: 4835160, gainKRW: -53650, gainPercent: -1.10, category: 'S&P500', account: 'ISA' },
+  { name: 'TIGER 나스닥100', ticker: 'TIGER_NAS', investedKRW: 2891400, currentKRW: 2857680, gainKRW: -33720, gainPercent: -1.17, category: '나스닥', account: 'ISA' },
+  { name: 'PLUS 신흥국MSCI', ticker: 'PLUS_EM', investedKRW: 2997060, currentKRW: 2695055, gainKRW: -302005, gainPercent: -10.08, category: '신흥국', account: 'ISA' },
+  { name: 'TIGER 미국채10년', ticker: 'TIGER_BD', investedKRW: 2003535, currentKRW: 2069325, gainKRW: 65790, gainPercent: 3.28, category: '채권', account: 'ISA' },
+  { name: 'KODEX 금액티브', ticker: 'KODEX_G', investedKRW: 1984640, currentKRW: 1806720, gainKRW: -177920, gainPercent: -8.96, category: '금', account: 'ISA' },
+  { name: '아마존', ticker: 'AMZN', investedKRW: 2941594, currentKRW: 2702213, gainKRW: -239381, gainPercent: -8.13, category: 'Big Tech', account: '한투' },
+  { name: 'KODEX 200', ticker: 'KODEX200_P', investedKRW: 4912225, currentKRW: 4467375, gainKRW: -444850, gainPercent: -9.06, category: '국내주식', account: '연금' },
+  { name: 'KODEX 코스닥150', ticker: 'KODEX150_P', investedKRW: 1084800, currentKRW: 1070820, gainKRW: -13980, gainPercent: -1.29, category: '국내주식', account: '연금' },
+  { name: '발행어음CMA', ticker: 'CMA', investedKRW: 14015160, currentKRW: 14030691, gainKRW: 15531, gainPercent: 0.11, category: '현금성', account: 'CMA' },
+  { name: 'TDF2025', ticker: 'TDF2025', investedKRW: 267479, currentKRW: 265937, gainKRW: -1542, gainPercent: -0.58, category: '연금', account: 'IRP' },
+  { name: '비트코인', ticker: 'BTC', investedKRW: 1098351, currentKRW: 1091846, gainKRW: -6505, gainPercent: -0.59, category: '암호화폐', account: '업비트' },
 ];
 
 let currentTab = 'hauga';
@@ -529,8 +536,10 @@ function getHoldings() { return currentTab === 'hauga' ? HAUGA_ALL_HOLDINGS : GA
 function getTargetWeights() { return currentTab === 'hauga' ? HAUGA_TARGET_WEIGHTS : GAYOON_TARGET_WEIGHTS; }
 
 function formatMoney(krw) {
-  if (krw >= 10000000) return (krw / 10000000).toFixed(1) + '천만';
-  if (krw >= 10000) return Math.round(krw / 10000) + '만';
+  const absKrw = Math.abs(krw);
+  const sign = krw < 0 ? '-' : '';
+  if (absKrw >= 10000000) return sign + (absKrw / 10000000).toFixed(1) + '천만';
+  if (absKrw >= 10000) return sign + Math.round(absKrw / 10000) + '만';
   return krw.toLocaleString() + '원';
 }
 
@@ -710,29 +719,85 @@ function render() {
   });
 
   const tableBody = document.getElementById('holdings-table');
+  const tableHead = document.getElementById('holdings-head');
+  const hasGainData = holdings[0] && holdings[0].investedKRW !== undefined;
   let sorted = holdings.map(h => ({ ...h, weight: (h.currentKRW / data.totalKRW) * 100 }));
 
   if (sortBy === 'amount') sorted.sort((a, b) => b.currentKRW - a.currentKRW);
   else if (sortBy === 'weight') sorted.sort((a, b) => b.weight - a.weight);
   else if (sortBy === 'name') sorted.sort((a, b) => a.name.localeCompare(b.name));
   else if (sortBy === 'account') sorted.sort((a, b) => a.account.localeCompare(b.account));
+  else if (sortBy === 'invested') sorted.sort((a, b) => (b.investedKRW || 0) - (a.investedKRW || 0));
+  else if (sortBy === 'gain') sorted.sort((a, b) => (b.gainKRW || 0) - (a.gainKRW || 0));
+  else if (sortBy === 'gainPercent') sorted.sort((a, b) => (b.gainPercent || 0) - (a.gainPercent || 0));
+
+  // Update header based on data type
+  if (hasGainData) {
+    tableHead.classList.remove('simple');
+    tableHead.innerHTML = `
+      <span data-sort="name">종목</span>
+      <span data-sort="account">계좌</span>
+      <span data-sort="invested" style="text-align:right;">매입금액</span>
+      <span data-sort="amount" style="text-align:right;">평가금액</span>
+      <span data-sort="gain" style="text-align:right;">손익</span>
+      <span data-sort="gainPercent" style="text-align:right;">수익률 ▼</span>
+    `;
+  } else {
+    tableHead.classList.add('simple');
+    tableHead.innerHTML = `
+      <span data-sort="name">종목</span>
+      <span data-sort="account">계좌</span>
+      <span data-sort="amount" style="text-align:right;">금액 ▼</span>
+      <span data-sort="weight" style="text-align:right;">비중</span>
+    `;
+  }
+
+  // Rebind sort events
+  tableHead.querySelectorAll('span[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const newSort = th.dataset.sort;
+      if (sortBy === newSort) return;
+      sortBy = newSort;
+      render();
+    });
+  });
 
   tableBody.innerHTML = '';
   sorted.forEach(item => {
     const color = CATEGORY_COLORS[item.category] || '#9CA3AF';
-    tableBody.innerHTML += `
-      <div class="compare-row">
-        <div class="cr-name">
-          <div class="cr-dot" style="background:${color};"></div>
-          <div class="cr-info">
-            <div class="cr-ticker">${item.name}</div>
-            <div class="cr-cat">${item.category}</div>
+    if (hasGainData) {
+      const gainClass = item.gainKRW >= 0 ? 'positive' : 'negative';
+      const gainSign = item.gainKRW >= 0 ? '+' : '';
+      tableBody.innerHTML += `
+        <div class="compare-row">
+          <div class="cr-name">
+            <div class="cr-dot" style="background:${color};"></div>
+            <div class="cr-info">
+              <div class="cr-ticker">${item.name}</div>
+              <div class="cr-cat">${item.category}</div>
+            </div>
           </div>
-        </div>
-        <div><span class="cr-account">${item.account}</span></div>
-        <div class="cr-amount">${formatMoney(item.currentKRW)}</div>
-        <div class="cr-weight">${item.weight.toFixed(1)}%</div>
-      </div>`;
+          <div><span class="cr-account">${item.account}</span></div>
+          <div class="cr-amount">${formatMoney(item.investedKRW)}</div>
+          <div class="cr-amount">${formatMoney(item.currentKRW)}</div>
+          <div class="cr-gain ${gainClass}">${gainSign}${formatMoney(item.gainKRW)}</div>
+          <div class="cr-gain ${gainClass}">${gainSign}${item.gainPercent.toFixed(2)}%</div>
+        </div>`;
+    } else {
+      tableBody.innerHTML += `
+        <div class="compare-row simple">
+          <div class="cr-name">
+            <div class="cr-dot" style="background:${color};"></div>
+            <div class="cr-info">
+              <div class="cr-ticker">${item.name}</div>
+              <div class="cr-cat">${item.category}</div>
+            </div>
+          </div>
+          <div><span class="cr-account">${item.account}</span></div>
+          <div class="cr-amount">${formatMoney(item.currentKRW)}</div>
+          <div class="cr-weight">${item.weight.toFixed(1)}%</div>
+        </div>`;
+    }
   });
 }
 
@@ -745,16 +810,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-document.querySelectorAll('.compare-head span[data-sort]').forEach(th => {
-  th.addEventListener('click', () => {
-    const newSort = th.dataset.sort;
-    if (sortBy === newSort) return;
-    sortBy = newSort;
-    document.querySelectorAll('.compare-head span').forEach(t => t.textContent = t.textContent.replace(' ▼', ''));
-    th.textContent += ' ▼';
-    render();
-  });
-});
+// Sort events are bound in render() function
 
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
