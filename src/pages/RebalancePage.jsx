@@ -190,6 +190,43 @@ export default function RebalancePage() {
         icon = '🟡'
       }
 
+      // 종목별 상세 의견 계산
+      const holdingsInCategory = allHoldings.filter(h => h.category === cat)
+      const stockRecommendations = []
+
+      if (diff > 0.5) {
+        // 매수 의견: 현재 보유 종목 중 비중이 작은 것 우선 매수
+        const sorted = [...holdingsInCategory].sort((a, b) => a.currentKRW - b.currentKRW)
+        const perStock = Math.abs(diffKRW) / Math.max(sorted.length, 1)
+        sorted.forEach(h => {
+          stockRecommendations.push({
+            name: h.name,
+            ticker: h.ticker,
+            account: h.account,
+            currentKRW: h.currentKRW,
+            adjustKRW: Math.round(perStock),
+            action: '매수',
+          })
+        })
+      } else if (diff < -0.5) {
+        // 매도 의견: 현재 보유 종목 중 비중이 큰 것 우선 매도
+        const sorted = [...holdingsInCategory].sort((a, b) => b.currentKRW - a.currentKRW)
+        let remaining = Math.abs(diffKRW)
+        sorted.forEach(h => {
+          if (remaining <= 0) return
+          const sellAmount = Math.min(remaining, h.currentKRW * 0.5) // 최대 50%까지만 매도 권장
+          stockRecommendations.push({
+            name: h.name,
+            ticker: h.ticker,
+            account: h.account,
+            currentKRW: h.currentKRW,
+            adjustKRW: -Math.round(sellAmount),
+            action: '매도',
+          })
+          remaining -= sellAmount
+        })
+      }
+
       recommendations.push({
         category: cat,
         currentWeight,
@@ -200,6 +237,7 @@ export default function RebalancePage() {
         actionColor,
         icon,
         holdings: categoryHoldings[cat] || [],
+        stockRecommendations,
       })
     })
 
@@ -597,82 +635,123 @@ export default function RebalancePage() {
           <span>리밸런싱 의견</span>
         </div>
 
-        <div style={styles.tableWrapper}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th(false)}>카테고리</th>
-                <th style={{ ...styles.th(false), textAlign: 'center' }}>현재</th>
-                <th style={{ ...styles.th(false), textAlign: 'center' }}>목표</th>
-                <th style={{ ...styles.th(false), textAlign: 'center' }}>차이</th>
-                <th style={{ ...styles.th(false), textAlign: 'center' }}>의견</th>
-                <th style={{ ...styles.th(false), textAlign: 'right' }}>조정 금액</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recommendations
-                .filter(r => r.action !== '유지')
-                .map((rec, idx) => {
-                  const color = CATEGORY_COLORS[rec.category] || '#9CA3AF'
-                  return (
-                    <tr key={idx}>
-                      <td style={styles.td}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={styles.colorDot(color)} />
+        {recommendations
+          .filter(r => r.action !== '유지')
+          .map((rec, idx) => {
+            const color = CATEGORY_COLORS[rec.category] || '#9CA3AF'
+            const isBuy = rec.action.includes('매수')
+            return (
+              <div key={idx} style={{
+                marginBottom: '16px',
+                border: '1px solid #E5E8EB',
+                borderRadius: '12px',
+                overflow: 'hidden',
+              }}>
+                {/* 카테고리 헤더 */}
+                <div style={{
+                  padding: '16px',
+                  backgroundColor: isBuy ? '#E8F5E9' : '#FFEBEE',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      ...styles.colorDot(color),
+                      width: '14px',
+                      height: '14px',
+                    }} />
+                    <div>
+                      <div style={{ fontWeight: '700', fontSize: '15px', color: '#191F28' }}>
+                        {rec.category}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#6B7684', marginTop: '2px' }}>
+                        현재 {rec.currentWeight.toFixed(1)}% → 목표 {rec.targetWeight.toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      backgroundColor: isBuy ? '#2E7D32' : '#C62828',
+                      color: 'white',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                    }}>
+                      {rec.icon} {rec.action} {Math.abs(rec.diffKRW) >= 10000
+                        ? `${(Math.abs(rec.diffKRW) / 10000).toFixed(0)}만원`
+                        : `${Math.abs(rec.diffKRW).toLocaleString()}원`
+                      }
+                    </span>
+                  </div>
+                </div>
+
+                {/* 종목별 상세 */}
+                {rec.stockRecommendations && rec.stockRecommendations.length > 0 && (
+                  <div style={{ padding: '12px 16px' }}>
+                    <div style={{
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      color: '#8B95A1',
+                      marginBottom: '10px',
+                      textTransform: 'uppercase',
+                    }}>
+                      종목별 상세
+                    </div>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                      gap: '8px',
+                    }}>
+                      {rec.stockRecommendations.map((stock, sIdx) => (
+                        <div key={sIdx} style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '10px 12px',
+                          backgroundColor: '#F7F8FA',
+                          borderRadius: '8px',
+                        }}>
                           <div>
-                            <div style={{ fontWeight: '600' }}>{rec.category}</div>
-                            {rec.holdings.length > 0 && (
-                              <div style={{ fontSize: '10px', color: '#8B95A1', marginTop: '2px' }}>
-                                {rec.holdings.slice(0, 3).join(', ')}
-                                {rec.holdings.length > 3 && ` 외 ${rec.holdings.length - 3}개`}
-                              </div>
-                            )}
+                            <div style={{ fontWeight: '600', fontSize: '13px', color: '#191F28' }}>
+                              {stock.name}
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#8B95A1', marginTop: '2px' }}>
+                              {stock.account} · 현재 {stock.currentKRW >= 10000
+                                ? `${(stock.currentKRW / 10000).toFixed(0)}만`
+                                : `${stock.currentKRW.toLocaleString()}원`
+                              }
+                            </div>
+                          </div>
+                          <div style={{
+                            fontWeight: '700',
+                            fontSize: '13px',
+                            color: stock.adjustKRW > 0 ? '#2E7D32' : '#C62828',
+                          }}>
+                            {stock.adjustKRW > 0 ? '+' : ''}
+                            {Math.abs(stock.adjustKRW) >= 10000
+                              ? `${(stock.adjustKRW / 10000).toFixed(0)}만`
+                              : `${stock.adjustKRW.toLocaleString()}원`
+                            }
                           </div>
                         </div>
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center', fontWeight: '600' }}>
-                        {rec.currentWeight.toFixed(1)}%
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center', fontWeight: '600', color: '#3182F6' }}>
-                        {rec.targetWeight.toFixed(1)}%
-                      </td>
-                      <td style={{
-                        ...styles.td,
-                        textAlign: 'center',
-                        fontWeight: '600',
-                        color: rec.diff > 0 ? '#2E7D32' : '#C62828'
-                      }}>
-                        {rec.diff > 0 ? '+' : ''}{rec.diff.toFixed(1)}%
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' }}>
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          padding: '4px 10px',
-                          borderRadius: '6px',
-                          backgroundColor: rec.action.includes('매수') ? '#E8F5E9' : '#FFEBEE',
-                          color: rec.actionColor,
-                          fontSize: '12px',
-                          fontWeight: '600',
-                        }}>
-                          {rec.icon} {rec.action}
-                        </span>
-                      </td>
-                      <td style={{
-                        ...styles.td,
-                        textAlign: 'right',
-                        fontWeight: '600',
-                        color: rec.diff > 0 ? '#2E7D32' : '#C62828'
-                      }}>
-                        {rec.diff > 0 ? '+' : ''}{(rec.diffKRW / 10000).toFixed(0)}만원
-                      </td>
-                    </tr>
-                  )
-                })}
-            </tbody>
-          </table>
-        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 신규 매수인 경우 */}
+                {rec.action === '신규 매수' && (
+                  <div style={{ padding: '12px 16px', color: '#6B7684', fontSize: '12px' }}>
+                    💡 이 카테고리에 새로운 종목을 추가하세요
+                  </div>
+                )}
+              </div>
+            )
+          })}
 
         {recommendations.filter(r => r.action !== '유지').length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px', color: '#8B95A1' }}>
