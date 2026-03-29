@@ -27,6 +27,160 @@ const CATEGORY_COLORS = {
   '나스닥': '#7C3AED',
 }
 
+// ========== 4인 전문가 패널 의견 생성 ==========
+const getExpertOpinions = (category, action, diff) => {
+  const isBuy = action.includes('매수')
+
+  // 카테고리별 4인 의견
+  const opinions = {
+    'Big Tech': {
+      buy: {
+        buffett: { stance: '⚠️ 신중', opinion: '애플 P/E 33배에 매도했습니다. 지금 빅테크는 여전히 비쌉니다.' },
+        ackman: { stance: '✅ 찬성', opinion: '아마존, 메타 추가 매수 중. AI 수혜주는 장기 보유 가치 있습니다.' },
+        abel: { stance: '🔄 조건부', opinion: '분할 매수로 접근하세요. 한 번에 몰빵은 위험합니다.' },
+        munger: { stance: '🤔 관망', opinion: '좋은 기업이지만 좋은 가격인지 확인하세요.' },
+      },
+      sell: {
+        buffett: { stance: '✅ 찬성', opinion: '저도 애플 대량 매도했습니다. 이익 실현 타이밍입니다.' },
+        ackman: { stance: '⚠️ 반대', opinion: '장기 성장주를 팔면 후회합니다. 보유하세요.' },
+        abel: { stance: '🔄 일부만', opinion: '전량 매도보다 비중 조절이 현명합니다.' },
+        munger: { stance: '🤔 상황별', opinion: '팔아야 할 이유가 명확한지 자문하세요.' },
+      },
+    },
+    'S&P500': {
+      buy: {
+        buffett: { stance: '⚠️ 대기', opinion: 'S&P CAPE 39는 역사적 고점입니다. 서두르지 마세요.' },
+        ackman: { stance: '🔄 조건부', opinion: '분할 매수는 괜찮지만 올인은 금물입니다.' },
+        abel: { stance: '✅ 장기적', opinion: '10년 보유 관점이면 지금도 나쁘지 않습니다.' },
+        munger: { stance: '🤔 인내', opinion: '더 좋은 가격이 올 수 있습니다. 기다리세요.' },
+      },
+      sell: {
+        buffett: { stance: '✅ 찬성', opinion: '고평가 구간입니다. 현금 확보가 현명합니다.' },
+        ackman: { stance: '⚠️ 반대', opinion: '인덱스는 장기 보유가 원칙입니다.' },
+        abel: { stance: '🔄 일부만', opinion: '전량 매도는 극단적입니다. 10-20%만 조절하세요.' },
+        munger: { stance: '🤔 냉정히', opinion: '공포에 팔지 마세요. 계획대로 행동하세요.' },
+      },
+    },
+    '국내주식': {
+      buy: {
+        buffett: { stance: '🤔 관망', opinion: '한국 시장은 잘 모릅니다. 아는 것에 투자하세요.' },
+        ackman: { stance: '⚠️ 신중', opinion: '신흥국 리스크가 있습니다. 미국 시장이 더 안전합니다.' },
+        abel: { stance: '🔄 분산용', opinion: '글로벌 분산 차원에서 소량은 괜찮습니다.' },
+        munger: { stance: '✅ 저평가', opinion: '한국 시장 PBR 1 미만은 역사적 저점입니다.' },
+      },
+      sell: {
+        buffett: { stance: '🔄 중립', opinion: '홈 바이어스를 경계하세요. 글로벌 분산이 중요합니다.' },
+        ackman: { stance: '✅ 찬성', opinion: '미국 시장에 집중하는 것이 효율적입니다.' },
+        abel: { stance: '⚠️ 일부만', opinion: '완전 매도보다 비중 조절을 권합니다.' },
+        munger: { stance: '🤔 재고', opinion: '싸게 팔면 후회합니다. 가치를 재평가하세요.' },
+      },
+    },
+    '현금성': {
+      buy: {
+        buffett: { stance: '✅ 강력 찬성', opinion: '$3,730억 현금 보유 중. 현금은 기회의 총알입니다.' },
+        ackman: { stance: '🔄 적정선', opinion: '20-30%면 충분합니다. 너무 많으면 기회비용.' },
+        abel: { stance: '✅ 찬성', opinion: '드라이 파우더 전략. 하락장 대비 필수입니다.' },
+        munger: { stance: '✅ 찬성', opinion: '현금은 어리석은 행동을 막아줍니다.' },
+      },
+      sell: {
+        buffett: { stance: '⚠️ 신중', opinion: 'CAPE 39에서 현금 줄이기는 위험합니다.' },
+        ackman: { stance: '🔄 선별적', opinion: '확신 있는 종목에만 투입하세요.' },
+        abel: { stance: '⚠️ 천천히', opinion: '분할로 천천히 투입하세요. 급하지 않습니다.' },
+        munger: { stance: '🤔 때를 봐서', opinion: '좋은 기회가 올 때까지 참으세요.' },
+      },
+    },
+    '채권': {
+      buy: {
+        buffett: { stance: '✅ 찬성', opinion: '단기채 수익률 5%는 매력적입니다.' },
+        ackman: { stance: '🔄 중립', opinion: '주식보다 낫지만 장기 수익은 제한적입니다.' },
+        abel: { stance: '✅ 방어용', opinion: '포트폴리오 안정성을 위해 필요합니다.' },
+        munger: { stance: '✅ 균형', opinion: '주식과 채권의 균형이 중요합니다.' },
+      },
+      sell: {
+        buffett: { stance: '⚠️ 반대', opinion: '불확실한 시장에서 채권은 안전판입니다.' },
+        ackman: { stance: '🔄 상황별', opinion: '금리 방향을 고려해 결정하세요.' },
+        abel: { stance: '⚠️ 유지', opinion: '방어 자산을 줄이면 리스크가 커집니다.' },
+        munger: { stance: '🤔 재고', opinion: '왜 팔려는지 이유를 명확히 하세요.' },
+      },
+    },
+    '암호화폐': {
+      buy: {
+        buffett: { stance: '❌ 반대', opinion: '"쥐약의 제곱"입니다. 투자하지 않습니다.' },
+        ackman: { stance: '⚠️ 극소량', opinion: '포트폴리오 1-2% 이하로만, 잃어도 괜찮은 돈만.' },
+        abel: { stance: '❌ 회의적', opinion: '버크셔는 암호화폐에 투자하지 않습니다.' },
+        munger: { stance: '❌ 강력 반대', opinion: '성병보다 나쁩니다. 피하세요.' },
+      },
+      sell: {
+        buffett: { stance: '✅ 찬성', opinion: '애초에 보유하지 말았어야 합니다.' },
+        ackman: { stance: '🔄 상황별', opinion: '이익이면 일부 실현, 손실이면 보유 고려.' },
+        abel: { stance: '✅ 찬성', opinion: '변동성이 너무 큽니다. 줄이세요.' },
+        munger: { stance: '✅ 즉시', opinion: '빨리 정리하고 잊어버리세요.' },
+      },
+    },
+    '배당주': {
+      buy: {
+        buffett: { stance: '✅ 찬성', opinion: '코카콜라 배당으로 40년 복리 수익 중입니다.' },
+        ackman: { stance: '🔄 선별적', opinion: '배당성장주가 단순 고배당주보다 좋습니다.' },
+        abel: { stance: '✅ 안정적', opinion: '하락장에서 현금흐름은 든든합니다.' },
+        munger: { stance: '✅ 좋은 선택', opinion: '복리의 마법을 믿으세요.' },
+      },
+      sell: {
+        buffett: { stance: '⚠️ 반대', opinion: '좋은 배당주는 평생 보유합니다.' },
+        ackman: { stance: '🔄 재평가', opinion: '배당 지속 가능성을 확인하세요.' },
+        abel: { stance: '⚠️ 신중', opinion: '현금흐름 포기는 신중히 결정하세요.' },
+        munger: { stance: '🤔 이유 확인', opinion: '왜 팔려는지 명확한 이유가 있나요?' },
+      },
+    },
+    '에너지': {
+      buy: {
+        buffett: { stance: '✅ 찬성', opinion: '옥시덴탈 대량 보유 중. 에너지는 필수재입니다.' },
+        ackman: { stance: '🔄 중립', opinion: 'ESG 트렌드와 상충되지만 단기 수익은 가능.' },
+        abel: { stance: '✅ 인프라', opinion: '에너지 인프라 투자 15조원 계획 중입니다.' },
+        munger: { stance: '🔄 사이클', opinion: '에너지는 사이클 산업입니다. 타이밍 중요.' },
+      },
+      sell: {
+        buffett: { stance: '⚠️ 유지', opinion: '저는 계속 보유합니다. 배당이 좋습니다.' },
+        ackman: { stance: '🔄 일부', opinion: '비중이 과하면 일부 차익실현.' },
+        abel: { stance: '⚠️ 장기 보유', opinion: '에너지 수요는 계속됩니다.' },
+        munger: { stance: '🤔 가격 확인', opinion: '유가 사이클 고점인지 확인하세요.' },
+      },
+    },
+    '연금': {
+      buy: {
+        buffett: { stance: '✅ 무조건', opinion: '세금 절약은 확실한 수익입니다.' },
+        ackman: { stance: '✅ 한도까지', opinion: '세제혜택 한도는 반드시 채우세요.' },
+        abel: { stance: '✅ 필수', opinion: '장기 복리 + 절세 = 최강 조합.' },
+        munger: { stance: '✅ 당연히', opinion: '세금 내고 투자하면 바보입니다.' },
+      },
+      sell: {
+        buffett: { stance: '❌ 반대', opinion: '연금을 빼면 세금 폭탄입니다.' },
+        ackman: { stance: '❌ 반대', opinion: '절대 중도 해지하지 마세요.' },
+        abel: { stance: '❌ 불가', opinion: '장기 플랜을 유지하세요.' },
+        munger: { stance: '❌ 어리석음', opinion: '가장 어리석은 결정입니다.' },
+      },
+    },
+  }
+
+  // 기본값
+  const defaultOpinion = {
+    buy: {
+      buffett: { stance: '🤔 검토', opinion: '충분히 분석한 후 결정하세요.' },
+      ackman: { stance: '🔄 분할', opinion: '분할 매수로 리스크를 줄이세요.' },
+      abel: { stance: '🔄 신중', opinion: '시장 상황을 고려해 천천히.' },
+      munger: { stance: '🤔 확신', opinion: '확신이 없으면 하지 마세요.' },
+    },
+    sell: {
+      buffett: { stance: '🤔 재고', opinion: '팔아야 할 명확한 이유가 있나요?' },
+      ackman: { stance: '🔄 일부만', opinion: '전량보다 일부 매도를 권합니다.' },
+      abel: { stance: '🔄 점진적', opinion: '급하게 팔지 마세요.' },
+      munger: { stance: '🤔 냉정', opinion: '감정적 결정은 피하세요.' },
+    },
+  }
+
+  const categoryOpinions = opinions[category] || defaultOpinion
+  return isBuy ? categoryOpinions.buy : categoryOpinions.sell
+}
+
 // ========== 2026년 3월 시장 상황 (실시간 데이터 기반) ==========
 const MARKET_CONTEXT = {
   cape: 39.0,                    // 쉴러 P/E - 역대 2위 (닷컴버블 다음)
@@ -859,64 +1013,75 @@ export default function RebalancePage() {
                   </div>
                 </div>
 
-                {/* 시장 분석 기반 의견 */}
+                {/* 4인 전문가 패널 의견 */}
                 {(() => {
-                  const smartAdvice = getSmartAdvice(rec.category, rec.action, rec.currentWeight, rec.targetWeight)
-                  const urgencyColors = {
-                    high: { bg: '#FEE2E2', border: '#FECACA', text: '#991B1B', badge: '#DC2626' },
-                    medium: { bg: '#FEF3C7', border: '#FDE68A', text: '#92400E', badge: '#D97706' },
-                    low: { bg: '#DBEAFE', border: '#BFDBFE', text: '#1E40AF', badge: '#2563EB' },
-                  }
-                  const colors = urgencyColors[smartAdvice.urgency] || urgencyColors.medium
+                  const expertOpinions = getExpertOpinions(rec.category, rec.action, rec.diff)
+                  const experts = [
+                    { key: 'buffett', name: '버핏', icon: '👴', color: '#EF4444' },
+                    { key: 'ackman', name: '애크먼', icon: '🦅', color: '#F59E0B' },
+                    { key: 'abel', name: '아벨', icon: '🏛️', color: '#10B981' },
+                    { key: 'munger', name: '멍거', icon: '🦉', color: '#8B5CF6' },
+                  ]
                   return (
                     <div style={{
-                      padding: '14px 16px',
-                      backgroundColor: colors.bg,
-                      borderTop: `1px solid ${colors.border}`,
+                      padding: '16px',
+                      backgroundColor: '#F8FAFC',
+                      borderTop: '1px solid #E2E8F0',
                     }}>
                       <div style={{
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        color: '#475569',
+                        marginBottom: '12px',
                         display: 'flex',
-                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '10px',
-                        flexWrap: 'wrap',
-                        gap: '8px',
+                        gap: '6px',
                       }}>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                        }}>
-                          <span style={{ fontSize: '14px' }}>🎯</span>
-                          <span style={{
-                            fontSize: '11px',
-                            fontWeight: '700',
-                            color: colors.badge,
-                            textTransform: 'uppercase',
-                          }}>
-                            {smartAdvice.urgency === 'high' ? '중요' : smartAdvice.urgency === 'medium' ? '참고' : '낮음'}
-                          </span>
-                        </div>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          padding: '3px 8px',
-                          backgroundColor: 'rgba(0,0,0,0.05)',
-                          borderRadius: '4px',
-                        }}>
-                          <span style={{ fontSize: '11px' }}>👴</span>
-                          <span style={{ fontSize: '10px', color: '#6B7280', fontWeight: '500' }}>
-                            버핏: {smartAdvice.buffettDoing}
-                          </span>
-                        </div>
+                        <span>👔</span> 4인 전문가 의견
                       </div>
                       <div style={{
-                        fontSize: '13px',
-                        color: colors.text,
-                        lineHeight: '1.6',
+                        display: 'grid',
+                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                        gap: '10px',
                       }}>
-                        {smartAdvice.advice}
+                        {experts.map(expert => {
+                          const opinion = expertOpinions[expert.key]
+                          return (
+                            <div key={expert.key} style={{
+                              padding: '12px',
+                              backgroundColor: 'white',
+                              borderRadius: '8px',
+                              borderLeft: `3px solid ${expert.color}`,
+                            }}>
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                marginBottom: '6px',
+                              }}>
+                                <span style={{ fontSize: '16px' }}>{expert.icon}</span>
+                                <span style={{ fontWeight: '700', fontSize: '12px', color: '#1E293B' }}>
+                                  {expert.name}
+                                </span>
+                                <span style={{
+                                  marginLeft: 'auto',
+                                  fontSize: '11px',
+                                  fontWeight: '600',
+                                  color: expert.color,
+                                }}>
+                                  {opinion.stance}
+                                </span>
+                              </div>
+                              <div style={{
+                                fontSize: '11px',
+                                color: '#64748B',
+                                lineHeight: '1.5',
+                              }}>
+                                "{opinion.opinion}"
+                              </div>
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   )
@@ -1266,7 +1431,7 @@ export default function RebalancePage() {
         </div>
       </div>
 
-      {/* 종합 의견 */}
+      {/* 종합 의견 - 그래서 어떻게 해야 하나요? */}
       <div style={{
         backgroundColor: 'white',
         borderRadius: '16px',
@@ -1278,60 +1443,220 @@ export default function RebalancePage() {
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          marginBottom: '20px',
+          marginBottom: '24px',
         }}>
-          <span style={{ fontSize: '24px' }}>🧠</span>
+          <span style={{ fontSize: '28px' }}>❓</span>
           <div>
-            <div style={{ fontSize: '18px', fontWeight: '700', color: '#191F28' }}>
-              종합 의견
+            <div style={{ fontSize: '20px', fontWeight: '700', color: '#191F28' }}>
+              그래서 어떻게 해야 하나요?
             </div>
             <div style={{ fontSize: '12px', color: '#8B95A1' }}>
-              2026년 3월 시장 분석 · 냉철한 T의 시선
+              4인 전문가 패널의 합의를 바탕으로 한 실행 가이드
+            </div>
+          </div>
+        </div>
+
+        {/* 핵심 답변 */}
+        <div style={{
+          padding: '20px',
+          backgroundColor: '#0F172A',
+          borderRadius: '12px',
+          marginBottom: '20px',
+        }}>
+          <div style={{
+            fontSize: '16px',
+            fontWeight: '700',
+            color: '#F59E0B',
+            marginBottom: '12px',
+          }}>
+            📌 한 줄 답변
+          </div>
+          <div style={{
+            fontSize: '18px',
+            fontWeight: '600',
+            color: 'white',
+            lineHeight: '1.6',
+          }}>
+            "지금은 <span style={{ color: '#EF4444' }}>70% 수비</span> + <span style={{ color: '#10B981' }}>30% 선별 공격</span>으로 가세요.
+            현금을 무기로 남기고, 확신 있는 종목만 분할 매수하세요."
+          </div>
+        </div>
+
+        {/* 구체적 액션 플랜 */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+          gap: '16px',
+          marginBottom: '20px',
+        }}>
+          {/* 이번 주 할 일 */}
+          <div style={{
+            padding: '16px',
+            backgroundColor: '#ECFDF5',
+            borderRadius: '12px',
+            border: '1px solid #A7F3D0',
+          }}>
+            <div style={{
+              fontSize: '14px',
+              fontWeight: '700',
+              color: '#065F46',
+              marginBottom: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}>
+              ✅ 이번 주 할 일
+            </div>
+            <div style={{ fontSize: '13px', color: '#047857', lineHeight: '1.8' }}>
+              <div style={{ marginBottom: '6px' }}>1. 현금 비중 확인 (목표: 20-30%)</div>
+              <div style={{ marginBottom: '6px' }}>2. 연금저축/IRP 한도 채우기</div>
+              <div style={{ marginBottom: '6px' }}>3. 고위험 자산 5% 이하로 조절</div>
+              <div>4. 분할 매수 일정 세우기 (월 1-2회)</div>
+            </div>
+          </div>
+
+          {/* 이번 주 하지 말 일 */}
+          <div style={{
+            padding: '16px',
+            backgroundColor: '#FEF2F2',
+            borderRadius: '12px',
+            border: '1px solid #FECACA',
+          }}>
+            <div style={{
+              fontSize: '14px',
+              fontWeight: '700',
+              color: '#991B1B',
+              marginBottom: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}>
+              ❌ 이번 주 하지 말 일
+            </div>
+            <div style={{ fontSize: '13px', color: '#B91C1C', lineHeight: '1.8' }}>
+              <div style={{ marginBottom: '6px' }}>1. 현금 전액 주식 투자</div>
+              <div style={{ marginBottom: '6px' }}>2. "바닥이다" 확신하고 몰빵</div>
+              <div style={{ marginBottom: '6px' }}>3. 레버리지/신용 사용</div>
+              <div>4. 패닉에 손절</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 시나리오별 대응 */}
+        <div style={{
+          padding: '16px',
+          backgroundColor: '#F8FAFC',
+          borderRadius: '12px',
+          marginBottom: '20px',
+        }}>
+          <div style={{
+            fontSize: '14px',
+            fontWeight: '700',
+            color: '#334155',
+            marginBottom: '12px',
+          }}>
+            🎯 시나리오별 대응 전략
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+            gap: '12px',
+          }}>
+            <div style={{
+              padding: '12px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '12px', color: '#64748B', marginBottom: '4px' }}>S&P 500 횡보 시</div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: '#334155' }}>현 비중 유지</div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '4px' }}>분할 매수 계속</div>
+            </div>
+            <div style={{
+              padding: '12px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '12px', color: '#64748B', marginBottom: '4px' }}>S&P -10~20% 추가 하락</div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: '#F59E0B' }}>매수 비중 ↑</div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '4px' }}>현금 30→20%로</div>
+            </div>
+            <div style={{
+              padding: '12px',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '12px', color: '#64748B', marginBottom: '4px' }}>S&P -30% 이상 폭락</div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: '#10B981' }}>공격적 매수</div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '4px' }}>현금 대부분 투입</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4인 요약 */}
+        <div style={{
+          padding: '16px',
+          backgroundColor: '#1E293B',
+          borderRadius: '12px',
+          marginBottom: '16px',
+        }}>
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '700',
+            color: '#F59E0B',
+            marginBottom: '10px',
+          }}>
+            🎓 4인 거장의 핵심 교훈
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)',
+            gap: '12px',
+            fontSize: '12px',
+            color: '#E2E8F0',
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '20px', marginBottom: '4px' }}>👴</div>
+              <div style={{ fontWeight: '600' }}>버핏</div>
+              <div style={{ color: '#94A3B8', fontSize: '11px' }}>"현금이 왕이다"</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '20px', marginBottom: '4px' }}>🦅</div>
+              <div style={{ fontWeight: '600' }}>애크먼</div>
+              <div style={{ color: '#94A3B8', fontSize: '11px' }}>"확신에 베팅"</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '20px', marginBottom: '4px' }}>🏛️</div>
+              <div style={{ fontWeight: '600' }}>아벨</div>
+              <div style={{ color: '#94A3B8', fontSize: '11px' }}>"기회를 기다려"</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '20px', marginBottom: '4px' }}>🦉</div>
+              <div style={{ fontWeight: '600' }}>멍거</div>
+              <div style={{ color: '#94A3B8', fontSize: '11px' }}>"덜 행동하라"</div>
             </div>
           </div>
         </div>
 
         <div style={{
-          fontSize: '14px',
-          color: '#374151',
-          lineHeight: '1.8',
-          whiteSpace: 'pre-line',
-        }}>
-{`▎결론: 버핏(수비) + 애크먼(선별 공격) + 아벨(기회 대기) + 멍거(인내) = 최적 전략
-
-네 거장의 공통점은 "지금은 올인할 때가 아니다"입니다. 버핏은 역사상 최대 현금을 쌓았고, 애크먼은 -14% 손실에도 확신 있는 종목만 추가 매수하며, 아벨은 "드라이 파우더" 전략으로 기회를 노리고, 멍거는 "아무것도 안 하는 것의 가치"를 강조합니다.
-
-▎당신의 전략 (4인 합성):
-① 현금 20-30% 유지 - 버핏처럼 총알을 남겨두세요
-② 확신 종목만 분할 매수 - 애크먼처럼 AI 빅테크 중 확신 있는 것만
-③ 추가 하락 대비 - 아벨처럼 S&P -20~30%면 공격적 매수 준비
-④ 감정 배제 - 세 거장 모두 FOMO에 흔들리지 않습니다
-
-▎피해야 할 것:
-✗ "바닥인 것 같다"는 희망적 사고
-✗ 전문가도 모르는 타이밍 맞추기
-✗ 하락장에서 패닉 셀링
-
-지금 당신이 가진 현금은 "기회비용"이 아니라 "옵션"입니다. 시장이 더 빠지면 그 현금이 최고의 무기가 됩니다.`}
-        </div>
-
-        <div style={{
-          marginTop: '20px',
           padding: '12px 16px',
-          backgroundColor: '#F8FAFC',
+          backgroundColor: '#FFFBEB',
           borderRadius: '8px',
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
+          borderLeft: '3px solid #F59E0B',
         }}>
           <span style={{ fontSize: '20px' }}>💎</span>
           <div style={{
             fontSize: '13px',
-            color: '#64748B',
+            color: '#92400E',
             fontStyle: 'italic',
           }}>
-            "시장에서 돈을 버는 것은 어렵지 않다. 어려운 것은 빠른 돈을 벌고 싶은 유혹을 이기는 것이다."
-            <br />— 찰리 멍거
+            "주식시장은 인내심 없는 사람의 돈을 인내심 있는 사람에게 이전하는 장치다."
+            <br />— 워렌 버핏
           </div>
         </div>
       </div>
