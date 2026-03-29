@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>리밸런싱 대시보드</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<style>
+:root{
+  --hd-black:#171A19;
+  --hd-green-01:#01A76B;
+  --hd-green-02:#00905C;
+  --hd-gradient-01:linear-gradient(135deg,#00905C,#193D26);
+  --hd-gradient-02:linear-gradient(135deg,#089F4A,#0F6849);
+  --hd-gradient-03:linear-gradient(135deg,#0FB700,#00957A);
+  --gray-01:#434545;
+  --gray-02:#727573;
+  --gray-04:#8b8b8b;
+  --gray-05:#EAEBEA;
+  --gray-06:#F7F7F7;
+  --negative:#EB3912;
+  --hd-blue:#3A5FFF;
+  --hd-purple:#8B5CF6;
+  --shadow-h1:0 4px 36px rgba(0,0,0,0.10);
+  --shadow-h2:0 2px 14px rgba(0,0,0,0.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:var(--gray-06);color:var(--hd-black);
+  -webkit-font-smoothing:antialiased;font-weight:500;line-height:1.5;
+}
+.wrap{max-width:880px;margin:0 auto;padding:40px 24px 64px;}
+
+.tab-wrap{display:flex;gap:12px;margin-bottom:24px;}
+.tab-btn{
+  flex:1;padding:16px;border-radius:16px;border:2px solid var(--gray-05);
+  background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all 0.3s;font-family:inherit;
+}
+.tab-btn:hover{border-color:var(--hd-green-01);background:rgba(1,167,107,0.05);}
+.tab-btn.active{border-color:var(--hd-green-01);background:rgba(1,167,107,0.08);}
+.tab-emoji{font-size:24px;}
+.tab-name{font-size:16px;font-weight:700;color:var(--hd-black);}
+.tab-btn.active .tab-name{color:var(--hd-green-02);}
+
+.hero{
+  background:var(--hd-gradient-01);border-radius:24px;
+  padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:24px;
+  box-shadow:var(--shadow-h1);
+}
+.hero::before{
+  content:'';position:absolute;top:-60px;right:-40px;
+  width:280px;height:280px;background:rgba(255,255,255,0.06);
+  transform:skewX(-35deg);border-radius:32px;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-40px;left:20%;
+  width:200px;height:200px;background:rgba(255,255,255,0.04);
+  transform:skewX(-35deg);border-radius:24px;
+}
+.hero-badge{
+  display:inline-block;padding:8px 16px;
+  background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);
+  border-radius:20px;font-size:14px;font-weight:700;
+  margin-bottom:20px;position:relative;z-index:1;
+}
+.hero h1{font-size:40px;font-weight:800;line-height:1.3;letter-spacing:-1.5px;margin-bottom:8px;position:relative;z-index:1;}
+.hero-sub{font-size:15px;font-weight:500;opacity:0.8;margin-bottom:32px;position:relative;z-index:1;}
+.hero-stats{display:flex;gap:48px;position:relative;z-index:1;}
+.hero-stat-label{font-size:13px;opacity:0.7;margin-bottom:4px;}
+.hero-stat-value{font-size:36px;font-weight:800;}
+
+.defense-badge{
+  display:flex;align-items:center;gap:14px;
+  padding:20px 24px;background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);
+  border-radius:16px;margin-top:28px;position:relative;z-index:1;
+}
+.defense-icon{font-size:32px;}
+.defense-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.defense-desc{font-size:13px;opacity:0.8;}
+.defense-progress{margin-top:20px;position:relative;z-index:1;}
+.defense-progress-label{display:flex;justify-content:space-between;font-size:12px;opacity:0.8;margin-bottom:8px;}
+.defense-progress-bar{height:10px;background:rgba(255,255,255,0.2);border-radius:5px;overflow:hidden;}
+.defense-progress-fill{height:100%;border-radius:5px;transition:width 0.5s ease;}
+
+.section{
+  background:#fff;border-radius:24px;padding:40px;margin-bottom:24px;
+  box-shadow:var(--shadow-h1);
+}
+.sh{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.sh-icon{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  background:var(--hd-gradient-02);color:#fff;
+  box-shadow:0 4px 12px rgba(1,167,107,0.25);
+}
+.sh-title{font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1.4;color:var(--hd-black);}
+.sh-sub{font-size:15px;font-weight:500;color:var(--gray-02);margin-left:52px;margin-bottom:24px;letter-spacing:-0.4px;}
+
+.id-shape{
+  display:inline-block;width:48px;height:6px;
+  background:var(--hd-gradient-03);
+  transform:skewX(-35deg);border-radius:2px;
+  margin-bottom:16px;
+}
+
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.summary-card{
+  background:#fff;border-radius:20px;padding:28px 20px;text-align:center;
+  box-shadow:var(--shadow-h2);transition:all 0.3s;
+}
+.summary-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(1,167,107,0.12);}
+.summary-icon{
+  width:48px;height:48px;margin:0 auto 12px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+.summary-icon.buy{background:linear-gradient(135deg,#10B981,#059669);color:#fff;}
+.summary-icon.hold{background:linear-gradient(135deg,#8B95A1,#6B7280);color:#fff;}
+.summary-icon.sell{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;}
+.summary-label{font-size:14px;font-weight:700;color:var(--hd-green-02);margin-bottom:6px;}
+.summary-value{font-size:28px;font-weight:800;color:var(--hd-black);}
+
+.stack-bar{display:flex;height:28px;border-radius:14px;overflow:hidden;margin-bottom:24px;box-shadow:var(--shadow-h2);}
+.stack-segment{transition:width 0.5s ease;}
+
+.cat-list{display:flex;flex-direction:column;gap:10px;}
+.cat-item{
+  display:flex;align-items:center;gap:14px;padding:16px 20px;
+  background:var(--gray-06);border-radius:16px;transition:all 0.2s;
+}
+.cat-item:hover{background:#fff;box-shadow:var(--shadow-h2);transform:translateX(4px);}
+.cat-dot{width:12px;height:12px;border-radius:4px;flex-shrink:0;}
+.cat-name{flex:1;font-size:14px;font-weight:600;color:var(--hd-black);}
+.cat-current{font-size:15px;font-weight:700;color:var(--hd-black);}
+.cat-target{font-size:12px;font-weight:600;color:var(--gray-04);width:70px;text-align:right;}
+
+.ibox{
+  display:flex;align-items:flex-start;gap:20px;padding:28px;
+  border-radius:20px;box-shadow:var(--shadow-h2);margin-bottom:16px;
+  transition:all 0.3s ease;
+}
+.ibox:hover{transform:scale(1.002);box-shadow:0 6px 24px rgba(0,0,0,0.08);}
+.ibox.green{background:linear-gradient(135deg,#E8F5EE,#D4EDDA);}
+.ibox.blue{background:linear-gradient(135deg,#E8EEFF,#D6E0FF);}
+.ibox.yellow{background:linear-gradient(135deg,#FFF9E5,#FFF3CC);}
+.ibox.purple{background:linear-gradient(135deg,#F0ECFF,#E4DEFF);}
+.ibox.red{background:linear-gradient(135deg,#FFEDED,#FFE0E0);}
+.ibox-icon{font-size:32px;flex-shrink:0;margin-top:2px;}
+.ibox-content{flex:1;min-width:0;}
+.ibox-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.ibox-name{font-size:18px;font-weight:800;color:var(--hd-black);}
+.ibox-badge{padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;color:#fff;}
+.ibox-badge.red{background:#EB3912;}
+.ibox-badge.yellow{background:#D97706;}
+.ibox-badge.green{background:#059669;}
+.ibox-badge.purple{background:#7C3AED;}
+.ibox-badge.blue{background:#3A5FFF;}
+.ibox-desc{font-size:14px;font-weight:500;color:var(--gray-01);line-height:1.8;margin-bottom:16px;}
+
+/* Expert Portfolio Table */
+.portfolio-mini{margin-top:16px;padding:20px;background:rgba(255,255,255,0.8);border-radius:14px;}
+.portfolio-mini-title{font-size:14px;font-weight:700;color:var(--hd-black);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.portfolio-bar{display:flex;height:24px;border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.portfolio-bar-segment{transition:width 0.5s;}
+
+.portfolio-table{width:100%;}
+.portfolio-row{
+  display:grid;grid-template-columns:auto 1fr 80px 100px;gap:12px;
+  padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.06);align-items:center;
+}
+.portfolio-row:last-child{border-bottom:none;}
+.portfolio-row-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.portfolio-row-name{font-size:13px;font-weight:600;color:var(--hd-black);}
+.portfolio-row-pct{font-size:13px;font-weight:700;color:var(--hd-green-02);text-align:right;}
+.portfolio-row-amt{font-size:13px;font-weight:700;color:var(--hd-black);text-align:right;}
+
+.portfolio-total{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:12px;padding-top:12px;border-top:2px solid rgba(0,0,0,0.1);
+}
+.portfolio-total-label{font-size:14px;font-weight:700;color:var(--gray-02);}
+.portfolio-total-value{font-size:16px;font-weight:800;color:var(--hd-black);}
+
+.action-list{display:flex;flex-direction:column;gap:12px;}
+.action-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 24px;background:var(--gray-06);border-radius:16px;transition:all 0.2s;
+}
+.action-item:hover{background:#fff;box-shadow:var(--shadow-h2);transform:translateX(6px);}
+.action-left{display:flex;align-items:center;gap:14px;}
+.action-dot{width:12px;height:12px;border-radius:4px;}
+.action-cat{font-size:16px;font-weight:700;color:var(--hd-black);}
+.action-change{font-size:13px;color:var(--gray-02);}
+.action-badge{padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;}
+
+.cta{
+  background:var(--hd-gradient-01);border-radius:24px;
+  padding:40px;color:#fff;position:relative;overflow:hidden;margin-bottom:24px;
+  box-shadow:var(--shadow-h1);
+}
+.cta::before{
+  content:'';position:absolute;top:-50px;right:-30px;
+  width:240px;height:240px;background:rgba(255,255,255,0.05);
+  transform:skewX(-35deg);border-radius:28px;
+}
+.cta-title{font-size:22px;font-weight:800;margin-bottom:24px;letter-spacing:-1px;position:relative;z-index:1;}
+.cta-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;position:relative;z-index:1;}
+.cta-col-title{font-size:14px;font-weight:700;margin-bottom:16px;}
+.cta-item{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;background:rgba(255,255,255,0.12);
+  border-radius:12px;margin-bottom:8px;backdrop-filter:blur(8px);transition:all 0.3s;
+}
+.cta-item:hover{background:rgba(255,255,255,0.22);transform:translateX(6px);}
+.cta-num{
+  width:28px;height:28px;background:rgba(255,255,255,0.2);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;flex-shrink:0;
+}
+.cta-text{font-size:14px;font-weight:600;line-height:1.5;}
+.cta-dont{padding:14px 18px;background:rgba(235,57,18,0.15);border-radius:12px;margin-bottom:8px;font-size:14px;font-weight:600;}
+
+.compare-wrap{padding:28px;background:var(--gray-06);border-radius:20px;box-shadow:var(--shadow-h2);}
+.compare-head{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  padding:14px 20px;font-size:12px;font-weight:700;color:var(--gray-04);
+  border-bottom:2px solid var(--gray-05);
+}
+.compare-head span{cursor:pointer;}
+.compare-head span:hover{color:var(--hd-green-01);}
+.compare-row{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  padding:16px 20px;font-size:14px;font-weight:600;
+  border-bottom:1px solid var(--gray-05);transition:background 0.2s;
+}
+.compare-row:hover{background:rgba(1,167,107,0.03);}
+.compare-row:last-child{border-bottom:none;}
+.cr-name{display:flex;align-items:center;gap:12px;}
+.cr-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.cr-ticker{font-weight:700;color:var(--hd-black);}
+.cr-cat{font-size:11px;color:var(--gray-04);}
+.cr-account{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;background:#fff;color:var(--gray-02);display:inline-block;}
+.cr-amount{font-weight:700;color:var(--hd-black);text-align:right;}
+.cr-weight{font-weight:700;color:var(--hd-black);text-align:right;}
+
+.conclusion{
+  margin-top:24px;padding:24px;
+  background:linear-gradient(135deg,#E8F5EE,#D4EDDA);
+  border-radius:16px;text-align:center;box-shadow:var(--shadow-h2);
+}
+.conclusion-text{font-size:18px;font-weight:800;color:var(--hd-black);}
+.conclusion-text .defense{color:#EB3912;}
+.conclusion-text .offense{color:#059669;}
+
+.fade{opacity:0;transform:translateY(28px);transition:all 0.7s cubic-bezier(0.16,1,0.3,1);}
+.fade.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:768px){
+  .wrap{padding:20px 16px 40px;}
+  .hero{padding:40px 24px;}.hero h1{font-size:30px;}
+  .hero-stats{flex-direction:column;gap:20px;}
+  .section{padding:28px 20px;border-radius:20px;}
+  .summary-grid{grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .summary-card{padding:20px 14px;}.summary-value{font-size:22px;}
+  .cta-grid{grid-template-columns:1fr;}
+  .compare-head,.compare-row{grid-template-columns:2fr 1fr 1fr 1fr;font-size:12px;padding:12px 14px;}
+  .ibox{padding:20px;flex-direction:column;}
+  .ibox-icon{font-size:28px;}
+  .portfolio-row{grid-template-columns:auto 1fr 60px 80px;gap:8px;}
+  .portfolio-row-name{font-size:12px;}
+  .portfolio-row-pct,.portfolio-row-amt{font-size:12px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="tab-wrap">
+  <button class="tab-btn active" data-tab="hauga">
+    <span class="tab-emoji">☁️</span>
+    <span class="tab-name">하늘</span>
+  </button>
+  <button class="tab-btn" data-tab="gayoon">
+    <span class="tab-emoji">🐰</span>
+    <span class="tab-name">가윤</span>
+  </button>
+</div>
+
+<div class="hero fade">
+  <div class="hero-badge" id="hero-badge">💼 하늘 · 2026.03.29 기준</div>
+  <h1>리밸런싱 대시보드</h1>
+  <p class="hero-sub">포트폴리오 현황과 전문가 의견을 한눈에</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-label">총 자산</div>
+      <div class="hero-stat-value" id="total-asset">470만원</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-label">현금 비중</div>
+      <div class="hero-stat-value" id="cash-weight">15%</div>
+    </div>
+  </div>
+  <div class="defense-badge">
+    <span class="defense-icon">🛡️</span>
+    <div class="defense-content">
+      <div class="defense-title">방어 모드 | 현금 목표 15%</div>
+      <div class="defense-desc">CAPE 39 + 이란 전쟁 → 보수적 접근</div>
+    </div>
+  </div>
+  <div class="defense-progress">
+    <div class="defense-progress-label">
+      <span>현금 비중</span>
+      <span id="cash-progress-label">13.0% / 목표 15%</span>
+    </div>
+    <div class="defense-progress-bar">
+      <div class="defense-progress-fill" id="cash-progress-fill" style="width:87%;background:#10B981;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="summary-grid fade">
+  <div class="summary-card">
+    <div class="summary-icon buy">📈</div>
+    <div class="summary-label">매수</div>
+    <div class="summary-value" id="buy-count">3건</div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-icon hold">⚖️</div>
+    <div class="summary-label">유지</div>
+    <div class="summary-value" id="hold-count">5건</div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-icon sell">📉</div>
+    <div class="summary-label">매도</div>
+    <div class="summary-value" id="sell-count">2건</div>
+  </div>
+</div>
+
+<div class="section fade">
+  <div class="id-shape"></div>
+  <div class="sh">
+    <div class="sh-icon">📊</div>
+    <h2 class="sh-title">카테고리별 비중</h2>
+  </div>
+  <p class="sh-sub">현재 포트폴리오의 자산 배분 현황</p>
+  <div class="stack-bar" id="stack-bar"></div>
+  <div class="cat-list" id="cat-list"></div>
+</div>
+
+<div class="section fade">
+  <div class="id-shape"></div>
+  <div class="sh">
+    <div class="sh-icon">⚖️</div>
+    <h2 class="sh-title">리밸런싱 의견</h2>
+  </div>
+  <p class="sh-sub">목표 비중 대비 조정이 필요한 카테고리</p>
+  <div class="action-list" id="action-list"></div>
+</div>
+
+<div class="section fade">
+  <div class="id-shape"></div>
+  <div class="sh">
+    <div class="sh-icon">👔</div>
+    <h2 class="sh-title">전문가별 포트폴리오</h2>
+  </div>
+  <p class="sh-sub">각 전문가가 당신의 포트폴리오를 재구성한다면?</p>
+  <div id="expert-portfolios"></div>
+  <div class="conclusion">
+    <div class="conclusion-text">
+      종합 결론: <span class="defense">70% 수비</span> + <span class="offense">30% 선별 공격</span>
+    </div>
+  </div>
+</div>
+
+<div class="cta fade">
+  <div class="cta-title">📋 이번 주 액션 플랜</div>
+  <div class="cta-grid">
+    <div class="cta-col">
+      <div class="cta-col-title">✅ 할 일</div>
+      <div class="cta-item"><div class="cta-num">1</div><div class="cta-text">현금 15% 유지</div></div>
+      <div class="cta-item"><div class="cta-num">2</div><div class="cta-text">연금저축/IRP 한도 채우기</div></div>
+      <div class="cta-item"><div class="cta-num">3</div><div class="cta-text">확신 종목만 분할 매수</div></div>
+    </div>
+    <div class="cta-col">
+      <div class="cta-col-title">❌ 하지 말 일</div>
+      <div class="cta-dont">• 현금 전액 투자</div>
+      <div class="cta-dont">• "바닥이다" 몰빵</div>
+      <div class="cta-dont">• 레버리지/신용 사용</div>
+    </div>
+  </div>
+</div>
+
+<div class="section fade">
+  <div class="id-shape"></div>
+  <div class="sh">
+    <div class="sh-icon">📋</div>
+    <h2 class="sh-title">전체 보유 종목</h2>
+  </div>
+  <p class="sh-sub">클릭하여 정렬 가능</p>
+  <div class="compare-wrap">
+    <div class="compare-head">
+      <span data-sort="name">종목</span>
+      <span data-sort="account">계좌</span>
+      <span data-sort="amount" style="text-align:right;">금액 ▼</span>
+      <span data-sort="weight" style="text-align:right;">비중</span>
+    </div>
+    <div id="holdings-table"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const CATEGORY_COLORS = {
+  'Big Tech': '#3182F6', 'S&P500': '#6366F1', '금융': '#10B981', '에너지': '#F59E0B',
+  '반도체': '#EC4899', '헬스케어': '#8B5CF6', '암호화폐': '#F97316', '국내주식': '#EF4444',
+  '채권': '#6B7280', '신흥국': '#10B981', '금': '#FBBF24', '배당주': '#059669',
+  '현금성': '#8B95A1', '연금': '#6366F1', '나스닥': '#7C3AED', '기타': '#9CA3AF',
+};
+
+const EXPERT_PORTFOLIOS = {
+  hauga: {
+    buffett: {
+      name: '버핏', icon: '👴', badge: '현금 유지', badgeClass: 'red', boxClass: 'red',
+      opinion: 'CAPE 39는 역사적 고평가 구간입니다. 지금은 현금을 쥐고 기다릴 때입니다. "다른 사람이 탐욕적일 때 두려워하라."',
+      portfolio: { '현금성': 25, 'S&P500': 20, 'Big Tech': 15, '국내주식': 20, '에너지': 10, '채권': 7, '기타': 3 },
+    },
+    ackman: {
+      name: '애크먼', icon: '🦅', badge: '선별 매수', badgeClass: 'yellow', boxClass: 'yellow',
+      opinion: 'AI 혁명은 진행 중입니다. 하락장에서 우량 빅테크를 분할 매수하세요. 확신 있는 종목 3개에 집중하세요.',
+      portfolio: { 'Big Tech': 35, 'S&P500': 20, '국내주식': 15, '에너지': 10, '현금성': 10, '채권': 7, '기타': 3 },
+    },
+    abel: {
+      name: '아벨', icon: '🏛️', badge: '기회 대기', badgeClass: 'green', boxClass: 'green',
+      opinion: '현금은 옵션입니다. 추가 하락 시 공격적으로 매수할 수 있는 드라이 파우더를 유지하세요.',
+      portfolio: { '현금성': 20, 'S&P500': 25, '국내주식': 20, 'Big Tech': 15, '채권': 10, '에너지': 7, '기타': 3 },
+    },
+    munger: {
+      name: '멍거', icon: '🦉', badge: '덜 행동', badgeClass: 'purple', boxClass: 'purple',
+      opinion: '투자의 비결은 가만히 있는 것입니다. 조급함이 가장 큰 적입니다. 아무것도 안 하는 게 최선입니다.',
+      portfolio: { 'S&P500': 30, '국내주식': 25, 'Big Tech': 15, '현금성': 15, '에너지': 8, '채권': 5, '기타': 2 },
+    },
+  },
+  gayoon: {
+    buffett: {
+      name: '버핏', icon: '👴', badge: '현금 유지', badgeClass: 'red', boxClass: 'red',
+      opinion: '이미 S&P500 비중이 높습니다. 지금 추가 매수보다 현금을 늘려 다음 기회를 기다리세요.',
+      portfolio: { '현금성': 25, 'S&P500': 35, '배당주': 15, '국내주식': 10, '채권': 8, '금': 5, '기타': 2 },
+    },
+    ackman: {
+      name: '애크먼', icon: '🦅', badge: '선별 매수', badgeClass: 'yellow', boxClass: 'yellow',
+      opinion: '아마존 같은 우량주는 분할 매수 기회입니다. 나스닥 비중을 조금 더 늘려도 됩니다.',
+      portfolio: { 'S&P500': 35, '나스닥': 15, 'Big Tech': 10, '배당주': 12, '국내주식': 10, '현금성': 10, '기타': 8 },
+    },
+    abel: {
+      name: '아벨', icon: '🏛️', badge: '기회 대기', badgeClass: 'green', boxClass: 'green',
+      opinion: 'CMA에 현금이 충분합니다. 좋은 자세입니다. S&P500 추가 하락 시 분할 매수 준비하세요.',
+      portfolio: { 'S&P500': 40, '현금성': 18, '배당주': 12, '국내주식': 12, '채권': 8, '신흥국': 5, '기타': 5 },
+    },
+    munger: {
+      name: '멍거', icon: '🦉', badge: '덜 행동', badgeClass: 'purple', boxClass: 'purple',
+      opinion: '포트폴리오가 이미 잘 구성되어 있습니다. 조급하게 바꾸지 마세요. 일관성이 중요합니다.',
+      portfolio: { 'S&P500': 42, '배당주': 12, '국내주식': 15, '현금성': 15, '채권': 8, '금': 5, '기타': 3 },
+    },
+  },
+};
+
+const HAUGA_TARGET_WEIGHTS = {
+  'Big Tech': 25, 'S&P500': 15, '국내주식': 30, '에너지': 10, '반도체': 5,
+  '헬스케어': 3, '금융': 2, '채권': 5, '암호화폐': 3, '현금성': 15, '연금': 0,
+};
+const GAYOON_TARGET_WEIGHTS = {
+  'S&P500': 38, '배당주': 8, '국내주식': 16, '나스닥': 5, '신흥국': 4,
+  '채권': 6, '금': 4, 'Big Tech': 5, '암호화폐': 1, '현금성': 15, '연금': 1,
+};
+
+const HAUGA_ALL_HOLDINGS = [
+  { name: '아마존', ticker: 'AMZN', currentKRW: 365295, category: 'Big Tech', account: '토스' },
+  { name: '알파벳 C', ticker: 'GOOG', currentKRW: 58467, category: 'Big Tech', account: '토스' },
+  { name: '마이크로소프트', ticker: 'MSFT', currentKRW: 41152, category: 'Big Tech', account: '토스' },
+  { name: '메타', ticker: 'META', currentKRW: 19672, category: 'Big Tech', account: '토스' },
+  { name: '뱅크오브아메리카', ticker: 'BAC', currentKRW: 19012, category: '금융', account: '토스' },
+  { name: '알파벳 A', ticker: 'GOOGL', currentKRW: 16903, category: 'Big Tech', account: '토스' },
+  { name: 'SPY', ticker: 'SPY', currentKRW: 16890, category: 'S&P500', account: '토스' },
+  { name: '인튜이티브 서지컬', ticker: 'ISRG', currentKRW: 7313, category: '헬스케어', account: '토스' },
+  { name: '퀄컴', ticker: 'QCOM', currentKRW: 6850, category: '반도체', account: '토스' },
+  { name: '브로드컴', ticker: 'AVGO', currentKRW: 2686, category: '반도체', account: '토스' },
+  { name: '테슬라', ticker: 'TSLA', currentKRW: 2687, category: 'Big Tech', account: '토스' },
+  { name: 'KODEX 200', ticker: '069500', currentKRW: 1055925, category: '국내주식', account: '연금' },
+  { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 337110, category: '국내주식', account: '연금' },
+  { name: 'KODEX 코스닥150', ticker: '229200_I', currentKRW: 99150, category: '국내주식', account: 'ISA' },
+  { name: 'TIGER 미국채10년선물', ticker: '305080', currentKRW: 202875, category: '채권', account: 'ISA' },
+  { name: 'TIGER 미국S&P500', ticker: '360750_I', currentKRW: 195360, category: 'S&P500', account: 'ISA' },
+  { name: '셰브론', ticker: 'CVX', currentKRW: 636068, category: '에너지', account: '종합' },
+  { name: '알파벳 C', ticker: 'GOOG_M', currentKRW: 412337, category: 'Big Tech', account: '종합' },
+  { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 170940, category: 'S&P500', account: '종합' },
+  { name: '1Q S&P500미국채혼합', ticker: '484790', currentKRW: 116200, category: 'S&P500', account: '종합' },
+  { name: '화이자', ticker: 'PFE', currentKRW: 50000, category: '헬스케어', account: '종합' },
+  { name: 'IRP 예수금', ticker: 'IRP', currentKRW: 250069, category: '연금', account: 'IRP' },
+  { name: 'CMA (가족여행)', ticker: 'CMA', currentKRW: 610106, category: '현금성', account: 'CMA' },
+  { name: '비트코인', ticker: 'BTC', currentKRW: 165490, category: '암호화폐', account: '업비트' },
+];
+
+const GAYOON_ALL_HOLDINGS = [
+  { name: 'Vanguard S&P500', ticker: 'VOO', currentKRW: 19317195, category: 'S&P500', account: '삼성' },
+  { name: 'VOO (소수점)', ticker: 'VOO_P', currentKRW: 647620, category: 'S&P500', account: '삼성' },
+  { name: 'Schwab 배당주', ticker: 'SCHD', currentKRW: 4584872, category: '배당주', account: '삼성' },
+  { name: '케이뱅크', ticker: 'KBANK', currentKRW: 62700, category: '국내주식', account: '삼성' },
+  { name: 'KODEX 200', ticker: 'KODEX200_ISA', currentKRW: 5117175, category: '국내주식', account: 'ISA' },
+  { name: 'TIGER S&P500', ticker: 'TIGER_SP_ISA', currentKRW: 4835160, category: 'S&P500', account: 'ISA' },
+  { name: 'TIGER 나스닥100', ticker: 'TIGER_NAS', currentKRW: 2857680, category: '나스닥', account: 'ISA' },
+  { name: 'PLUS 신흥국MSCI', ticker: 'PLUS_EM', currentKRW: 2695055, category: '신흥국', account: 'ISA' },
+  { name: 'TIGER 미국채10년', ticker: 'TIGER_BD', currentKRW: 2069325, category: '채권', account: 'ISA' },
+  { name: 'KODEX 금액티브', ticker: 'KODEX_G', currentKRW: 1806720, category: '금', account: 'ISA' },
+  { name: '아마존', ticker: 'AMZN', currentKRW: 2702213, category: 'Big Tech', account: '한투' },
+  { name: 'KODEX 200', ticker: 'KODEX200_P', currentKRW: 4467375, category: '국내주식', account: '연금' },
+  { name: 'KODEX 코스닥150', ticker: 'KODEX150_P', currentKRW: 1070820, category: '국내주식', account: '연금' },
+  { name: '발행어음CMA', ticker: 'CMA', currentKRW: 14030691, category: '현금성', account: 'CMA' },
+  { name: 'TDF2025', ticker: 'TDF2025', currentKRW: 265937, category: '연금', account: 'IRP' },
+  { name: '비트코인', ticker: 'BTC', currentKRW: 1091846, category: '암호화폐', account: '업비트' },
+];
+
+let currentTab = 'hauga';
+let sortBy = 'amount';
+
+function getHoldings() { return currentTab === 'hauga' ? HAUGA_ALL_HOLDINGS : GAYOON_ALL_HOLDINGS; }
+function getTargetWeights() { return currentTab === 'hauga' ? HAUGA_TARGET_WEIGHTS : GAYOON_TARGET_WEIGHTS; }
+
+function formatMoney(krw) {
+  if (krw >= 10000000) return (krw / 10000000).toFixed(1) + '천만';
+  if (krw >= 10000) return Math.round(krw / 10000) + '만';
+  return krw.toLocaleString() + '원';
+}
+
+function formatMoneyFull(krw) {
+  return krw.toLocaleString() + '원';
+}
+
+function calculateData() {
+  const holdings = getHoldings();
+  const targetWeights = getTargetWeights();
+  const totalKRW = holdings.reduce((sum, h) => sum + h.currentKRW, 0);
+
+  const categoryTotals = {};
+  holdings.forEach(h => {
+    const cat = h.category || '기타';
+    categoryTotals[cat] = (categoryTotals[cat] || 0) + h.currentKRW;
+  });
+
+  const cashWeight = ((categoryTotals['현금성'] || 0) / totalKRW) * 100;
+
+  const recommendations = [];
+  Object.entries(categoryTotals).forEach(([cat, amount]) => {
+    const currentWeight = (amount / totalKRW) * 100;
+    const targetWeight = targetWeights[cat] || 0;
+    const diff = targetWeight - currentWeight;
+
+    let action = '유지', actionColor = '#8B95A1';
+    if (diff > 2) { action = '매수'; actionColor = '#10B981'; }
+    else if (diff < -2) { action = '매도'; actionColor = '#EF4444'; }
+    else if (diff > 0.5) { action = '소량 매수'; actionColor = '#10B981'; }
+    else if (diff < -0.5) { action = '소량 매도'; actionColor = '#EF4444'; }
+
+    recommendations.push({ category: cat, currentWeight, targetWeight, diff, action, actionColor });
+  });
+
+  Object.entries(targetWeights).forEach(([cat, target]) => {
+    if (!categoryTotals[cat] && target > 0) {
+      recommendations.push({
+        category: cat, currentWeight: 0, targetWeight: target, diff: target,
+        action: '신규 매수', actionColor: '#3182F6',
+      });
+    }
+  });
+
+  recommendations.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+
+  return {
+    totalKRW, categoryTotals, cashWeight, recommendations,
+    buyCount: recommendations.filter(r => r.action.includes('매수')).length,
+    holdCount: recommendations.filter(r => r.action === '유지').length,
+    sellCount: recommendations.filter(r => r.action.includes('매도')).length,
+  };
+}
+
+function renderExpertPortfolio(expert, totalKRW) {
+  const sorted = Object.entries(expert.portfolio).sort((a, b) => b[1] - a[1]);
+
+  let barHTML = '<div class="portfolio-bar">';
+  sorted.forEach(([cat, pct]) => {
+    const color = CATEGORY_COLORS[cat] || '#9CA3AF';
+    barHTML += `<div class="portfolio-bar-segment" style="width:${pct}%;background:${color};" title="${cat}: ${pct}%"></div>`;
+  });
+  barHTML += '</div>';
+
+  let tableHTML = '<div class="portfolio-table">';
+  sorted.forEach(([cat, pct]) => {
+    const color = CATEGORY_COLORS[cat] || '#9CA3AF';
+    const amount = Math.round(totalKRW * pct / 100);
+    tableHTML += `
+      <div class="portfolio-row">
+        <div class="portfolio-row-dot" style="background:${color};"></div>
+        <div class="portfolio-row-name">${cat}</div>
+        <div class="portfolio-row-pct">${pct}%</div>
+        <div class="portfolio-row-amt">${formatMoney(amount)}</div>
+      </div>`;
+  });
+  tableHTML += '</div>';
+
+  tableHTML += `
+    <div class="portfolio-total">
+      <div class="portfolio-total-label">총 자산</div>
+      <div class="portfolio-total-value">${formatMoney(totalKRW)}</div>
+    </div>`;
+
+  return `
+    <div class="portfolio-mini">
+      <div class="portfolio-mini-title">📊 ${expert.name}의 추천 포트폴리오</div>
+      ${barHTML}
+      ${tableHTML}
+    </div>`;
+}
+
+function render() {
+  const holdings = getHoldings();
+  const targetWeights = getTargetWeights();
+  const data = calculateData();
+  const targetCash = 15;
+
+  document.getElementById('hero-badge').textContent =
+    currentTab === 'hauga' ? '💼 하늘 · 2026.03.29 기준' : '🐰 가윤 · 2026.03.29 기준';
+  document.getElementById('total-asset').textContent = formatMoney(data.totalKRW);
+  document.getElementById('cash-weight').textContent = Math.round(data.cashWeight) + '%';
+
+  const cashProgress = Math.min((data.cashWeight / targetCash) * 100, 100);
+  const cashColor = data.cashWeight >= targetCash ? '#10B981' : '#FBBF24';
+  document.getElementById('cash-progress-label').textContent = data.cashWeight.toFixed(1) + '% / 목표 ' + targetCash + '%';
+  document.getElementById('cash-progress-fill').style.width = cashProgress + '%';
+  document.getElementById('cash-progress-fill').style.background = cashColor;
+
+  document.getElementById('buy-count').textContent = data.buyCount + '건';
+  document.getElementById('hold-count').textContent = data.holdCount + '건';
+  document.getElementById('sell-count').textContent = data.sellCount + '건';
+
+  const stackBar = document.getElementById('stack-bar');
+  stackBar.innerHTML = '';
+  const sortedCats = Object.entries(data.categoryTotals).sort((a, b) => b[1] - a[1]);
+  sortedCats.forEach(([cat, amount]) => {
+    const percent = (amount / data.totalKRW) * 100;
+    const color = CATEGORY_COLORS[cat] || '#9CA3AF';
+    stackBar.innerHTML += `<div class="stack-segment" style="width:${percent}%;background:${color};" title="${cat}: ${percent.toFixed(1)}%"></div>`;
+  });
+
+  const catList = document.getElementById('cat-list');
+  catList.innerHTML = '';
+  sortedCats.forEach(([cat, amount]) => {
+    const percent = (amount / data.totalKRW) * 100;
+    const color = CATEGORY_COLORS[cat] || '#9CA3AF';
+    const target = targetWeights[cat] || 0;
+    catList.innerHTML += `
+      <div class="cat-item">
+        <div class="cat-dot" style="background:${color};"></div>
+        <div class="cat-name">${cat}</div>
+        <div class="cat-current">${percent.toFixed(1)}%</div>
+        <div class="cat-target">목표 ${target}%</div>
+      </div>`;
+  });
+
+  const actionList = document.getElementById('action-list');
+  const actions = data.recommendations.filter(r => r.action !== '유지');
+  if (actions.length === 0) {
+    actionList.innerHTML = `<div style="text-align:center;padding:40px;color:#8B95A1;"><div style="font-size:32px;margin-bottom:12px;">✅</div><div>목표 비중과 잘 맞습니다</div></div>`;
+  } else {
+    actionList.innerHTML = '';
+    actions.forEach(rec => {
+      const color = CATEGORY_COLORS[rec.category] || '#9CA3AF';
+      actionList.innerHTML += `
+        <div class="action-item">
+          <div class="action-left">
+            <div class="action-dot" style="background:${color};"></div>
+            <div>
+              <div class="action-cat">${rec.category}</div>
+              <div class="action-change">${rec.currentWeight.toFixed(1)}% → ${rec.targetWeight.toFixed(1)}%</div>
+            </div>
+          </div>
+          <div class="action-badge" style="background:${rec.actionColor};">${rec.action}</div>
+        </div>`;
+    });
+  }
+
+  const experts = EXPERT_PORTFOLIOS[currentTab];
+  const expertContainer = document.getElementById('expert-portfolios');
+  expertContainer.innerHTML = '';
+
+  Object.values(experts).forEach(expert => {
+    expertContainer.innerHTML += `
+      <div class="ibox ${expert.boxClass}">
+        <span class="ibox-icon">${expert.icon}</span>
+        <div class="ibox-content">
+          <div class="ibox-header">
+            <span class="ibox-name">${expert.name}</span>
+            <span class="ibox-badge ${expert.badgeClass}">${expert.badge}</span>
+          </div>
+          <div class="ibox-desc">${expert.opinion}</div>
+          ${renderExpertPortfolio(expert, data.totalKRW)}
+        </div>
+      </div>`;
+  });
+
+  const tableBody = document.getElementById('holdings-table');
+  let sorted = holdings.map(h => ({ ...h, weight: (h.currentKRW / data.totalKRW) * 100 }));
+
+  if (sortBy === 'amount') sorted.sort((a, b) => b.currentKRW - a.currentKRW);
+  else if (sortBy === 'weight') sorted.sort((a, b) => b.weight - a.weight);
+  else if (sortBy === 'name') sorted.sort((a, b) => a.name.localeCompare(b.name));
+  else if (sortBy === 'account') sorted.sort((a, b) => a.account.localeCompare(b.account));
+
+  tableBody.innerHTML = '';
+  sorted.forEach(item => {
+    const color = CATEGORY_COLORS[item.category] || '#9CA3AF';
+    tableBody.innerHTML += `
+      <div class="compare-row">
+        <div class="cr-name">
+          <div class="cr-dot" style="background:${color};"></div>
+          <div class="cr-info">
+            <div class="cr-ticker">${item.name}</div>
+            <div class="cr-cat">${item.category}</div>
+          </div>
+        </div>
+        <div><span class="cr-account">${item.account}</span></div>
+        <div class="cr-amount">${formatMoney(item.currentKRW)}</div>
+        <div class="cr-weight">${item.weight.toFixed(1)}%</div>
+      </div>`;
+  });
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = btn.dataset.tab;
+    render();
+  });
+});
+
+document.querySelectorAll('.compare-head span[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const newSort = th.dataset.sort;
+    if (sortBy === newSort) return;
+    sortBy = newSort;
+    document.querySelectorAll('.compare-head span').forEach(t => t.textContent = t.textContent.replace(' ▼', ''));
+    th.textContent += ' ▼';
+    render();
+  });
+});
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade').forEach(el => observer.observe(el));
+
+render();
+</script>
+</body>
+</html>
