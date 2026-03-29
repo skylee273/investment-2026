@@ -181,6 +181,22 @@ const getExpertOpinions = (category, action, diff) => {
   return isBuy ? categoryOpinions.buy : categoryOpinions.sell
 }
 
+// ========== 시장 상황별 현금 비중 (공격적 투자자, 연 15% 목표) ==========
+const CASH_TARGETS = {
+  normal: 5,    // 평시: CAPE < 25
+  caution: 10,  // 경계: CAPE 25-35
+  defense: 15,  // 방어: CAPE > 35 OR 전쟁
+  crisis: 20,   // 위기: CAPE > 35 AND 전쟁
+}
+
+// 시장 상황명 (한글)
+const MARKET_PHASE_NAMES = {
+  normal: '평시',
+  caution: '경계',
+  defense: '방어',
+  crisis: '위기',
+}
+
 // ========== 2026년 3월 시장 상황 (실시간 데이터 기반) ==========
 const MARKET_CONTEXT = {
   // 기존 핵심 지표
@@ -346,7 +362,7 @@ const getSmartAdvice = (category, action, currentWeight, targetWeight) => {
   }
 }
 
-// ========== 하우가 패밀리 목표 비중 (카테고리별) ==========
+// ========== 하우가 패밀리 목표 비중 (카테고리별, 평시 기준) ==========
 const HAUGA_TARGET_WEIGHTS = {
   'Big Tech': 25,
   'S&P500': 15,
@@ -357,11 +373,11 @@ const HAUGA_TARGET_WEIGHTS = {
   '금융': 2,
   '채권': 5,
   '암호화폐': 3,
-  '현금성': 2,
+  '현금성': 5,  // 평시 5% (시장 상황에 따라 자동 조정)
   '연금': 0, // IRP 예수금은 별도
 }
 
-// ========== 가윤 달리오 목표 비중 (카테고리별) ==========
+// ========== 가윤 달리오 목표 비중 (카테고리별, 평시 기준) ==========
 const GAYOON_TARGET_WEIGHTS = {
   'S&P500': 40,
   '배당주': 8,
@@ -372,49 +388,92 @@ const GAYOON_TARGET_WEIGHTS = {
   '금': 3,
   'Big Tech': 5,
   '암호화폐': 2,
-  '현금성': 10,
+  '현금성': 5,  // 평시 5% (시장 상황에 따라 자동 조정)
   '연금': 1,
 }
 
-// ========== 시장 상황 반영 목표 비중 ==========
-const getMarketAdjustedTargets = (baseTargets, isGayoon = false) => {
-  const { cape, iranWar, fearGreed, marketPhase } = MARKET_CONTEXT
+// ========== 시장 상황 판단 함수 ==========
+const getMarketPhase = () => {
+  const { cape, iranWar, fearGreed } = MARKET_CONTEXT
 
-  // 방어 모드 조건: CAPE > 35 OR 전쟁 OR 공포 구간(30 미만)
-  const isDefenseMode = cape > 35 || iranWar || fearGreed < 30
-
-  if (!isDefenseMode) {
-    return { adjusted: baseTargets, isDefenseMode: false, defenseModeReasons: [] }
+  // 위기 모드: CAPE > 35 AND (전쟁 OR 극심한 공포)
+  if (cape > 35 && (iranWar || fearGreed < 25)) {
+    return 'crisis'
   }
+  // 방어 모드: CAPE > 35 OR 전쟁
+  if (cape > 35 || iranWar) {
+    return 'defense'
+  }
+  // 경계 모드: CAPE 25-35
+  if (cape >= 25) {
+    return 'caution'
+  }
+  // 평시
+  return 'normal'
+}
 
-  // 방어 모드 사유 수집
+// ========== 시장 상황 반영 목표 비중 (동일 기준 적용) ==========
+const getMarketAdjustedTargets = (baseTargets) => {
+  const { cape, iranWar, fearGreed } = MARKET_CONTEXT
+  const phase = getMarketPhase()
+  const targetCash = CASH_TARGETS[phase]
+  const phaseName = MARKET_PHASE_NAMES[phase]
+
+  // 방어/위기 모드 사유 수집
   const defenseModeReasons = []
   if (cape > 35) defenseModeReasons.push(`CAPE ${cape} (역사적 고평가)`)
-  if (iranWar) defenseModeReasons.push('이란 전쟁 발발')
+  if (iranWar) defenseModeReasons.push('이란 전쟁 진행 중')
   if (fearGreed < 30) defenseModeReasons.push(`공포지수 ${fearGreed} (공포 구간)`)
+
+  const isDefenseMode = phase === 'defense' || phase === 'crisis'
+
+  if (!isDefenseMode) {
+    return {
+      adjusted: baseTargets,
+      isDefenseMode: false,
+      defenseModeReasons: [],
+      phase,
+      phaseName,
+      targetCash: CASH_TARGETS.normal,
+    }
+  }
 
   const adjusted = { ...baseTargets }
 
-  // 현금성 상향 (평시의 2.5배, 최대 30%)
-  const baseCash = baseTargets['현금성'] || 10
-  adjusted['현금성'] = Math.min(Math.round(baseCash * 2.5), 30)
+  // 시장 상황에 따른 현금 비중 (절대값, 두 고객 동일)
+  adjusted['현금성'] = targetCash
 
-  // 방어 자산 상향
-  adjusted['채권'] = (baseTargets['채권'] || 0) + 3
-  adjusted['금'] = (baseTargets['금'] || 0) + 2
+  // 현금 증가분만큼 주식에서 비례 감소
+  const baseCash = baseTargets['현금성'] || 5
+  const cashIncrease = adjusted['현금성'] - baseCash
 
-  // 주식 하향 (15% 축소)
-  const stockCats = ['S&P500', 'Big Tech', '나스닥', '국내주식', '신흥국']
-  stockCats.forEach(cat => {
-    if (adjusted[cat]) {
-      adjusted[cat] = Math.round(adjusted[cat] * 0.85)
-    }
-  })
+  if (cashIncrease > 0) {
+    const stockCats = ['S&P500', 'Big Tech', '나스닥', '국내주식', '신흥국']
+    const totalStock = stockCats.reduce((sum, cat) => sum + (adjusted[cat] || 0), 0)
+
+    stockCats.forEach(cat => {
+      if (adjusted[cat] && totalStock > 0) {
+        const ratio = adjusted[cat] / totalStock
+        adjusted[cat] = Math.max(0, Math.round(adjusted[cat] - (cashIncrease * ratio)))
+      }
+    })
+  }
+
+  // 방어 자산 소폭 상향
+  adjusted['채권'] = (baseTargets['채권'] || 0) + 2
+  adjusted['금'] = (baseTargets['금'] || 0) + 1
 
   // 고위험 축소 (최대 1%)
   adjusted['암호화폐'] = Math.min(baseTargets['암호화폐'] || 0, 1)
 
-  return { adjusted, isDefenseMode: true, defenseModeReasons }
+  return {
+    adjusted,
+    isDefenseMode: true,
+    defenseModeReasons,
+    phase,
+    phaseName,
+    targetCash,
+  }
 }
 
 // ========== 하우가 패밀리 전체 보유 종목 (2026.03.29 기준) ==========
@@ -787,10 +846,9 @@ export default function RebalancePage() {
   const baseTargetWeights = mainTab === 'hauga' ? HAUGA_TARGET_WEIGHTS : GAYOON_TARGET_WEIGHTS
   const totalKRW = allHoldings.reduce((sum, h) => sum + h.currentKRW, 0)
 
-  // 시장 상황 반영 목표 비중
-  const { adjusted: targetWeights, isDefenseMode, defenseModeReasons } = getMarketAdjustedTargets(
-    baseTargetWeights,
-    mainTab === 'gayoon'
+  // 시장 상황 반영 목표 비중 (두 고객 동일 기준 적용)
+  const { adjusted: targetWeights, isDefenseMode, defenseModeReasons, phase, phaseName, targetCash } = getMarketAdjustedTargets(
+    baseTargetWeights
   )
 
   // 비중 계산된 종목 리스트
@@ -1181,52 +1239,123 @@ export default function RebalancePage() {
         </div>
       </div>
 
-      {/* 방어 모드 배지 */}
+      {/* 시장 모드 배지 + 기준 테이블 */}
       {isDefenseMode && (
         <div style={{
-          padding: '16px 20px',
-          backgroundColor: '#FEF2F2',
+          backgroundColor: phase === 'crisis' ? '#FEF2F2' : '#FEF9C3',
           borderRadius: '16px',
-          border: '2px solid #FECACA',
+          border: `2px solid ${phase === 'crisis' ? '#FECACA' : '#FDE047'}`,
           marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '16px',
-          flexWrap: 'wrap',
+          overflow: 'hidden',
         }}>
+          {/* 상단: 현재 모드 표시 */}
           <div style={{
+            padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
+            gap: '12px',
+            borderBottom: `1px solid ${phase === 'crisis' ? '#FECACA' : '#FDE047'}`,
           }}>
-            <span style={{ fontSize: '28px' }}>🛡️</span>
-            <div>
+            <span style={{ fontSize: '28px' }}>{phase === 'crisis' ? '🚨' : '🛡️'}</span>
+            <div style={{ flex: 1 }}>
               <div style={{
                 fontSize: '16px',
                 fontWeight: '700',
-                color: '#991B1B',
+                color: phase === 'crisis' ? '#991B1B' : '#92400E',
               }}>
-                현재 시장: 방어 모드
+                현재: {phaseName} 모드 | 현금 목표 {targetCash}% (두 고객 동일 기준)
               </div>
-              <div style={{ fontSize: '12px', color: '#B91C1C', marginTop: '2px' }}>
+              <div style={{ fontSize: '12px', color: phase === 'crisis' ? '#B91C1C' : '#A16207', marginTop: '2px' }}>
                 {defenseModeReasons.join(' · ')}
               </div>
             </div>
           </div>
-          <div style={{
-            flex: 1,
-            minWidth: '200px',
-            padding: '12px 16px',
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            borderLeft: '3px solid #EF4444',
-          }}>
-            <div style={{ fontSize: '12px', color: '#991B1B', fontWeight: '600', marginBottom: '4px' }}>
-              평시 목표 → 방어 목표 자동 조정
+
+          {/* 기준 테이블 */}
+          <div style={{ padding: '16px 20px', backgroundColor: 'white' }}>
+            <div style={{
+              fontSize: '13px',
+              fontWeight: '600',
+              color: '#191F28',
+              marginBottom: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              <span>📊</span>
+              시장 상황 기반 현금 비중 기준 (연 15% 목표, 공격적 투자자)
             </div>
-            <div style={{ fontSize: '11px', color: '#6B7684', lineHeight: '1.5' }}>
-              현금성 {baseTargetWeights['현금성'] || 10}% → {targetWeights['현금성']}% ·
-              주식 비중 15% 축소 · 방어 자산 상향
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
+              gap: '8px',
+            }}>
+              {[
+                { id: 'normal', label: '평시', condition: 'CAPE < 25', cash: '5%' },
+                { id: 'caution', label: '경계', condition: 'CAPE 25-35', cash: '10%' },
+                { id: 'defense', label: '방어', condition: 'CAPE > 35 OR 전쟁', cash: '15%' },
+                { id: 'crisis', label: '위기', condition: 'CAPE > 35 + 전쟁', cash: '20%' },
+              ].map(item => (
+                <div
+                  key={item.id}
+                  style={{
+                    padding: '12px',
+                    borderRadius: '10px',
+                    backgroundColor: phase === item.id ? (phase === 'crisis' ? '#FEE2E2' : '#FEF3C7') : '#F8FAFC',
+                    border: phase === item.id ? `2px solid ${phase === 'crisis' ? '#EF4444' : '#F59E0B'}` : '1px solid #E5E8EB',
+                    position: 'relative',
+                  }}
+                >
+                  {phase === item.id && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '-8px',
+                      right: '8px',
+                      backgroundColor: phase === 'crisis' ? '#EF4444' : '#F59E0B',
+                      color: 'white',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                    }}>
+                      현재
+                    </div>
+                  )}
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    color: phase === item.id ? (phase === 'crisis' ? '#991B1B' : '#92400E') : '#4B5563',
+                    marginBottom: '4px',
+                  }}>
+                    {item.label}
+                  </div>
+                  <div style={{
+                    fontSize: '11px',
+                    color: '#6B7684',
+                    marginBottom: '6px',
+                  }}>
+                    {item.condition}
+                  </div>
+                  <div style={{
+                    fontSize: '18px',
+                    fontWeight: '800',
+                    color: phase === item.id ? (phase === 'crisis' ? '#DC2626' : '#D97706') : '#374151',
+                  }}>
+                    {item.cash}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{
+              marginTop: '12px',
+              padding: '10px 14px',
+              backgroundColor: '#F0FDF4',
+              borderRadius: '8px',
+              borderLeft: '3px solid #10B981',
+              fontSize: '12px',
+              color: '#166534',
+            }}>
+              <strong>현재:</strong> CAPE {MARKET_CONTEXT.cape} + 이란 전쟁 = {phaseName} 모드 → 하늘, 가윤 모두 현금 목표 {targetCash}%
             </div>
           </div>
         </div>
@@ -1494,20 +1623,20 @@ export default function RebalancePage() {
                     <div style={{ fontSize: '11px', color: '#78350F', lineHeight: '1.6' }}>
                       {rec.category === '현금성' || rec.category === 'CMA' ? (
                         <>
-                          평시 목표는 {rec.baseTarget}%지만, <strong>방어 모드</strong>에서는 {rec.targetWeight}%로 상향됩니다.
+                          평시 목표는 5%지만, <strong>{phaseName} 모드</strong>에서는 {targetCash}%로 상향됩니다 (두 고객 동일 기준).
                           {rec.action === '유지' ? (
                             <> 현재 {rec.currentWeight.toFixed(1)}%로 목표 범위 내이므로 <strong>유지</strong>가 적절합니다.</>
                           ) : rec.action.includes('매수') ? (
                             <> 현재 {rec.currentWeight.toFixed(1)}%로 목표에 미달하므로 <strong>추가 확보</strong>를 권장합니다.</>
                           ) : (
-                            <> 현재 {rec.currentWeight.toFixed(1)}%로 목표보다 많습니다만, 방어 모드에서 현금은 무기입니다.</>
+                            <> 현재 {rec.currentWeight.toFixed(1)}%로 목표보다 많습니다만, {phaseName} 모드에서 현금은 무기입니다.</>
                           )}
                           <br />• {defenseModeReasons.join(' · ')}
                           <br />• 버핏: $3,730억 현금 보유 중
                         </>
                       ) : rec.targetAdjustmentDirection === '하향' ? (
                         <>
-                          방어 모드에서 주식 비중 목표가 평시 {rec.baseTarget}% → {rec.targetWeight}%로 하향 조정됩니다.
+                          {phaseName} 모드에서 주식 비중 목표가 평시 {rec.baseTarget}% → {rec.targetWeight}%로 하향 조정됩니다.
                           {rec.action === '유지' ? (
                             <> 현재 {rec.currentWeight.toFixed(1)}%로 조정된 목표 범위 내입니다. <strong>추가 매수 보류</strong>를 권장합니다.</>
                           ) : rec.action.includes('매도') ? (
@@ -1712,12 +1841,12 @@ export default function RebalancePage() {
               <div style={{
                 marginLeft: 'auto',
                 padding: '8px 16px',
-                backgroundColor: '#EF4444',
+                backgroundColor: phase === 'crisis' ? '#EF4444' : '#F59E0B',
                 borderRadius: '8px',
                 fontWeight: '700',
                 fontSize: '14px',
               }}>
-                🔴 방어 모드
+                {phase === 'crisis' ? '🚨' : '🛡️'} {phaseName} 모드
               </div>
             </div>
           </div>
@@ -1762,12 +1891,12 @@ export default function RebalancePage() {
                   marginBottom: '8px',
                 }}>✅</div>
                 <div style={{ fontSize: '14px', fontWeight: '700', color: '#065F46', marginBottom: '6px' }}>
-                  현금 {targetWeights['현금성']}% 유지
+                  현금 {targetCash}% 유지 (두 고객 동일)
                 </div>
                 <div style={{ fontSize: '11px', color: '#047857', lineHeight: '1.5' }}>
-                  평시 {baseTargetWeights['현금성'] || 10}% → 방어 {targetWeights['현금성']}%
+                  {phaseName} 모드: CAPE {MARKET_CONTEXT.cape} + 전쟁
                   <br />
-                  CAPE 39 + 전쟁 = 현금 비중 상향
+                  하늘, 가윤 모두 동일 기준 적용
                 </div>
               </div>
 
