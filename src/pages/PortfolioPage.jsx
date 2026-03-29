@@ -6,17 +6,6 @@ import { fetchPortfolioPrices, fetchMultipleStockPrices, fetchExchangeRate, clea
 // per: 주가수익비율, pbr: 주가순자산비율 (2026.02 기준)
 const TARGET_TOTAL = 1000000 // 목표 총 투자금액 100만원
 
-// 2월 실현수익
-const REALIZED_GAINS = {
-  month: '2026-02',
-  total: 2900,
-  details: [
-    { type: '판매수익', amount: 2828, percent: 2.0 },
-    { type: '배당금', amount: 42 },
-    { type: '계좌이자', amount: 30 },
-  ]
-}
-
 // 미래에셋증권 계좌별 보유 종목 (2026.03.29 기준)
 const MIRAE_ACCOUNTS = [
   {
@@ -24,12 +13,12 @@ const MIRAE_ACCOUNTS = [
     name: '연금저축계좌',
     accountNo: '010-8784-7546-2',
     icon: '🧓',
-    totalKRW: 1393035,
-    gainKRW: -83440,
-    gainPercent: -5.65,
+    totalKRW: 1493152,
+    gainKRW: 16677,
+    gainPercent: 1.13,
     holdings: [
-      { name: 'KODEX 200', shares: 13, currentKRW: 1055925, investedKRW: 1131700, gainKRW: -75775, gainPercent: -6.70 },
-      { name: 'KODEX 코스닥150', shares: 17, currentKRW: 337110, investedKRW: 344775, gainKRW: -7665, gainPercent: -2.22 },
+      { name: 'KODEX 200', shares: 14, currentKRW: 1138008, investedKRW: 1131700, gainKRW: 6308, gainPercent: 0.56 },
+      { name: 'KODEX 코스닥150', shares: 18, currentKRW: 355144, investedKRW: 344775, gainKRW: 10369, gainPercent: 3.01 },
     ]
   },
   {
@@ -37,13 +26,13 @@ const MIRAE_ACCOUNTS = [
     name: 'ISA (중개형)',
     accountNo: '660-9824-0136-0',
     icon: '📊',
-    totalKRW: 497385,
-    gainKRW: -5030,
-    gainPercent: -1.00,
+    totalKRW: 500404,
+    gainKRW: 3019,
+    gainPercent: 0.61,
     holdings: [
-      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 99150, investedKRW: 101075, gainKRW: -1925, gainPercent: -1.90 },
-      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 202875, investedKRW: 198375, gainKRW: 4500, gainPercent: 2.27 },
-      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 195360, investedKRW: 196840, gainKRW: -1480, gainPercent: -0.75 },
+      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 98680, investedKRW: 101075, gainKRW: -2395, gainPercent: -2.37 },
+      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 204375, investedKRW: 198375, gainKRW: 6000, gainPercent: 3.02 },
+      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 197349, investedKRW: 196840, gainKRW: 509, gainPercent: 0.26 },
     ]
   },
   {
@@ -51,21 +40,22 @@ const MIRAE_ACCOUNTS = [
     name: '종합 (해외주식)',
     accountNo: '종합계좌',
     icon: '🌍',
-    totalKRW: 1435612,
-    gainKRW: 10954,
-    gainPercent: 0.77,
+    totalKRW: 1335816,
+    gainKRW: -41638,
+    gainPercent: -3.02,
     holdings: [
-      { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 170940, investedKRW: 174090, gainKRW: -3150, gainPercent: -1.81 },
-      { name: '1Q 미국S&P500미국채혼합', shares: 10, currentKRW: 116200, investedKRW: 116250, gainKRW: -50, gainPercent: -0.04 },
-      { name: '셰브론 (CVX)', shares: 2, currentKRW: 636068, investedKRW: 568711, gainKRW: 67357, gainPercent: 11.84 },
-      { name: '알파벳 C (GOOG)', shares: 1, currentKRW: 412337, investedKRW: 468022, gainKRW: -55685, gainPercent: -11.90 },
+      { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 172690, investedKRW: 174090, gainKRW: -1400, gainPercent: -0.80 },
+      { name: '1Q 미국S&P500미국채혼합', shares: 10, currentKRW: 116100, investedKRW: 116250, gainKRW: -150, gainPercent: -0.13 },
+      { name: '셰브론 (CVX)', shares: 2, currentKRW: 620068, investedKRW: 568711, gainKRW: 51357, gainPercent: 9.03 },
+      { name: '알파벳 C (GOOG)', shares: 1, currentKRW: 376687, investedKRW: 468022, gainKRW: -91335, gainPercent: -19.51 },
       { name: '미국달러', shares: 0.18, currentKRW: 271, investedKRW: 271, gainKRW: 0, gainPercent: 0.00 },
+      { name: '화이자 (PFE)', shares: 2, currentKRW: 50000, investedKRW: 50000, gainKRW: 0, gainPercent: 0.00 },
     ]
   },
   {
     id: 'irp',
     name: '이하늘 개인형IRP',
-    accountNo: 'IRP',
+    accountNo: '496-5412-7732-0',
     icon: '🏦',
     totalKRW: 250069,
     gainKRW: 0,
@@ -76,14 +66,14 @@ const MIRAE_ACCOUNTS = [
   },
   {
     id: 'cma',
-    name: 'CMA',
-    accountNo: 'CMA',
-    icon: '💰',
+    name: 'CMA (가족여행)',
+    accountNo: '010-8784-7546-1',
+    icon: '✈️',
     totalKRW: 610106,
-    gainKRW: 106,
-    gainPercent: 0.02,
+    gainKRW: 10,
+    gainPercent: 0.00,
     holdings: [
-      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 610106, investedKRW: 610000, gainKRW: 106, gainPercent: 0.02 },
+      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 610106, investedKRW: 610096, gainKRW: 10, gainPercent: 0.00 },
     ]
   },
 ]
@@ -347,7 +337,7 @@ function PortfolioChart({ icon, title, subtitle, amount, gainKRW, gainPercent, s
   )
 }
 
-// 전체 보유 종목 통합 (미래에셋)
+// 전체 보유 종목 통합 (미래에셋 + 토스)
 const ALL_HOLDINGS = [
   // 미래에셋증권 (계좌별)
   ...MIRAE_ACCOUNTS.flatMap(acc =>
@@ -359,6 +349,14 @@ const ALL_HOLDINGS = [
       ticker: h.name, // 미래에셋은 name을 ticker로 사용
     }))
   ),
+  // 토스증권 해외주식
+  ...TOSS_HOLDINGS.map(h => ({
+    ...h,
+    broker: '토스증권',
+    account: '해외주식',
+    accountIcon: '🌏',
+    ticker: h.name,
+  })),
 ]
 
 // 매도 예정/완료 종목 (비중 미포함)
@@ -366,16 +364,13 @@ const PENDING_SALES = []
 
 // 비상금/현금 계좌 (매월 25일 입금)
 const CASH_ACCOUNTS = [
-  { id: 'parking', name: '파킹계좌', icon: '🅿️', targetKRW: 900000, currentKRW: 0, depositDay: 25, note: '비상금 (언제든 출금 가능)' },
-  { id: 'cma-trip', name: 'CMA (가족여행)', icon: '✈️', targetKRW: 0, currentKRW: 400000, depositDay: null, note: '하우가 가족여행' },
-  { id: 'cma-emergency', name: 'CMA (비상금)', icon: '💳', targetKRW: 1000000, currentKRW: 600000, depositDay: 25, note: '비상금 (증권사 CMA)' },
+  { id: 'pension', name: '연금저축 ETF', icon: '🧓', targetKRW: 6000000, currentKRW: 1493152, depositDay: 25, monthlyDeposit: 500000, note: '세액공제 연 600만원 한도' },
+  { id: 'isa', name: 'ISA', icon: '📈', targetKRW: 20000000, currentKRW: 500404, depositDay: 25, monthlyDeposit: 0, note: '비과세 200만원 한도 (3년 유지 필수)' },
+  { id: 'irp', name: 'IRP', icon: '🏦', targetKRW: 3000000, currentKRW: 250069, depositDay: 25, monthlyDeposit: 0, note: '세액공제 300만원 한도' },
+  { id: 'stocks', name: '일반 주식', icon: '📊', targetKRW: 0, currentKRW: 1335816, depositDay: null, note: '일반 증권계좌 (해외주식)' },
+  { id: 'cma-trip', name: 'CMA (가족여행)', icon: '✈️', targetKRW: 1000000, currentKRW: 610106, depositDay: null, note: '하우가 가족여행' },
   { id: 'hanwha-insurance', name: '한화생명보험저축', icon: '🛡️', targetKRW: 30240000, currentKRW: 12390000, depositDay: null, monthlyDeposit: 210000, depositCount: 59, targetCount: 144, note: '월 21만원 × 59/144회 납입' },
   { id: 'housing', name: '청약저축', icon: '🏠', targetKRW: 3000000, currentKRW: 720000, depositDay: 25, monthlyDeposit: 20000, depositCount: 36, targetCount: 24, note: '1순위 달성 (36회 납입)' },
-  { id: 'pension', name: '연금저축 ETF', icon: '🧓', targetKRW: 6000000, currentKRW: 1468227, depositDay: 25, monthlyDeposit: 500000, note: '세액공제 연 600만원 한도' },
-  { id: 'isa', name: 'ISA', icon: '📈', targetKRW: 20000000, currentKRW: 504279, depositDay: 25, monthlyDeposit: 0, note: '비과세 200만원 한도 (3년 유지 필수)' },
-  { id: 'irp', name: 'IRP', icon: '🏦', targetKRW: 3000000, currentKRW: 250000, depositDay: 25, monthlyDeposit: 0, note: '세액공제 300만원 한도' },
-  { id: 'pension-extra', name: '추가 연금저축', icon: '🧓', targetKRW: 9000000, currentKRW: 0, depositDay: null, monthlyDeposit: 0, note: '과세이연 (일반주식 오르면 이동 예정)' },
-  { id: 'stocks', name: '일반 주식', icon: '📊', targetKRW: 0, currentKRW: 1930546, depositDay: null, note: '일반 증권계좌' },
 ]
 
 const QUARTERLY_PORTFOLIOS = {
@@ -1014,12 +1009,6 @@ export default function PortfolioPage() {
     let totalCost = 0 // 총 투자원금
     let totalGain = 0 // 총 수익금
 
-    // PORTFOLIO (기존 목표 포트폴리오)
-    PORTFOLIO.forEach(item => {
-      totalCost += item.investedKRW || 0
-      totalGain += item.gainKRW || 0
-    })
-
     // 미래에셋증권 계좌별
     MIRAE_ACCOUNTS.forEach(acc => {
       acc.holdings.forEach(item => {
@@ -1028,14 +1017,20 @@ export default function PortfolioPage() {
       })
     })
 
+    // 토스증권 해외주식
+    TOSS_HOLDINGS.forEach(item => {
+      totalCost += item.investedKRW || 0
+      totalGain += item.gainKRW || 0
+    })
+
     const totalValue = totalCost + totalGain
     const totalGainPercent = totalCost > 0 ? (totalGain / totalCost) * 100 : 0
     return { totalCost, totalValue, totalGain, totalGainPercent }
   }
 
   // 총 투자금액 계산
-  const TOTAL_INVESTMENT = PORTFOLIO.reduce((sum, item) => sum + (item.investedKRW || 0), 0)
-    + MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.holdings.reduce((s, h) => s + h.investedKRW, 0), 0)
+  const TOTAL_INVESTMENT = MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.holdings.reduce((s, h) => s + h.investedKRW, 0), 0)
+    + TOSS_HOLDINGS.reduce((sum, h) => sum + h.investedKRW, 0)
 
   const portfolioStats = calculatePortfolioValue()
 
@@ -1312,36 +1307,6 @@ export default function PortfolioPage() {
             </div>
           )
         })}
-      </div>
-
-      {/* 2월 실현수익 */}
-      <div style={{
-        padding: '20px',
-        backgroundColor: '#E8F5E9',
-        borderRadius: '16px',
-        border: '1px solid #A5D6A7',
-        marginBottom: '24px',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '20px' }}>💰</span>
-            <span style={{ fontSize: '16px', fontWeight: '700', color: '#2E7D32' }}>2월 실현수익</span>
-          </div>
-          <span style={{ fontSize: '24px', fontWeight: '700', color: '#00C853' }}>
-            +{REALIZED_GAINS.total.toLocaleString()}원
-          </span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '8px' : '12px' }}>
-          {REALIZED_GAINS.details.map((item, idx) => (
-            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobile ? '12px' : '13px' }}>
-              <span style={{ color: '#4E5968' }}>{item.type}</span>
-              <span style={{ color: '#00C853', fontWeight: '600' }}>
-                +{item.amount.toLocaleString()}원
-                {item.percent && ` (${item.percent}%)`}
-              </span>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* 포트폴리오 구성 */}
