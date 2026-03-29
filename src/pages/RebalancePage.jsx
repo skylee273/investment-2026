@@ -23,52 +23,45 @@ const CATEGORY_COLORS = {
   '퇴직연금': '#6366F1',
 }
 
-// ========== 하우가 패밀리 데이터 ==========
+// ========== 하우가 패밀리 데이터 (2026.03.29 기준) ==========
 const HAUGA_PORTFOLIOS = {
   toss: {
     name: '토스증권 해외주식',
     icon: '🇺🇸',
     target: [
-      { ticker: 'AMZN', name: '아마존', category: 'Big Tech', targetWeight: 52 },
-      { ticker: 'ADA', name: '에이다', category: '암호화폐', targetWeight: 9 },
-      { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 9 },
-      { ticker: 'MSFT', name: '마이크로소프트', category: 'Big Tech', targetWeight: 6 },
-      { ticker: 'CVX', name: '셰브론', category: '에너지', targetWeight: 4 },
+      { ticker: 'AMZN', name: '아마존', category: 'Big Tech', targetWeight: 65 },
+      { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 10 },
+      { ticker: 'MSFT', name: '마이크로소프트', category: 'Big Tech', targetWeight: 7 },
       { ticker: 'META', name: '메타', category: 'Big Tech', targetWeight: 3 },
-      { ticker: 'GOOGL+BAC+AXP', name: '기타 (알파벳A, 금융)', category: '금융', targetWeight: 9 },
-      { ticker: 'SPY+기타', name: 'ETF/기타', category: 'ETF', targetWeight: 8 },
+      { ticker: 'BAC', name: '뱅크오브아메리카', category: '금융', targetWeight: 3 },
+      { ticker: 'SPY', name: 'SPY', category: 'ETF', targetWeight: 3 },
+      { ticker: '기타', name: '기타', category: 'ETF', targetWeight: 9 },
     ],
     holdings: [
-      { ticker: 'ADA', name: '에이다 (카르다노)', currentKRW: 63529, category: '암호화폐' },
-      { ticker: 'AMZN', name: '아마존', currentKRW: 357500, category: 'Big Tech' },
-      { ticker: 'GOOG', name: '알파벳 C', currentKRW: 61640, category: 'Big Tech' },
-      { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 42545, category: 'Big Tech' },
-      { ticker: 'CVX', name: '셰브론', currentKRW: 28864, category: '에너지' },
-      { ticker: 'META', name: '메타', currentKRW: 22607, category: 'Big Tech' },
-      { ticker: 'AXP', name: '아메리칸 익스프레스', currentKRW: 21474, category: '금융' },
-      { ticker: 'BAC', name: '뱅크오브아메리카', currentKRW: 18877, category: '금융' },
-      { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 17793, category: 'Big Tech' },
-      { ticker: 'SPY', name: 'SPY', currentKRW: 17155, category: 'ETF' },
-      { ticker: 'MP', name: 'MP 머티리얼스', currentKRW: 7964, category: '소재' },
-      { ticker: 'ISRG', name: '인튜이티브 서지컬', currentKRW: 7656, category: '헬스케어' },
-      { ticker: 'QCOM', name: '퀄컴', currentKRW: 7193, category: '반도체' },
-      { ticker: 'PLTR', name: '팔란티어', currentKRW: 3097, category: 'AI/SW' },
-      { ticker: 'TSLA', name: '테슬라', currentKRW: 2765, category: '자동차' },
-      { ticker: 'AVGO', name: '브로드컴', currentKRW: 2640, category: '반도체' },
-      { ticker: 'VRT', name: '버티브 홀딩스', currentKRW: 1933, category: 'AI/SW' },
-      { ticker: 'VST', name: '비스트라 에너지', currentKRW: 955, category: '에너지' },
+      { ticker: 'AMZN', name: '아마존', currentKRW: 365295, category: 'Big Tech' },
+      { ticker: 'GOOG', name: '알파벳 C', currentKRW: 58467, category: 'Big Tech' },
+      { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 41152, category: 'Big Tech' },
+      { ticker: 'META', name: '메타', currentKRW: 19672, category: 'Big Tech' },
+      { ticker: 'BAC', name: '뱅크오브아메리카', currentKRW: 19012, category: '금융' },
+      { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 16903, category: 'Big Tech' },
+      { ticker: 'SPY', name: 'SPY', currentKRW: 16890, category: 'ETF' },
+      { ticker: 'ISRG', name: '인튜이티브 서지컬', currentKRW: 7313, category: '헬스케어' },
+      { ticker: 'QCOM', name: '퀄컴', currentKRW: 6850, category: '반도체' },
+      { ticker: 'AVGO', name: '브로드컴', currentKRW: 2686, category: '반도체' },
+      { ticker: 'TSLA', name: '테슬라', currentKRW: 2687, category: 'Big Tech' },
+      { ticker: 'VST', name: '비스트라 에너지', currentKRW: 925, category: '에너지' },
     ],
   },
   pension: {
     name: '연금저축',
     icon: '🧓',
     target: [
-      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 80 },
-      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20 },
+      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 75 },
+      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 25 },
     ],
     holdings: [
-      { name: 'KODEX 200', ticker: '069500', currentKRW: 658840, category: '국내대형' },
-      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 105500, category: '국내중소' },
+      { name: 'KODEX 200', ticker: '069500', currentKRW: 1138008, category: '국내대형' },
+      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 355144, category: '국내중소' },
     ],
   },
   isa: {
@@ -76,43 +69,55 @@ const HAUGA_PORTFOLIOS = {
     icon: '📊',
     target: [
       { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 40 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 39 },
-      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 21 },
+      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 40 },
+      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20 },
     ],
     holdings: [
-      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 105500, category: '국내중소' },
-      { name: 'TIGER 미국채10년선물', ticker: '305080', currentKRW: 199050, category: '채권' },
-      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 196520, category: 'S&P500' },
+      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 98680, category: '국내중소' },
+      { name: 'TIGER 미국채10년선물', ticker: '305080', currentKRW: 204375, category: '채권' },
+      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 197349, category: 'S&P500' },
     ],
   },
   stock: {
-    name: '종합_주식',
-    icon: '📈',
+    name: '종합 해외주식',
+    icon: '🌍',
     target: [
-      { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 60 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 23 },
-      { ticker: '484790', name: '1Q 미국S&P500미국채혼합', category: 'ETF', targetWeight: 15 },
+      { ticker: 'CVX', name: '셰브론', category: '에너지', targetWeight: 45 },
+      { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 30 },
+      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 15 },
+      { ticker: '484790', name: '1Q 미국S&P500미국채혼합', category: 'ETF', targetWeight: 10 },
     ],
     holdings: [
-      { name: '알파벳 C', ticker: 'GOOG', currentKRW: 443632, category: 'Big Tech' },
-      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 171955, category: 'S&P500' },
-      { name: '1Q 미국S&P500미국채혼합', ticker: '484790', currentKRW: 113550, category: 'ETF' },
+      { name: '셰브론', ticker: 'CVX', currentKRW: 620068, category: '에너지' },
+      { name: '알파벳 C', ticker: 'GOOG', currentKRW: 376687, category: 'Big Tech' },
+      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 172690, category: 'S&P500' },
+      { name: '1Q 미국S&P500미국채혼합', ticker: '484790', currentKRW: 116100, category: 'ETF' },
+      { name: '화이자', ticker: 'PFE', currentKRW: 50000, category: '헬스케어' },
     ],
   },
   irp: {
     name: 'IRP',
     icon: '🏦',
     target: [
-      { ticker: '133690', name: 'TIGER 미국나스닥100', category: 'S&P500', targetWeight: 35 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 21 },
-      { ticker: '195980', name: 'TIGER MSCI신흥국', category: '신흥국', targetWeight: 14 },
-      { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 30 },
+      { ticker: '예수금', name: 'IRP 예수금', category: '현금성', targetWeight: 100 },
     ],
-    holdings: [],
+    holdings: [
+      { name: 'IRP 예수금', ticker: '예수금', currentKRW: 250069, category: '현금성' },
+    ],
+  },
+  crypto: {
+    name: '암호화폐',
+    icon: '₿',
+    target: [
+      { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 100 },
+    ],
+    holdings: [
+      { ticker: 'BTC', name: '비트코인', currentKRW: 165490, category: '암호화폐' },
+    ],
   },
 }
 
-// ========== 가윤 달리오 데이터 ==========
+// ========== 가윤 달리오 데이터 (2026.03.29 기준) ==========
 const GAYOON_PORTFOLIOS = {
   sp500: {
     name: 'S&P500 + 배당주',
@@ -122,56 +127,80 @@ const GAYOON_PORTFOLIOS = {
       { ticker: 'SCHD', name: 'Schwab 배당주', category: '배당주', targetWeight: 20 },
     ],
     holdings: [
-      { ticker: 'VOO', name: 'Vanguard S&P500 ETF', currentKRW: 19577473 + 656352, category: '해외주식' },
-      { ticker: 'SCHD', name: 'Schwab 미국 배당주 ETF', currentKRW: 4562673, category: '배당주' },
+      { ticker: 'VOO', name: 'Vanguard S&P500 ETF', currentKRW: 19317195 + 647620, category: '해외주식' },
+      { ticker: 'SCHD', name: 'Schwab 미국 배당주 ETF', currentKRW: 4584872, category: '배당주' },
     ],
   },
   isa: {
     name: 'ISA',
     icon: '📊',
     target: [
-      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 30 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 20 },
-      { ticker: '133690', name: 'TIGER 미국나스닥100', category: 'S&P500', targetWeight: 15 },
-      { ticker: '195980', name: 'TIGER MSCI신흥국', category: '신흥국', targetWeight: 15 },
-      { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10 },
+      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 25 },
+      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 25 },
+      { ticker: '133690', name: 'TIGER 미국나스닥100', category: '나스닥', targetWeight: 15 },
+      { ticker: '195980', name: 'PLUS 신흥국MSCI', category: '신흥국', targetWeight: 15 },
+      { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10 },
       { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10 },
     ],
     holdings: [
-      // 현재 보유: 총 7,026,625원
-      { ticker: '195980', name: 'PLUS 신흥국MSCI (→ TIGER 신흥국)', currentKRW: 2991835, category: '신흥국' },
-      { ticker: '305080', name: 'TIGER 미국채10년선물', currentKRW: 2030310, category: '채권' },
-      { ticker: '472150', name: 'KODEX 금액티브', currentKRW: 2004480, category: '금' },
+      { ticker: '069500', name: 'KODEX 200', currentKRW: 5117175, category: '국내대형' },
+      { ticker: '360750', name: 'TIGER 미국S&P500', currentKRW: 4835160, category: 'S&P500' },
+      { ticker: '133690', name: 'TIGER 나스닥100', currentKRW: 2857680, category: '나스닥' },
+      { ticker: '195980', name: 'PLUS 신흥국MSCI', currentKRW: 2695055, category: '신흥국' },
+      { ticker: '305080', name: 'TIGER 미국채10년선물', currentKRW: 2069325, category: '채권' },
+      { ticker: '472150', name: 'KODEX 금액티브', currentKRW: 1806720, category: '금' },
     ],
   },
   pension: {
     name: '연금저축',
     icon: '🧓',
     target: [
-      { ticker: '069500', name: 'KODEX 200', category: '국내대형', targetWeight: 100 },
+      { ticker: '069500', name: 'KODEX 200', category: '국내대형', targetWeight: 80 },
+      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20 },
     ],
     holdings: [
-      { ticker: 'KODEX200', name: 'KODEX 200', currentKRW: 1976520, category: '국내대형' },
+      { ticker: '069500', name: 'KODEX 200', currentKRW: 4467375, category: '국내대형' },
+      { ticker: '229200', name: 'KODEX 코스닥150', currentKRW: 1070820, category: '국내중소' },
+    ],
+  },
+  amazon: {
+    name: '아마존 (한투)',
+    icon: '🛒',
+    target: [
+      { ticker: 'AMZN', name: '아마존', category: 'Big Tech', targetWeight: 100 },
+    ],
+    holdings: [
+      { ticker: 'AMZN', name: '아마존', currentKRW: 2702213, category: 'Big Tech' },
     ],
   },
   irp: {
     name: 'IRP',
     icon: '🏦',
     target: [
-      { ticker: 'IRP', name: 'IRP 투자상품', category: '퇴직연금', targetWeight: 100 },
+      { ticker: 'TDF2025', name: 'TDF2025', category: '퇴직연금', targetWeight: 100 },
     ],
     holdings: [
-      { ticker: 'IRP투자', name: 'IRP 투자상품', currentKRW: 273323, category: '퇴직연금' },
+      { ticker: 'TDF2025', name: 'TDF2025 (IRP)', currentKRW: 265937, category: '퇴직연금' },
     ],
   },
   cma: {
     name: 'CMA',
     icon: '💵',
     target: [
-      { ticker: 'MMF', name: '삼성신종MMF', category: 'CMA', targetWeight: 100 },
+      { ticker: 'MMF', name: '발행어음CMA', category: 'CMA', targetWeight: 100 },
     ],
     holdings: [
-      { ticker: 'MMF', name: '삼성신종MMF (CMA)', currentKRW: 6631937, category: 'CMA' },
+      { ticker: 'MMF', name: '발행어음CMA', currentKRW: 14030691, category: 'CMA' },
+    ],
+  },
+  crypto: {
+    name: '암호화폐',
+    icon: '₿',
+    target: [
+      { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 100 },
+    ],
+    holdings: [
+      { ticker: 'BTC', name: '비트코인', currentKRW: 1091846, category: '암호화폐' },
     ],
   },
 }

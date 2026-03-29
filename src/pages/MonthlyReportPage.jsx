@@ -19,40 +19,77 @@ const CATEGORY_COLORS = {
   '에너지': '#F59E0B',
   '금융': '#10B981',
   '반도체': '#EC4899',
+  '헬스케어': '#8B5CF6',
   '채권': '#6B7280',
   '금': '#FBBF24',
-  '신흥국': '#10B981',
+  '신흥국': '#14B8A6',
   'S&P500': '#6366F1',
-  '배당주': '#10B981',
+  '배당주': '#22C55E',
+  '나스닥': '#7C3AED',
   'CMA': '#8B95A1',
 }
 
-// ========== 하우가 패밀리 데이터 ==========
+// ========== 하우가 패밀리 데이터 (2026.03.29 기준) ==========
 const HAUGA_HOLDINGS = [
-  { ticker: 'AMZN', name: '아마존', currentKRW: 357500, investedKRW: 405609, gainKRW: -48109, gainPercent: -11.8, category: 'Big Tech' },
-  { ticker: 'ADA', name: '에이다', currentKRW: 63529, investedKRW: 60077, gainKRW: 3452, gainPercent: 5.75, category: '암호화폐' },
-  { ticker: 'GOOG', name: '알파벳 C (토스)', currentKRW: 61640, investedKRW: 63640, gainKRW: -2000, gainPercent: -3.1, category: 'Big Tech' },
-  { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 42545, investedKRW: 47589, gainKRW: -5044, gainPercent: -10.5, category: 'Big Tech' },
-  { ticker: 'CVX', name: '셰브론', currentKRW: 28864, investedKRW: 26635, gainKRW: 2229, gainPercent: 8.3, category: '에너지' },
-  { ticker: 'KODEX200', name: 'KODEX 200 (연금)', currentKRW: 658840, investedKRW: 617700, gainKRW: 41140, gainPercent: 6.66, category: '국내주식' },
-  { ticker: 'KODEX150', name: 'KODEX 코스닥150', currentKRW: 211000, investedKRW: 202375, gainKRW: 8625, gainPercent: 4.26, category: '국내주식' },
-  { ticker: 'TIGER_SP', name: 'TIGER 미국S&P500', currentKRW: 368475, investedKRW: 370930, gainKRW: -2455, gainPercent: -0.66, category: 'S&P500' },
-  { ticker: 'TIGER_BOND', name: 'TIGER 미국채10년', currentKRW: 199050, investedKRW: 198375, gainKRW: 675, gainPercent: 0.34, category: '채권' },
-  { ticker: 'CMA', name: 'CMA (비상금+여행)', currentKRW: 1010298, investedKRW: 1010032, gainKRW: 266, gainPercent: 0.03, category: '현금성' },
+  // 토스증권 해외주식
+  { ticker: 'AMZN', name: '아마존', currentKRW: 365295, investedKRW: 405610, gainKRW: -40314, gainPercent: -9.93, category: 'Big Tech' },
+  { ticker: 'GOOG', name: '알파벳 C', currentKRW: 58467, investedKRW: 63641, gainKRW: -5173, gainPercent: -8.12, category: 'Big Tech' },
+  { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 16903, investedKRW: 19727, gainKRW: -2823, gainPercent: -14.31, category: 'Big Tech' },
+  { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 41152, investedKRW: 47590, gainKRW: -6437, gainPercent: -13.52, category: 'Big Tech' },
+  { ticker: 'META', name: '메타', currentKRW: 19672, investedKRW: 23670, gainKRW: -3997, gainPercent: -16.88, category: 'Big Tech' },
+  { ticker: 'TSLA', name: '테슬라', currentKRW: 2687, investedKRW: 2969, gainKRW: -281, gainPercent: -9.48, category: 'Big Tech' },
+  { ticker: 'BAC', name: '뱅크오브아메리카', currentKRW: 19012, investedKRW: 20702, gainKRW: -1689, gainPercent: -8.16, category: '금융' },
+  { ticker: 'AVGO', name: '브로드컴', currentKRW: 2686, investedKRW: 2973, gainKRW: -286, gainPercent: -9.64, category: '반도체' },
+  { ticker: 'QCOM', name: '퀄컴', currentKRW: 6850, investedKRW: 7883, gainKRW: -1032, gainPercent: -13.09, category: '반도체' },
+  { ticker: 'ISRG', name: '인튜이티브 서지컬', currentKRW: 7313, investedKRW: 7882, gainKRW: -568, gainPercent: -7.21, category: '헬스케어' },
+  { ticker: 'VST', name: '비스트라 에너지', currentKRW: 925, investedKRW: 986, gainKRW: -60, gainPercent: -6.16, category: '에너지' },
+  { ticker: 'SPY', name: 'SPY', currentKRW: 16890, investedKRW: 17704, gainKRW: -813, gainPercent: -4.59, category: 'S&P500' },
+  // 미래에셋 - 연금저축
+  { ticker: 'KODEX200_P', name: 'KODEX 200 (연금)', currentKRW: 1138008, investedKRW: 1131700, gainKRW: 6308, gainPercent: 0.56, category: '국내주식' },
+  { ticker: 'KODEX150_P', name: 'KODEX 코스닥150 (연금)', currentKRW: 355144, investedKRW: 344775, gainKRW: 10369, gainPercent: 3.01, category: '국내주식' },
+  // 미래에셋 - ISA
+  { ticker: 'KODEX150_I', name: 'KODEX 코스닥150 (ISA)', currentKRW: 98680, investedKRW: 101075, gainKRW: -2395, gainPercent: -2.37, category: '국내주식' },
+  { ticker: 'TIGER_BOND', name: 'TIGER 미국채10년선물', currentKRW: 204375, investedKRW: 198375, gainKRW: 6000, gainPercent: 3.02, category: '채권' },
+  { ticker: 'TIGER_SP_I', name: 'TIGER 미국S&P500 (ISA)', currentKRW: 197349, investedKRW: 196840, gainKRW: 509, gainPercent: 0.26, category: 'S&P500' },
+  // 미래에셋 - 종합 (해외주식)
+  { ticker: 'TIGER_SP', name: 'TIGER 미국S&P500', currentKRW: 172690, investedKRW: 174090, gainKRW: -1400, gainPercent: -0.80, category: 'S&P500' },
+  { ticker: '1Q_HYB', name: '1Q S&P500미국채혼합', currentKRW: 116100, investedKRW: 116250, gainKRW: -150, gainPercent: -0.13, category: 'S&P500' },
+  { ticker: 'CVX', name: '셰브론', currentKRW: 620068, investedKRW: 568711, gainKRW: 51357, gainPercent: 9.03, category: '에너지' },
+  { ticker: 'GOOG_M', name: '알파벳 C (미래)', currentKRW: 376687, investedKRW: 468022, gainKRW: -91335, gainPercent: -19.51, category: 'Big Tech' },
+  { ticker: 'PFE', name: '화이자', currentKRW: 50000, investedKRW: 50000, gainKRW: 0, gainPercent: 0.00, category: '헬스케어' },
+  // 미래에셋 - IRP
+  { ticker: 'IRP', name: 'IRP 예수금', currentKRW: 250069, investedKRW: 250069, gainKRW: 0, gainPercent: 0.00, category: '연금' },
+  // 미래에셋 - CMA
+  { ticker: 'CMA', name: 'CMA (가족여행)', currentKRW: 610106, investedKRW: 610096, gainKRW: 10, gainPercent: 0.00, category: '현금성' },
+  // 업비트 - 암호화폐
+  { ticker: 'BTC', name: '비트코인', currentKRW: 165490, investedKRW: 167040, gainKRW: -1552, gainPercent: -0.93, category: '암호화폐' },
 ]
 
-// ========== 가윤 달리오 데이터 ==========
+// ========== 가윤 달리오 데이터 (2026.03.29 기준) ==========
 const GAYOON_HOLDINGS = [
-  { ticker: 'VOO', name: 'Vanguard S&P500', currentKRW: 20233825, investedKRW: 18711656, gainKRW: 1522169, gainPercent: 8.13, category: '해외주식' },
-  { ticker: 'SCHD', name: 'Schwab 배당주', currentKRW: 4562673, investedKRW: 4047160, gainKRW: 515513, gainPercent: 12.74, category: '배당주' },
-  { ticker: 'AMZN', name: '아마존', currentKRW: 2638715, investedKRW: 2782034, gainKRW: -143319, gainPercent: -5.15, category: '해외주식' },
-  { ticker: 'PLUS신흥국', name: 'PLUS 신흥국MSCI', currentKRW: 2991835, investedKRW: 2997060, gainKRW: -5225, gainPercent: -0.17, category: '신흥국' },
-  { ticker: 'TIGER미국채', name: 'TIGER 미국채10년', currentKRW: 2030310, investedKRW: 2003535, gainKRW: 26775, gainPercent: 1.34, category: '채권' },
-  { ticker: 'KODEX금', name: 'KODEX 금액티브', currentKRW: 2004480, investedKRW: 1984640, gainKRW: 19840, gainPercent: 1.00, category: '금' },
-  { ticker: 'KODEX200', name: 'KODEX 200', currentKRW: 1976520, investedKRW: 1977045, gainKRW: -525, gainPercent: -0.03, category: '국내주식' },
-  { ticker: 'IRP', name: 'IRP 투자상품', currentKRW: 273323, investedKRW: 200000, gainKRW: 73323, gainPercent: 36.66, category: '연금' },
-  { ticker: 'CMA', name: '삼성MMF (CMA)', currentKRW: 6631937, investedKRW: 6630776, gainKRW: 1161, gainPercent: 0.02, category: '현금성' },
-  { ticker: 'BTC', name: '비트코인', currentKRW: 990775, investedKRW: 999500, gainKRW: -8725, gainPercent: -0.87, category: '암호화폐' },
+  // 삼성증권 - 해외주식
+  { ticker: 'VOO', name: 'Vanguard S&P500', currentKRW: 19317195, investedKRW: 18034965, gainKRW: 1282230, gainPercent: 7.11, category: 'S&P500' },
+  { ticker: 'VOO_P', name: 'VOO (소수점)', currentKRW: 647620, investedKRW: 676691, gainKRW: -29071, gainPercent: -4.30, category: 'S&P500' },
+  { ticker: 'SCHD', name: 'Schwab 배당주', currentKRW: 4584872, investedKRW: 4047160, gainKRW: 537712, gainPercent: 13.29, category: '배당주' },
+  { ticker: 'KBANK', name: '케이뱅크', currentKRW: 62700, investedKRW: 83000, gainKRW: -20300, gainPercent: -24.46, category: '국내주식' },
+  // 삼성증권 - ISA
+  { ticker: 'KODEX200_ISA', name: 'KODEX 200 (ISA)', currentKRW: 5117175, investedKRW: 5223390, gainKRW: -106215, gainPercent: -2.03, category: '국내주식' },
+  { ticker: 'TIGER_NAS', name: 'TIGER 나스닥100', currentKRW: 2857680, investedKRW: 2891400, gainKRW: -33720, gainPercent: -1.17, category: '나스닥' },
+  { ticker: 'PLUS_EM', name: 'PLUS 신흥국MSCI', currentKRW: 2695055, investedKRW: 2997060, gainKRW: -302005, gainPercent: -10.08, category: '신흥국' },
+  { ticker: 'TIGER_BD', name: 'TIGER 미국채10년', currentKRW: 2069325, investedKRW: 2003535, gainKRW: 65790, gainPercent: 3.28, category: '채권' },
+  { ticker: 'TIGER_SP_ISA', name: 'TIGER S&P500 (ISA)', currentKRW: 4835160, investedKRW: 4888810, gainKRW: -53650, gainPercent: -1.10, category: 'S&P500' },
+  { ticker: 'KODEX_G', name: 'KODEX 금액티브', currentKRW: 1806720, investedKRW: 1984640, gainKRW: -177920, gainPercent: -8.96, category: '금' },
+  // 한투 - 해외주식
+  { ticker: 'AMZN', name: '아마존 (한투)', currentKRW: 2702213, investedKRW: 2941594, gainKRW: -239381, gainPercent: -8.13, category: 'Big Tech' },
+  // 미래에셋 - 연금저축
+  { ticker: 'KODEX200_P', name: 'KODEX 200 (연금)', currentKRW: 4467375, investedKRW: 4912225, gainKRW: -444850, gainPercent: -9.06, category: '국내주식' },
+  { ticker: 'KODEX150_P', name: 'KODEX 코스닥150 (연금)', currentKRW: 1070820, investedKRW: 1084800, gainKRW: -13980, gainPercent: -1.29, category: '국내주식' },
+  // 미래에셋 - CMA
+  { ticker: 'CMA', name: '발행어음CMA', currentKRW: 14030691, investedKRW: 14015160, gainKRW: 15531, gainPercent: 0.11, category: '현금성' },
+  // 미래에셋 - IRP
+  { ticker: 'TDF2025', name: 'TDF2025 (IRP)', currentKRW: 265937, investedKRW: 267479, gainKRW: -1542, gainPercent: -0.58, category: '연금' },
+  // 업비트 - 암호화폐
+  { ticker: 'BTC', name: '비트코인', currentKRW: 1091846, investedKRW: 1098351, gainKRW: -6504, gainPercent: -0.59, category: '암호화폐' },
 ]
 
 // 초기 스냅샷 데이터
@@ -60,17 +97,17 @@ const INITIAL_SNAPSHOTS = {
   hauga: {
     '2026-01': {
       date: '2026-01-31',
-      totalKRW: 2800000,
-      totalInvested: 2850000,
-      holdings: HAUGA_HOLDINGS.map(h => ({ ...h, currentKRW: h.investedKRW * 0.98 })),
+      totalKRW: 4000000,
+      totalInvested: 4100000,
+      holdings: HAUGA_HOLDINGS.map(h => ({ ...h, currentKRW: Math.round(h.investedKRW * 0.98) })),
       realizedGain: 0,
       note: '연초 시작',
     },
     '2026-02': {
       date: '2026-02-28',
-      totalKRW: 2950000,
-      totalInvested: 2850000,
-      holdings: HAUGA_HOLDINGS.map(h => ({ ...h, currentKRW: h.currentKRW * 0.98 })),
+      totalKRW: 4150000,
+      totalInvested: 4100000,
+      holdings: HAUGA_HOLDINGS.map(h => ({ ...h, currentKRW: Math.round(h.investedKRW * 1.01) })),
       realizedGain: 2900,
       note: '배당금+판매수익 2,900원',
     },
@@ -78,17 +115,17 @@ const INITIAL_SNAPSHOTS = {
   gayoon: {
     '2026-01': {
       date: '2026-01-31',
-      totalKRW: 43000000,
-      totalInvested: 42000000,
-      holdings: GAYOON_HOLDINGS.map(h => ({ ...h, currentKRW: h.investedKRW * 1.02 })),
+      totalKRW: 65000000,
+      totalInvested: 63000000,
+      holdings: GAYOON_HOLDINGS.map(h => ({ ...h, currentKRW: Math.round(h.investedKRW * 1.03) })),
       realizedGain: 0,
       note: '연초 시작',
     },
     '2026-02': {
       date: '2026-02-28',
-      totalKRW: 43800000,
-      totalInvested: 42000000,
-      holdings: GAYOON_HOLDINGS.map(h => ({ ...h, currentKRW: h.currentKRW * 0.99 })),
+      totalKRW: 66500000,
+      totalInvested: 63000000,
+      holdings: GAYOON_HOLDINGS.map(h => ({ ...h, currentKRW: Math.round(h.investedKRW * 1.05) })),
       realizedGain: 15000,
       note: '배당금 15,000원',
     },
