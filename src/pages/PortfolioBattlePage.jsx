@@ -41,26 +41,31 @@ const HAUGA_HOLDINGS = [
   { ticker: 'TIGER_BOND', name: 'TIGER 미국채10년선물', currentKRW: 202875, investedKRW: 198375, gainPercent: 2.27 },
 ]
 
-// ========== 가윤 달리오 실제 데이터 - 2026.03.03 기준 ==========
+// ========== 가윤 달리오 실제 데이터 - 2026.03.29 기준 ==========
 const GAYOON_HOLDINGS = [
-  // 삼성증권 - S&P500 + 배당주
-  { ticker: 'VOO', name: 'Vanguard S&P500 ETF', currentKRW: 19577473, investedKRW: 18034965, gainPercent: 8.55 },
-  { ticker: 'VOO_P', name: 'VOO (소수점)', currentKRW: 656352, investedKRW: 676691, gainPercent: -3.01 },
-  { ticker: 'SCHD', name: 'Schwab 배당주 ETF', currentKRW: 4562673, investedKRW: 4047160, gainPercent: 12.74 },
-  // 미래에셋 - 아마존
-  { ticker: 'AMZN', name: '아마존', currentKRW: 2638715, investedKRW: 2782034, gainPercent: -5.15 },
+  // 삼성증권 - 해외주식 (VOO, SCHD, 케이뱅크)
+  { ticker: 'VOO', name: 'Vanguard S&P500 ETF', currentKRW: 19317195, investedKRW: 18034965, gainPercent: 7.11 },
+  { ticker: 'VOO_P', name: 'VOO (소수점)', currentKRW: 647620, investedKRW: 676691, gainPercent: -4.30 },
+  { ticker: 'SCHD', name: 'Schwab 배당주 ETF', currentKRW: 4584872, investedKRW: 4047160, gainPercent: 13.29 },
+  { ticker: 'KBANK', name: '케이뱅크', currentKRW: 62700, investedKRW: 83000, gainPercent: -24.46 },
   // 삼성증권 - ISA
-  { ticker: 'PLUS_EM', name: 'PLUS 신흥국MSCI', currentKRW: 2991835, investedKRW: 2997060, gainPercent: -0.17 },
-  { ticker: 'TIGER_BD', name: 'TIGER 미국채10년', currentKRW: 2030310, investedKRW: 2003535, gainPercent: 1.34 },
-  { ticker: 'KODEX_G', name: 'KODEX 금액티브', currentKRW: 2004480, investedKRW: 1984640, gainPercent: 1.00 },
+  { ticker: 'KODEX200_ISA', name: 'KODEX 200 (ISA)', currentKRW: 5117175, investedKRW: 5223390, gainPercent: -2.03 },
+  { ticker: 'TIGER_NAS', name: 'TIGER 미국나스닥100', currentKRW: 2857680, investedKRW: 2891400, gainPercent: -1.17 },
+  { ticker: 'PLUS_EM', name: 'PLUS 신흥국MSCI', currentKRW: 2695055, investedKRW: 2997060, gainPercent: -10.08 },
+  { ticker: 'TIGER_BD', name: 'TIGER 미국채10년선물', currentKRW: 2069325, investedKRW: 2003535, gainPercent: 3.28 },
+  { ticker: 'TIGER_SP_ISA', name: 'TIGER 미국S&P500 (ISA)', currentKRW: 4835160, investedKRW: 4888810, gainPercent: -1.10 },
+  { ticker: 'KODEX_G', name: 'KODEX 금액티브', currentKRW: 1806720, investedKRW: 1984640, gainPercent: -8.96 },
+  { ticker: 'ISA_CASH', name: 'ISA 예수금', currentKRW: 10332, investedKRW: 10332, gainPercent: 0.00 },
+  // 한투 - 해외주식
+  { ticker: 'AMZN', name: '아마존 (한투)', currentKRW: 2702213, investedKRW: 2941594, gainPercent: -8.13 },
   // 미래에셋 - 연금저축
-  { ticker: 'KODEX200', name: 'KODEX 200', currentKRW: 1976520, investedKRW: 1977045, gainPercent: -0.03 },
-  // IRP
-  { ticker: 'IRP', name: 'IRP 투자상품', currentKRW: 273323, investedKRW: 200000, gainPercent: 36.66 },
-  // CMA
-  { ticker: 'CMA', name: '삼성신종MMF (CMA)', currentKRW: 6631937, investedKRW: 6630776, gainPercent: 0.02 },
-  // 비트코인
-  { ticker: 'BTC', name: '비트코인', currentKRW: 990775, investedKRW: 999500, gainPercent: -0.87 },
+  { ticker: 'KODEX200_P', name: 'KODEX 200 (연금)', currentKRW: 4467375, investedKRW: 4912225, gainPercent: -9.06 },
+  { ticker: 'KODEX150_P', name: 'KODEX 코스닥150 (연금)', currentKRW: 1070820, investedKRW: 1084800, gainPercent: -1.29 },
+  // 미래에셋 - CMA
+  { ticker: 'CMA', name: '발행어음CMA', currentKRW: 14030691, investedKRW: 14015160, gainPercent: 0.11 },
+  // 미래에셋 - IRP
+  { ticker: 'TDF2025', name: 'TDF2025 (IRP)', currentKRW: 265937, investedKRW: 267479, gainPercent: -0.58 },
+  { ticker: 'IRP_CASH', name: 'IRP 현금성자산', currentKRW: 89, investedKRW: 89, gainPercent: 0.00 },
 ]
 
 // 수익률 계산
