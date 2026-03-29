@@ -376,6 +376,47 @@ const GAYOON_TARGET_WEIGHTS = {
   '연금': 1,
 }
 
+// ========== 시장 상황 반영 목표 비중 ==========
+const getMarketAdjustedTargets = (baseTargets, isGayoon = false) => {
+  const { cape, iranWar, fearGreed, marketPhase } = MARKET_CONTEXT
+
+  // 방어 모드 조건: CAPE > 35 OR 전쟁 OR 공포 구간(30 미만)
+  const isDefenseMode = cape > 35 || iranWar || fearGreed < 30
+
+  if (!isDefenseMode) {
+    return { adjusted: baseTargets, isDefenseMode: false, defenseModeReasons: [] }
+  }
+
+  // 방어 모드 사유 수집
+  const defenseModeReasons = []
+  if (cape > 35) defenseModeReasons.push(`CAPE ${cape} (역사적 고평가)`)
+  if (iranWar) defenseModeReasons.push('이란 전쟁 발발')
+  if (fearGreed < 30) defenseModeReasons.push(`공포지수 ${fearGreed} (공포 구간)`)
+
+  const adjusted = { ...baseTargets }
+
+  // 현금성 상향 (평시의 2.5배, 최대 30%)
+  const baseCash = baseTargets['현금성'] || 10
+  adjusted['현금성'] = Math.min(Math.round(baseCash * 2.5), 30)
+
+  // 방어 자산 상향
+  adjusted['채권'] = (baseTargets['채권'] || 0) + 3
+  adjusted['금'] = (baseTargets['금'] || 0) + 2
+
+  // 주식 하향 (15% 축소)
+  const stockCats = ['S&P500', 'Big Tech', '나스닥', '국내주식', '신흥국']
+  stockCats.forEach(cat => {
+    if (adjusted[cat]) {
+      adjusted[cat] = Math.round(adjusted[cat] * 0.85)
+    }
+  })
+
+  // 고위험 축소 (최대 1%)
+  adjusted['암호화폐'] = Math.min(baseTargets['암호화폐'] || 0, 1)
+
+  return { adjusted, isDefenseMode: true, defenseModeReasons }
+}
+
 // ========== 하우가 패밀리 전체 보유 종목 (2026.03.29 기준) ==========
 const HAUGA_ALL_HOLDINGS = [
   // 토스증권 해외주식
@@ -439,7 +480,7 @@ const GAYOON_ALL_HOLDINGS = [
 ]
 
 // ========== 종합 시장 분석 대시보드 컴포넌트 ==========
-function MarketAnalysisDashboard({ isMobile }) {
+function MarketAnalysisDashboard({ isMobile, customerName }) {
   const [activeTab, setActiveTab] = useState('economy')
 
   const tabs = [
@@ -537,7 +578,7 @@ function MarketAnalysisDashboard({ isMobile }) {
           </span>
         </div>
         <div style={{ fontSize: '13px', color: '#6B7684' }}>
-          "가윤 고객님, 지금 시장에서 무슨 일이 일어나고 있나요?"
+          "{customerName} 고객님, 지금 시장에서 무슨 일이 일어나고 있나요?"
         </div>
       </div>
 
@@ -674,7 +715,7 @@ function MarketAnalysisDashboard({ isMobile }) {
           color: '#F59E0B',
           marginBottom: '12px',
         }}>
-          🎯 가윤 고객님을 위한 종합 결론
+          🎯 {customerName} 고객님을 위한 종합 결론
         </div>
         <div style={{
           fontSize: '13px',
@@ -743,8 +784,14 @@ export default function RebalancePage() {
 
   // 전체 보유 종목
   const allHoldings = mainTab === 'hauga' ? HAUGA_ALL_HOLDINGS : GAYOON_ALL_HOLDINGS
-  const targetWeights = mainTab === 'hauga' ? HAUGA_TARGET_WEIGHTS : GAYOON_TARGET_WEIGHTS
+  const baseTargetWeights = mainTab === 'hauga' ? HAUGA_TARGET_WEIGHTS : GAYOON_TARGET_WEIGHTS
   const totalKRW = allHoldings.reduce((sum, h) => sum + h.currentKRW, 0)
+
+  // 시장 상황 반영 목표 비중
+  const { adjusted: targetWeights, isDefenseMode, defenseModeReasons } = getMarketAdjustedTargets(
+    baseTargetWeights,
+    mainTab === 'gayoon'
+  )
 
   // 비중 계산된 종목 리스트
   const holdingsWithWeight = allHoldings.map(h => ({
@@ -774,8 +821,13 @@ export default function RebalancePage() {
     Object.entries(categoryTotals).forEach(([cat, amount]) => {
       const currentWeight = (amount / totalKRW) * 100
       const targetWeight = targetWeights[cat] || 0
+      const baseTarget = baseTargetWeights[cat] || 0
       const diff = targetWeight - currentWeight
       const diffKRW = (diff / 100) * totalKRW
+
+      // 평시 목표와 현재 목표 차이 확인 (방어 모드로 조정되었는지)
+      const isTargetAdjusted = isDefenseMode && Math.abs(targetWeight - baseTarget) > 0.1
+      const targetAdjustmentDirection = targetWeight > baseTarget ? '상향' : '하향'
 
       let action = '유지'
       let actionColor = '#8B95A1'
@@ -840,6 +892,9 @@ export default function RebalancePage() {
         category: cat,
         currentWeight,
         targetWeight,
+        baseTarget,
+        isTargetAdjusted,
+        targetAdjustmentDirection,
         diff,
         diffKRW,
         action,
@@ -1126,6 +1181,57 @@ export default function RebalancePage() {
         </div>
       </div>
 
+      {/* 방어 모드 배지 */}
+      {isDefenseMode && (
+        <div style={{
+          padding: '16px 20px',
+          backgroundColor: '#FEF2F2',
+          borderRadius: '16px',
+          border: '2px solid #FECACA',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '16px',
+          flexWrap: 'wrap',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}>
+            <span style={{ fontSize: '28px' }}>🛡️</span>
+            <div>
+              <div style={{
+                fontSize: '16px',
+                fontWeight: '700',
+                color: '#991B1B',
+              }}>
+                현재 시장: 방어 모드
+              </div>
+              <div style={{ fontSize: '12px', color: '#B91C1C', marginTop: '2px' }}>
+                {defenseModeReasons.join(' · ')}
+              </div>
+            </div>
+          </div>
+          <div style={{
+            flex: 1,
+            minWidth: '200px',
+            padding: '12px 16px',
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            borderLeft: '3px solid #EF4444',
+          }}>
+            <div style={{ fontSize: '12px', color: '#991B1B', fontWeight: '600', marginBottom: '4px' }}>
+              평시 목표 → 방어 목표 자동 조정
+            </div>
+            <div style={{ fontSize: '11px', color: '#6B7684', lineHeight: '1.5' }}>
+              현금성 {baseTargetWeights['현금성'] || 10}% → {targetWeights['현금성']}% ·
+              주식 비중 15% 축소 · 방어 자산 상향
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 시장 상황 요약 */}
       <div style={{
         backgroundColor: '#1E293B',
@@ -1193,7 +1299,7 @@ export default function RebalancePage() {
       </div>
 
       {/* 종합 시장 분석 대시보드 */}
-      <MarketAnalysisDashboard isMobile={isMobile} />
+      <MarketAnalysisDashboard isMobile={isMobile} customerName={mainTab === 'gayoon' ? '가윤' : '하늘'} />
 
       {/* 요약 카드 */}
       <div style={styles.summaryGrid}>
@@ -1289,21 +1395,29 @@ export default function RebalancePage() {
         </div>
 
         {recommendations
-          .filter(r => r.action !== '유지')
+          .filter(r => {
+            // 방어 모드에서 조정된 카테고리는 "유지"도 표시 (왜 유지인지 설명 필요)
+            if (isDefenseMode && r.isTargetAdjusted) return true
+            // 기본: 유지가 아닌 것만 표시
+            return r.action !== '유지'
+          })
           .map((rec, idx) => {
             const color = CATEGORY_COLORS[rec.category] || '#9CA3AF'
             const isBuy = rec.action.includes('매수')
+            const isHold = rec.action === '유지'
+            const headerBgColor = isHold ? '#F0F9FF' : (isBuy ? '#E8F5E9' : '#FFEBEE')
+            const actionBgColor = isHold ? '#3B82F6' : (isBuy ? '#2E7D32' : '#C62828')
             return (
               <div key={idx} style={{
                 marginBottom: '16px',
-                border: '1px solid #E5E8EB',
+                border: isHold && isDefenseMode ? '2px solid #3B82F6' : '1px solid #E5E8EB',
                 borderRadius: '12px',
                 overflow: 'hidden',
               }}>
                 {/* 카테고리 헤더 */}
                 <div style={{
                   padding: '16px',
-                  backgroundColor: isBuy ? '#E8F5E9' : '#FFEBEE',
+                  backgroundColor: headerBgColor,
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -1319,9 +1433,25 @@ export default function RebalancePage() {
                     <div>
                       <div style={{ fontWeight: '700', fontSize: '15px', color: '#191F28' }}>
                         {rec.category}
+                        {isDefenseMode && rec.isTargetAdjusted && (
+                          <span style={{
+                            marginLeft: '8px',
+                            padding: '2px 6px',
+                            backgroundColor: rec.targetAdjustmentDirection === '상향' ? '#DCFCE7' : '#FEE2E2',
+                            borderRadius: '4px',
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            color: rec.targetAdjustmentDirection === '상향' ? '#166534' : '#991B1B',
+                          }}>
+                            🛡️ {rec.targetAdjustmentDirection}
+                          </span>
+                        )}
                       </div>
                       <div style={{ fontSize: '12px', color: '#6B7684', marginTop: '2px' }}>
                         현재 {rec.currentWeight.toFixed(1)}% → 목표 {rec.targetWeight.toFixed(1)}%
+                        {rec.isTargetAdjusted && (
+                          <span style={{ color: '#8B95A1' }}> (평시 {rec.baseTarget}%)</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1329,18 +1459,76 @@ export default function RebalancePage() {
                     <span style={{
                       padding: '6px 12px',
                       borderRadius: '8px',
-                      backgroundColor: isBuy ? '#2E7D32' : '#C62828',
+                      backgroundColor: actionBgColor,
                       color: 'white',
                       fontSize: '13px',
                       fontWeight: '600',
                     }}>
-                      {rec.icon} {rec.action} {Math.abs(rec.diffKRW) >= 10000
-                        ? `${(Math.abs(rec.diffKRW) / 10000).toFixed(0)}만원`
-                        : `${Math.abs(rec.diffKRW).toLocaleString()}원`
-                      }
+                      {rec.icon} {rec.action} {isHold ? '(목표 범위 내)' : (
+                        Math.abs(rec.diffKRW) >= 10000
+                          ? `${(Math.abs(rec.diffKRW) / 10000).toFixed(0)}만원`
+                          : `${Math.abs(rec.diffKRW).toLocaleString()}원`
+                      )}
                     </span>
                   </div>
                 </div>
+
+                {/* 왜 이 액션인가요? */}
+                {isDefenseMode && rec.isTargetAdjusted && (
+                  <div style={{
+                    padding: '12px 16px',
+                    backgroundColor: '#FFFBEB',
+                    borderBottom: '1px solid #FDE68A',
+                  }}>
+                    <div style={{
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      color: '#92400E',
+                      marginBottom: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}>
+                      📌 왜 {rec.action}인가요?
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#78350F', lineHeight: '1.6' }}>
+                      {rec.category === '현금성' || rec.category === 'CMA' ? (
+                        <>
+                          평시 목표는 {rec.baseTarget}%지만, <strong>방어 모드</strong>에서는 {rec.targetWeight}%로 상향됩니다.
+                          {rec.action === '유지' ? (
+                            <> 현재 {rec.currentWeight.toFixed(1)}%로 목표 범위 내이므로 <strong>유지</strong>가 적절합니다.</>
+                          ) : rec.action.includes('매수') ? (
+                            <> 현재 {rec.currentWeight.toFixed(1)}%로 목표에 미달하므로 <strong>추가 확보</strong>를 권장합니다.</>
+                          ) : (
+                            <> 현재 {rec.currentWeight.toFixed(1)}%로 목표보다 많습니다만, 방어 모드에서 현금은 무기입니다.</>
+                          )}
+                          <br />• {defenseModeReasons.join(' · ')}
+                          <br />• 버핏: $3,730억 현금 보유 중
+                        </>
+                      ) : rec.targetAdjustmentDirection === '하향' ? (
+                        <>
+                          방어 모드에서 주식 비중 목표가 평시 {rec.baseTarget}% → {rec.targetWeight}%로 하향 조정됩니다.
+                          {rec.action === '유지' ? (
+                            <> 현재 {rec.currentWeight.toFixed(1)}%로 조정된 목표 범위 내입니다. <strong>추가 매수 보류</strong>를 권장합니다.</>
+                          ) : rec.action.includes('매도') ? (
+                            <> 추가 하락 가능성에 대비해 비중을 줄이는 것이 안전합니다.</>
+                          ) : (
+                            <> 신중한 분할 매수를 권장합니다.</>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          방어 자산 목표가 평시 {rec.baseTarget}% → {rec.targetWeight}%로 상향 조정됩니다.
+                          {rec.action === '유지' ? (
+                            <> 현재 {rec.currentWeight.toFixed(1)}%로 목표 범위 내입니다.</>
+                          ) : (
+                            <> 불확실성이 높은 시장에서 방어 자산을 확대하세요.</>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* 4인 전문가 패널 의견 */}
                 {(() => {
@@ -1480,13 +1668,201 @@ export default function RebalancePage() {
             )
           })}
 
-        {recommendations.filter(r => r.action !== '유지').length === 0 && (
+        {recommendations.filter(r => {
+          if (isDefenseMode && r.isTargetAdjusted) return true
+          return r.action !== '유지'
+        }).length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px', color: '#8B95A1' }}>
             <div style={{ fontSize: '32px', marginBottom: '12px' }}>✅</div>
             <div>포트폴리오가 목표 비중과 잘 맞습니다!</div>
           </div>
         )}
       </div>
+
+      {/* 고객님 맞춤 최종 가이드 */}
+      {isDefenseMode && (
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          border: '3px solid #1E293B',
+          marginBottom: '20px',
+          overflow: 'hidden',
+        }}>
+          {/* 헤더 */}
+          <div style={{
+            padding: '20px',
+            backgroundColor: '#0F172A',
+            color: 'white',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '8px',
+            }}>
+              <span style={{ fontSize: '28px' }}>📋</span>
+              <div>
+                <div style={{ fontSize: '18px', fontWeight: '700' }}>
+                  {mainTab === 'gayoon' ? '가윤' : '하늘'}님 맞춤 최종 가이드
+                </div>
+                <div style={{ fontSize: '12px', color: '#94A3B8' }}>
+                  전문가 합의 + 시장 상황 반영
+                </div>
+              </div>
+              <div style={{
+                marginLeft: 'auto',
+                padding: '8px 16px',
+                backgroundColor: '#EF4444',
+                borderRadius: '8px',
+                fontWeight: '700',
+                fontSize: '14px',
+              }}>
+                🔴 방어 모드
+              </div>
+            </div>
+          </div>
+
+          {/* 본문 */}
+          <div style={{ padding: '20px' }}>
+            {/* 현재 상황 요약 */}
+            <div style={{
+              padding: '16px',
+              backgroundColor: '#FEF2F2',
+              borderRadius: '12px',
+              borderLeft: '4px solid #EF4444',
+              marginBottom: '20px',
+            }}>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: '#991B1B', marginBottom: '8px' }}>
+                현재 상황: 위험 구간
+              </div>
+              <div style={{ fontSize: '12px', color: '#7F1D1D', lineHeight: '1.6' }}>
+                {defenseModeReasons.map((reason, idx) => (
+                  <span key={idx}>• {reason}<br /></span>
+                ))}
+                • 버핏 $3,730억 현금 보유 (역대 최대)
+              </div>
+            </div>
+
+            {/* 핵심 액션 3가지 */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+              gap: '16px',
+              marginBottom: '20px',
+            }}>
+              {/* 액션 1: 현금 유지 */}
+              <div style={{
+                padding: '16px',
+                backgroundColor: '#ECFDF5',
+                borderRadius: '12px',
+                border: '1px solid #A7F3D0',
+              }}>
+                <div style={{
+                  fontSize: '20px',
+                  marginBottom: '8px',
+                }}>✅</div>
+                <div style={{ fontSize: '14px', fontWeight: '700', color: '#065F46', marginBottom: '6px' }}>
+                  현금 {targetWeights['현금성']}% 유지
+                </div>
+                <div style={{ fontSize: '11px', color: '#047857', lineHeight: '1.5' }}>
+                  평시 {baseTargetWeights['현금성'] || 10}% → 방어 {targetWeights['현금성']}%
+                  <br />
+                  CAPE 39 + 전쟁 = 현금 비중 상향
+                </div>
+              </div>
+
+              {/* 액션 2: 주식 비중 유지 */}
+              <div style={{
+                padding: '16px',
+                backgroundColor: '#FEF3C7',
+                borderRadius: '12px',
+                border: '1px solid #FDE68A',
+              }}>
+                <div style={{
+                  fontSize: '20px',
+                  marginBottom: '8px',
+                }}>⏸️</div>
+                <div style={{ fontSize: '14px', fontWeight: '700', color: '#92400E', marginBottom: '6px' }}>
+                  주식 비중 조절 보류
+                </div>
+                <div style={{ fontSize: '11px', color: '#B45309', lineHeight: '1.5' }}>
+                  추가 하락 가능성 있음
+                  <br />
+                  현금을 무기로 보유
+                </div>
+              </div>
+
+              {/* 액션 3: 분할 매수 */}
+              <div style={{
+                padding: '16px',
+                backgroundColor: '#E0F2FE',
+                borderRadius: '12px',
+                border: '1px solid #BAE6FD',
+              }}>
+                <div style={{
+                  fontSize: '20px',
+                  marginBottom: '8px',
+                }}>📅</div>
+                <div style={{ fontSize: '14px', fontWeight: '700', color: '#075985', marginBottom: '6px' }}>
+                  분할 매수만 (월 1-2회)
+                </div>
+                <div style={{ fontSize: '11px', color: '#0369A1', lineHeight: '1.5' }}>
+                  바닥 확인 전 올인 금지
+                  <br />
+                  확신 종목만 소량 매수
+                </div>
+              </div>
+            </div>
+
+            {/* 최종 결론 */}
+            <div style={{
+              padding: '16px 20px',
+              backgroundColor: '#F0FDF4',
+              borderRadius: '12px',
+              border: '2px solid #86EFAC',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+            }}>
+              <span style={{ fontSize: '32px' }}>💡</span>
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: '700', color: '#166534', marginBottom: '4px' }}>
+                  지금 당장 바꿀 것 없습니다
+                </div>
+                <div style={{ fontSize: '13px', color: '#15803D' }}>
+                  현금을 들고 기다리세요. 전문가 4인이 모두 "신중히, 인내심을 가지세요"라고 말합니다.
+                </div>
+              </div>
+            </div>
+
+            {/* 전문가 합의 배지 */}
+            <div style={{
+              marginTop: '16px',
+              padding: '12px 16px',
+              backgroundColor: '#1E293B',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+              flexWrap: 'wrap',
+            }}>
+              <span style={{ fontSize: '12px', color: '#94A3B8' }}>전문가 합의:</span>
+              {['👴 버핏: 현금 유지', '🦅 애크먼: 선별 매수', '🏛️ 아벨: 기회 대기', '🦉 멍거: 덜 행동'].map((expert, idx) => (
+                <span key={idx} style={{
+                  padding: '4px 10px',
+                  backgroundColor: '#334155',
+                  borderRadius: '6px',
+                  fontSize: '11px',
+                  color: '#E2E8F0',
+                }}>
+                  {expert}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 전문가 패널 */}
       <div style={{
