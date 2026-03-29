@@ -13,6 +13,7 @@ const CATEGORY_COLORS = {
   '암호화폐': '#F97316',
   '국내대형': '#EF4444',
   '국내중소': '#F97316',
+  '국내주식': '#EF4444',
   '채권': '#6B7280',
   'ETF': '#3B82F6',
   '신흥국': '#10B981',
@@ -20,220 +21,109 @@ const CATEGORY_COLORS = {
   '해외주식': '#3182F6',
   '배당주': '#10B981',
   'CMA': '#8B95A1',
+  '현금성': '#8B95A1',
   '퇴직연금': '#6366F1',
+  '연금': '#6366F1',
+  '나스닥': '#7C3AED',
 }
 
-// ========== 하우가 패밀리 데이터 (2026.03.29 기준) ==========
-const HAUGA_PORTFOLIOS = {
-  toss: {
-    name: '토스증권 해외주식',
-    icon: '🇺🇸',
-    target: [
-      { ticker: 'AMZN', name: '아마존', category: 'Big Tech', targetWeight: 65 },
-      { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 10 },
-      { ticker: 'MSFT', name: '마이크로소프트', category: 'Big Tech', targetWeight: 7 },
-      { ticker: 'META', name: '메타', category: 'Big Tech', targetWeight: 3 },
-      { ticker: 'BAC', name: '뱅크오브아메리카', category: '금융', targetWeight: 3 },
-      { ticker: 'SPY', name: 'SPY', category: 'ETF', targetWeight: 3 },
-      { ticker: '기타', name: '기타', category: 'ETF', targetWeight: 9 },
-    ],
-    holdings: [
-      { ticker: 'AMZN', name: '아마존', currentKRW: 365295, category: 'Big Tech' },
-      { ticker: 'GOOG', name: '알파벳 C', currentKRW: 58467, category: 'Big Tech' },
-      { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 41152, category: 'Big Tech' },
-      { ticker: 'META', name: '메타', currentKRW: 19672, category: 'Big Tech' },
-      { ticker: 'BAC', name: '뱅크오브아메리카', currentKRW: 19012, category: '금융' },
-      { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 16903, category: 'Big Tech' },
-      { ticker: 'SPY', name: 'SPY', currentKRW: 16890, category: 'ETF' },
-      { ticker: 'ISRG', name: '인튜이티브 서지컬', currentKRW: 7313, category: '헬스케어' },
-      { ticker: 'QCOM', name: '퀄컴', currentKRW: 6850, category: '반도체' },
-      { ticker: 'AVGO', name: '브로드컴', currentKRW: 2686, category: '반도체' },
-      { ticker: 'TSLA', name: '테슬라', currentKRW: 2687, category: 'Big Tech' },
-    ],
-  },
-  pension: {
-    name: '연금저축',
-    icon: '🧓',
-    target: [
-      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 75 },
-      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 25 },
-    ],
-    holdings: [
-      { name: 'KODEX 200', ticker: '069500', currentKRW: 1055925, category: '국내대형' },
-      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 337110, category: '국내중소' },
-    ],
-  },
-  isa: {
-    name: 'ISA',
-    icon: '📊',
-    target: [
-      { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 40 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 40 },
-      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20 },
-    ],
-    holdings: [
-      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 99150, category: '국내중소' },
-      { name: 'TIGER 미국채10년선물', ticker: '305080', currentKRW: 202875, category: '채권' },
-      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 195360, category: 'S&P500' },
-    ],
-  },
-  stock: {
-    name: '종합 해외주식',
-    icon: '🌍',
-    target: [
-      { ticker: 'CVX', name: '셰브론', category: '에너지', targetWeight: 45 },
-      { ticker: 'GOOG', name: '알파벳 C', category: 'Big Tech', targetWeight: 30 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 15 },
-      { ticker: '484790', name: '1Q 미국S&P500미국채혼합', category: 'ETF', targetWeight: 10 },
-    ],
-    holdings: [
-      { name: '셰브론', ticker: 'CVX', currentKRW: 636068, category: '에너지' },
-      { name: '알파벳 C', ticker: 'GOOG', currentKRW: 412337, category: 'Big Tech' },
-      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 170940, category: 'S&P500' },
-      { name: '1Q 미국S&P500미국채혼합', ticker: '484790', currentKRW: 116200, category: 'ETF' },
-      { name: '화이자', ticker: 'PFE', currentKRW: 50000, category: '헬스케어' },
-    ],
-  },
-  irp: {
-    name: 'IRP',
-    icon: '🏦',
-    target: [
-      { ticker: '예수금', name: 'IRP 예수금', category: '현금성', targetWeight: 100 },
-    ],
-    holdings: [
-      { name: 'IRP 예수금', ticker: '예수금', currentKRW: 250069, category: '현금성' },
-    ],
-  },
-  crypto: {
-    name: '암호화폐',
-    icon: '₿',
-    target: [
-      { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 100 },
-    ],
-    holdings: [
-      { ticker: 'BTC', name: '비트코인', currentKRW: 165490, category: '암호화폐' },
-    ],
-  },
+// ========== 하우가 패밀리 목표 비중 (카테고리별) ==========
+const HAUGA_TARGET_WEIGHTS = {
+  'Big Tech': 25,
+  'S&P500': 15,
+  '국내주식': 30,
+  '에너지': 10,
+  '반도체': 5,
+  '헬스케어': 3,
+  '금융': 2,
+  '채권': 5,
+  '암호화폐': 3,
+  '현금성': 2,
+  '연금': 0, // IRP 예수금은 별도
 }
 
-// ========== 가윤 달리오 데이터 (2026.03.29 기준) ==========
-const GAYOON_PORTFOLIOS = {
-  sp500: {
-    name: 'S&P500 + 배당주',
-    icon: '📈',
-    target: [
-      { ticker: 'VOO', name: 'Vanguard S&P500', category: '해외주식', targetWeight: 80 },
-      { ticker: 'SCHD', name: 'Schwab 배당주', category: '배당주', targetWeight: 20 },
-    ],
-    holdings: [
-      { ticker: 'VOO', name: 'Vanguard S&P500 ETF', currentKRW: 19317195 + 647620, category: '해외주식' },
-      { ticker: 'SCHD', name: 'Schwab 미국 배당주 ETF', currentKRW: 4584872, category: '배당주' },
-    ],
-  },
-  isa: {
-    name: 'ISA',
-    icon: '📊',
-    target: [
-      { ticker: '069500', name: 'KODEX 코스피200', category: '국내대형', targetWeight: 25 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 25 },
-      { ticker: '133690', name: 'TIGER 미국나스닥100', category: '나스닥', targetWeight: 15 },
-      { ticker: '195980', name: 'PLUS 신흥국MSCI', category: '신흥국', targetWeight: 15 },
-      { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10 },
-      { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10 },
-    ],
-    holdings: [
-      { ticker: '069500', name: 'KODEX 200', currentKRW: 5117175, category: '국내대형' },
-      { ticker: '360750', name: 'TIGER 미국S&P500', currentKRW: 4835160, category: 'S&P500' },
-      { ticker: '133690', name: 'TIGER 나스닥100', currentKRW: 2857680, category: '나스닥' },
-      { ticker: '195980', name: 'PLUS 신흥국MSCI', currentKRW: 2695055, category: '신흥국' },
-      { ticker: '305080', name: 'TIGER 미국채10년선물', currentKRW: 2069325, category: '채권' },
-      { ticker: '472150', name: 'KODEX 금액티브', currentKRW: 1806720, category: '금' },
-    ],
-  },
-  pension: {
-    name: '연금저축',
-    icon: '🧓',
-    target: [
-      { ticker: '069500', name: 'KODEX 200', category: '국내대형', targetWeight: 80 },
-      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20 },
-    ],
-    holdings: [
-      { ticker: '069500', name: 'KODEX 200', currentKRW: 4467375, category: '국내대형' },
-      { ticker: '229200', name: 'KODEX 코스닥150', currentKRW: 1070820, category: '국내중소' },
-    ],
-  },
-  amazon: {
-    name: '아마존 (한투)',
-    icon: '🛒',
-    target: [
-      { ticker: 'AMZN', name: '아마존', category: 'Big Tech', targetWeight: 100 },
-    ],
-    holdings: [
-      { ticker: 'AMZN', name: '아마존', currentKRW: 2702213, category: 'Big Tech' },
-    ],
-  },
-  irp: {
-    name: 'IRP',
-    icon: '🏦',
-    target: [
-      { ticker: 'TDF2025', name: 'TDF2025', category: '퇴직연금', targetWeight: 100 },
-    ],
-    holdings: [
-      { ticker: 'TDF2025', name: 'TDF2025 (IRP)', currentKRW: 265937, category: '퇴직연금' },
-    ],
-  },
-  cma: {
-    name: 'CMA',
-    icon: '💵',
-    target: [
-      { ticker: 'MMF', name: '발행어음CMA', category: 'CMA', targetWeight: 100 },
-    ],
-    holdings: [
-      { ticker: 'MMF', name: '발행어음CMA', currentKRW: 14030691, category: 'CMA' },
-    ],
-  },
-  crypto: {
-    name: '암호화폐',
-    icon: '₿',
-    target: [
-      { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 100 },
-    ],
-    holdings: [
-      { ticker: 'BTC', name: '비트코인', currentKRW: 1091846, category: '암호화폐' },
-    ],
-  },
+// ========== 가윤 달리오 목표 비중 (카테고리별) ==========
+const GAYOON_TARGET_WEIGHTS = {
+  'S&P500': 40,
+  '배당주': 8,
+  '국내주식': 18,
+  '나스닥': 5,
+  '신흥국': 4,
+  '채권': 4,
+  '금': 3,
+  'Big Tech': 5,
+  '암호화폐': 2,
+  '현금성': 10,
+  '연금': 1,
 }
 
-// 리밸런싱 계산
-const calculateRebalance = (target, holdings, totalKRW) => {
-  return target.map(t => {
-    const holding = holdings.find(h =>
-      h.ticker === t.ticker ||
-      h.name?.includes(t.name?.split(' ')[0]) ||
-      t.ticker?.includes(h.ticker)
-    )
-    const currentKRW = holding?.currentKRW || 0
-    const currentWeight = totalKRW > 0 ? (currentKRW / totalKRW) * 100 : 0
-    const targetKRW = totalKRW * (t.targetWeight / 100)
-    const diffKRW = targetKRW - currentKRW
-    const diffPercent = t.targetWeight - currentWeight
+// ========== 하우가 패밀리 전체 보유 종목 (2026.03.29 기준) ==========
+const HAUGA_ALL_HOLDINGS = [
+  // 토스증권 해외주식
+  { name: '아마존', ticker: 'AMZN', currentKRW: 365295, category: 'Big Tech', account: '토스' },
+  { name: '알파벳 C', ticker: 'GOOG', currentKRW: 58467, category: 'Big Tech', account: '토스' },
+  { name: '마이크로소프트', ticker: 'MSFT', currentKRW: 41152, category: 'Big Tech', account: '토스' },
+  { name: '메타', ticker: 'META', currentKRW: 19672, category: 'Big Tech', account: '토스' },
+  { name: '뱅크오브아메리카', ticker: 'BAC', currentKRW: 19012, category: '금융', account: '토스' },
+  { name: '알파벳 A', ticker: 'GOOGL', currentKRW: 16903, category: 'Big Tech', account: '토스' },
+  { name: 'SPY', ticker: 'SPY', currentKRW: 16890, category: 'S&P500', account: '토스' },
+  { name: '인튜이티브 서지컬', ticker: 'ISRG', currentKRW: 7313, category: '헬스케어', account: '토스' },
+  { name: '퀄컴', ticker: 'QCOM', currentKRW: 6850, category: '반도체', account: '토스' },
+  { name: '브로드컴', ticker: 'AVGO', currentKRW: 2686, category: '반도체', account: '토스' },
+  { name: '테슬라', ticker: 'TSLA', currentKRW: 2687, category: 'Big Tech', account: '토스' },
+  // 미래에셋 연금저축
+  { name: 'KODEX 200', ticker: '069500', currentKRW: 1055925, category: '국내주식', account: '연금' },
+  { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 337110, category: '국내주식', account: '연금' },
+  // 미래에셋 ISA
+  { name: 'KODEX 코스닥150', ticker: '229200_I', currentKRW: 99150, category: '국내주식', account: 'ISA' },
+  { name: 'TIGER 미국채10년선물', ticker: '305080', currentKRW: 202875, category: '채권', account: 'ISA' },
+  { name: 'TIGER 미국S&P500', ticker: '360750_I', currentKRW: 195360, category: 'S&P500', account: 'ISA' },
+  // 미래에셋 종합 (해외주식)
+  { name: '셰브론', ticker: 'CVX', currentKRW: 636068, category: '에너지', account: '종합' },
+  { name: '알파벳 C', ticker: 'GOOG_M', currentKRW: 412337, category: 'Big Tech', account: '종합' },
+  { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 170940, category: 'S&P500', account: '종합' },
+  { name: '1Q S&P500미국채혼합', ticker: '484790', currentKRW: 116200, category: 'S&P500', account: '종합' },
+  { name: '화이자', ticker: 'PFE', currentKRW: 50000, category: '헬스케어', account: '종합' },
+  // 미래에셋 IRP
+  { name: 'IRP 예수금', ticker: 'IRP', currentKRW: 250069, category: '연금', account: 'IRP' },
+  // 미래에셋 CMA
+  { name: 'CMA (가족여행)', ticker: 'CMA', currentKRW: 610106, category: '현금성', account: 'CMA' },
+  // 업비트 암호화폐
+  { name: '비트코인', ticker: 'BTC', currentKRW: 165490, category: '암호화폐', account: '업비트' },
+]
 
-    return {
-      ...t,
-      currentKRW,
-      currentWeight: Math.round(currentWeight * 100) / 100,
-      targetKRW: Math.round(targetKRW),
-      diffKRW: Math.round(diffKRW),
-      diffPercent: Math.round(diffPercent * 100) / 100,
-      action: diffKRW > 5000 ? 'buy' : diffKRW < -5000 ? 'sell' : 'hold'
-    }
-  })
-}
+// ========== 가윤 달리오 전체 보유 종목 (2026.03.29 기준) ==========
+const GAYOON_ALL_HOLDINGS = [
+  // 삼성증권 해외주식
+  { name: 'Vanguard S&P500', ticker: 'VOO', currentKRW: 19317195, category: 'S&P500', account: '삼성' },
+  { name: 'VOO (소수점)', ticker: 'VOO_P', currentKRW: 647620, category: 'S&P500', account: '삼성' },
+  { name: 'Schwab 배당주', ticker: 'SCHD', currentKRW: 4584872, category: '배당주', account: '삼성' },
+  { name: '케이뱅크', ticker: 'KBANK', currentKRW: 62700, category: '국내주식', account: '삼성' },
+  // 삼성증권 ISA
+  { name: 'KODEX 200', ticker: 'KODEX200_ISA', currentKRW: 5117175, category: '국내주식', account: 'ISA' },
+  { name: 'TIGER S&P500', ticker: 'TIGER_SP_ISA', currentKRW: 4835160, category: 'S&P500', account: 'ISA' },
+  { name: 'TIGER 나스닥100', ticker: 'TIGER_NAS', currentKRW: 2857680, category: '나스닥', account: 'ISA' },
+  { name: 'PLUS 신흥국MSCI', ticker: 'PLUS_EM', currentKRW: 2695055, category: '신흥국', account: 'ISA' },
+  { name: 'TIGER 미국채10년', ticker: 'TIGER_BD', currentKRW: 2069325, category: '채권', account: 'ISA' },
+  { name: 'KODEX 금액티브', ticker: 'KODEX_G', currentKRW: 1806720, category: '금', account: 'ISA' },
+  // 한투 해외주식
+  { name: '아마존', ticker: 'AMZN', currentKRW: 2702213, category: 'Big Tech', account: '한투' },
+  // 미래에셋 연금저축
+  { name: 'KODEX 200', ticker: 'KODEX200_P', currentKRW: 4467375, category: '국내주식', account: '연금' },
+  { name: 'KODEX 코스닥150', ticker: 'KODEX150_P', currentKRW: 1070820, category: '국내주식', account: '연금' },
+  // 미래에셋 CMA
+  { name: '발행어음CMA', ticker: 'CMA', currentKRW: 14030691, category: '현금성', account: 'CMA' },
+  // 미래에셋 IRP
+  { name: 'TDF2025', ticker: 'TDF2025', currentKRW: 265937, category: '연금', account: 'IRP' },
+  // 업비트 암호화폐
+  { name: '비트코인', ticker: 'BTC', currentKRW: 1091846, category: '암호화폐', account: '업비트' },
+]
 
 export default function RebalancePage() {
   const [isMobile, setIsMobile] = useState(false)
   const [mainTab, setMainTab] = useState('hauga') // 'hauga' or 'gayoon'
-  const [selectedAccount, setSelectedAccount] = useState('toss')
+  const [sortBy, setSortBy] = useState('amount') // 'amount', 'weight', 'category'
+  const [filterCategory, setFilterCategory] = useState('all')
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -242,28 +132,114 @@ export default function RebalancePage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // 탭 변경 시 계좌 초기화
-  useEffect(() => {
-    setSelectedAccount(mainTab === 'hauga' ? 'toss' : 'sp500')
-  }, [mainTab])
+  // 전체 보유 종목
+  const allHoldings = mainTab === 'hauga' ? HAUGA_ALL_HOLDINGS : GAYOON_ALL_HOLDINGS
+  const targetWeights = mainTab === 'hauga' ? HAUGA_TARGET_WEIGHTS : GAYOON_TARGET_WEIGHTS
+  const totalKRW = allHoldings.reduce((sum, h) => sum + h.currentKRW, 0)
 
-  const portfolios = mainTab === 'hauga' ? HAUGA_PORTFOLIOS : GAYOON_PORTFOLIOS
-  const portfolio = portfolios[selectedAccount]
-  const totalKRW = portfolio?.holdings.reduce((sum, h) => sum + h.currentKRW, 0) || 0
-  const rebalanceData = portfolio ? calculateRebalance(portfolio.target, portfolio.holdings, totalKRW) : []
+  // 비중 계산된 종목 리스트
+  const holdingsWithWeight = allHoldings.map(h => ({
+    ...h,
+    weight: (h.currentKRW / totalKRW) * 100
+  }))
 
-  // 리밸런싱 필요 여부
-  const needsRebalance = rebalanceData.some(item => Math.abs(item.diffPercent) > 5)
-  const totalBuy = rebalanceData.filter(i => i.action === 'buy').reduce((sum, i) => sum + i.diffKRW, 0)
-  const totalSell = rebalanceData.filter(i => i.action === 'sell').reduce((sum, i) => sum + Math.abs(i.diffKRW), 0)
+  // 카테고리별 합계
+  const categoryTotals = allHoldings.reduce((acc, h) => {
+    const cat = h.category || '기타'
+    acc[cat] = (acc[cat] || 0) + h.currentKRW
+    return acc
+  }, {})
 
-  // 목표 달성률
-  const achievementRate = rebalanceData.reduce((sum, item) => {
-    const rate = item.targetWeight > 0
-      ? Math.min(100, (item.currentWeight / item.targetWeight) * 100)
-      : 100
-    return sum + rate * (item.targetWeight / 100)
-  }, 0)
+  // 카테고리별 종목 그룹핑
+  const categoryHoldings = allHoldings.reduce((acc, h) => {
+    const cat = h.category || '기타'
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(h.name)
+    return acc
+  }, {})
+
+  // 리밸런싱 의견 계산
+  const getRebalanceRecommendations = () => {
+    const recommendations = []
+
+    Object.entries(categoryTotals).forEach(([cat, amount]) => {
+      const currentWeight = (amount / totalKRW) * 100
+      const targetWeight = targetWeights[cat] || 0
+      const diff = targetWeight - currentWeight
+      const diffKRW = (diff / 100) * totalKRW
+
+      let action = '유지'
+      let actionColor = '#8B95A1'
+      let icon = '⚪'
+
+      if (diff > 2) {
+        action = '매수'
+        actionColor = '#2E7D32'
+        icon = '🟢'
+      } else if (diff < -2) {
+        action = '매도'
+        actionColor = '#C62828'
+        icon = '🔴'
+      } else if (diff > 0.5) {
+        action = '소량 매수'
+        actionColor = '#66BB6A'
+        icon = '🟡'
+      } else if (diff < -0.5) {
+        action = '소량 매도'
+        actionColor = '#EF5350'
+        icon = '🟡'
+      }
+
+      recommendations.push({
+        category: cat,
+        currentWeight,
+        targetWeight,
+        diff,
+        diffKRW,
+        action,
+        actionColor,
+        icon,
+        holdings: categoryHoldings[cat] || [],
+      })
+    })
+
+    // 목표에 있지만 현재 보유하지 않은 카테고리
+    Object.entries(targetWeights).forEach(([cat, target]) => {
+      if (!categoryTotals[cat] && target > 0) {
+        recommendations.push({
+          category: cat,
+          currentWeight: 0,
+          targetWeight: target,
+          diff: target,
+          diffKRW: (target / 100) * totalKRW,
+          action: '신규 매수',
+          actionColor: '#1565C0',
+          icon: '🔵',
+          holdings: [],
+        })
+      }
+    })
+
+    return recommendations.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff))
+  }
+
+  const recommendations = getRebalanceRecommendations()
+
+  // 정렬
+  const sortedHoldings = [...holdingsWithWeight].sort((a, b) => {
+    if (sortBy === 'amount') return b.currentKRW - a.currentKRW
+    if (sortBy === 'weight') return b.weight - a.weight
+    if (sortBy === 'category') return (a.category || '').localeCompare(b.category || '')
+    return 0
+  })
+
+  // 필터링
+  const filteredHoldings = filterCategory === 'all'
+    ? sortedHoldings
+    : sortedHoldings.filter(h => h.category === filterCategory)
+
+  // 카테고리 목록
+  const categories = Object.keys(categoryTotals).sort((a, b) => categoryTotals[b] - categoryTotals[a])
 
   const styles = {
     container: {
@@ -314,53 +290,50 @@ export default function RebalancePage() {
       color: '#8B95A1',
       marginTop: '4px',
     },
-    tabs: {
+    filterRow: {
       display: 'flex',
-      gap: '8px',
+      gap: '12px',
       marginBottom: '24px',
       flexWrap: 'wrap',
-    },
-    tab: (isActive) => ({
-      padding: '10px 16px',
-      borderRadius: '12px',
-      border: 'none',
-      backgroundColor: isActive ? '#3182F6' : '#F2F4F6',
-      color: isActive ? 'white' : '#4E5968',
-      fontSize: '14px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      display: 'flex',
       alignItems: 'center',
-      gap: '6px',
-      transition: 'all 0.2s',
-    }),
+    },
+    select: {
+      padding: '10px 14px',
+      borderRadius: '10px',
+      border: '1px solid #E5E8EB',
+      backgroundColor: 'white',
+      fontSize: '13px',
+      fontWeight: '500',
+      color: '#191F28',
+      cursor: 'pointer',
+    },
     summaryGrid: {
       display: 'grid',
-      gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+      gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)',
       gap: '16px',
       marginBottom: '24px',
     },
-    summaryCard: {
-      backgroundColor: 'white',
+    summaryCard: (highlight) => ({
+      backgroundColor: highlight ? '#3182F6' : 'white',
       borderRadius: '16px',
       padding: '20px',
-      border: '1px solid #E5E8EB',
-    },
-    summaryLabel: {
-      fontSize: '13px',
-      color: '#8B95A1',
-      marginBottom: '8px',
-    },
-    summaryValue: {
-      fontSize: '24px',
-      fontWeight: '700',
-      color: '#191F28',
-    },
-    summarySubtext: {
+      border: highlight ? 'none' : '1px solid #E5E8EB',
+    }),
+    summaryLabel: (highlight) => ({
       fontSize: '12px',
-      color: '#8B95A1',
+      color: highlight ? 'rgba(255,255,255,0.8)' : '#8B95A1',
+      marginBottom: '8px',
+    }),
+    summaryValue: (highlight) => ({
+      fontSize: isMobile ? '18px' : '22px',
+      fontWeight: '700',
+      color: highlight ? 'white' : '#191F28',
+    }),
+    summarySubtext: (highlight) => ({
+      fontSize: '11px',
+      color: highlight ? 'rgba(255,255,255,0.7)' : '#8B95A1',
       marginTop: '4px',
-    },
+    }),
     card: {
       backgroundColor: 'white',
       borderRadius: '16px',
@@ -384,7 +357,7 @@ export default function RebalancePage() {
       width: '100%',
       borderCollapse: 'collapse',
     },
-    th: {
+    th: (clickable) => ({
       textAlign: 'left',
       padding: '12px 8px',
       fontSize: '12px',
@@ -392,60 +365,35 @@ export default function RebalancePage() {
       color: '#8B95A1',
       borderBottom: '1px solid #E5E8EB',
       whiteSpace: 'nowrap',
-    },
+      cursor: clickable ? 'pointer' : 'default',
+    }),
     td: {
       padding: '14px 8px',
       fontSize: '13px',
       color: '#191F28',
       borderBottom: '1px solid #F2F4F6',
     },
-    badge: (action) => ({
+    accountBadge: {
       display: 'inline-block',
-      padding: '4px 10px',
-      borderRadius: '6px',
-      fontSize: '11px',
+      padding: '3px 8px',
+      borderRadius: '4px',
+      fontSize: '10px',
       fontWeight: '600',
-      backgroundColor: action === 'buy' ? '#E8F5E9' : action === 'sell' ? '#FFEBEE' : '#F2F4F6',
-      color: action === 'buy' ? '#2E7D32' : action === 'sell' ? '#C62828' : '#6B7684',
-    }),
-    barContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
+      backgroundColor: '#F2F4F6',
+      color: '#6B7684',
     },
     barWrapper: {
-      flex: 1,
-      height: '8px',
+      width: '100%',
+      height: '6px',
       backgroundColor: '#F2F4F6',
-      borderRadius: '4px',
+      borderRadius: '3px',
       overflow: 'hidden',
-      position: 'relative',
     },
-    barTarget: {
-      position: 'absolute',
+    barFill: (color, width) => ({
       height: '100%',
-      backgroundColor: '#E5E8EB',
-      borderRadius: '4px',
-    },
-    barCurrent: (color) => ({
-      position: 'absolute',
-      height: '100%',
+      width: `${width}%`,
       backgroundColor: color,
-      borderRadius: '4px',
-    }),
-    diffText: (isPositive) => ({
-      fontSize: '12px',
-      fontWeight: '600',
-      color: isPositive ? '#2E7D32' : '#C62828',
-    }),
-    statusBadge: (needsRebalance) => ({
-      display: 'inline-block',
-      padding: '6px 12px',
-      borderRadius: '8px',
-      fontSize: '13px',
-      fontWeight: '600',
-      backgroundColor: needsRebalance ? '#FFF3E0' : '#E8F5E9',
-      color: needsRebalance ? '#E65100' : '#2E7D32',
+      borderRadius: '3px',
     }),
     colorDot: (color) => ({
       width: '10px',
@@ -454,28 +402,61 @@ export default function RebalancePage() {
       backgroundColor: color,
       flexShrink: 0,
     }),
-    emptyState: {
-      textAlign: 'center',
-      padding: '60px 20px',
-      color: '#8B95A1',
-    },
-    emptyIcon: {
-      fontSize: '48px',
+    categoryBar: {
+      display: 'flex',
+      height: '24px',
+      borderRadius: '8px',
+      overflow: 'hidden',
       marginBottom: '16px',
     },
+    categorySegment: (color, width) => ({
+      width: `${width}%`,
+      backgroundColor: color,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      fontSize: '10px',
+      fontWeight: '600',
+    }),
+    categoryList: {
+      display: 'grid',
+      gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+      gap: '12px',
+    },
+    categoryItem: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: '10px',
+      padding: '12px',
+      backgroundColor: '#F7F8FA',
+      borderRadius: '10px',
+    },
+    categoryDot: (color) => ({
+      width: '12px',
+      height: '12px',
+      borderRadius: '4px',
+      backgroundColor: color,
+      marginTop: '2px',
+    }),
+    holdingTag: {
+      display: 'inline-block',
+      padding: '3px 8px',
+      borderRadius: '4px',
+      fontSize: '11px',
+      fontWeight: '500',
+      backgroundColor: '#E5E8EB',
+      color: '#4E5968',
+      marginRight: '4px',
+      marginTop: '4px',
+    },
   }
-
-  const accounts = Object.entries(portfolios).map(([key, val]) => ({
-    key,
-    name: val.name,
-    icon: val.icon,
-  }))
 
   return (
     <div style={styles.container}>
       <div style={styles.header}>
         <h1 style={styles.title}>⚖️ 리밸런싱</h1>
-        <p style={styles.subtitle}>목표 비중과 현재 비중을 비교하여 리밸런싱 필요 금액을 확인하세요</p>
+        <p style={styles.subtitle}>전체 보유 종목의 현재 비중을 확인하세요</p>
       </div>
 
       {/* 메인 탭: 하우가 패밀리 vs 가윤 달리오 */}
@@ -486,7 +467,7 @@ export default function RebalancePage() {
         >
           <div style={styles.mainTabEmoji}>☁️</div>
           <div style={styles.mainTabName(mainTab === 'hauga')}>하우가 패밀리</div>
-          <div style={styles.mainTabSub}>하늘 포트폴리오</div>
+          <div style={styles.mainTabSub}>{allHoldings.length}개 종목</div>
         </div>
         <div
           style={styles.mainTab(mainTab === 'gayoon')}
@@ -494,193 +475,277 @@ export default function RebalancePage() {
         >
           <div style={styles.mainTabEmoji}>🐰</div>
           <div style={styles.mainTabName(mainTab === 'gayoon')}>가윤 달리오</div>
-          <div style={styles.mainTabSub}>가윤 포트폴리오</div>
+          <div style={styles.mainTabSub}>{GAYOON_ALL_HOLDINGS.length}개 종목</div>
         </div>
       </div>
 
-      {/* 계좌 탭 */}
-      <div style={styles.tabs}>
-        {accounts.map(acc => (
-          <button
-            key={acc.key}
-            style={styles.tab(selectedAccount === acc.key)}
-            onClick={() => setSelectedAccount(acc.key)}
-          >
-            <span>{acc.icon}</span>
-            <span>{acc.name}</span>
-          </button>
-        ))}
+      {/* 필터/정렬 */}
+      <div style={styles.filterRow}>
+        <select
+          style={styles.select}
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="amount">금액순</option>
+          <option value="weight">비중순</option>
+          <option value="category">카테고리순</option>
+        </select>
+        <select
+          style={styles.select}
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+        >
+          <option value="all">전체 카테고리</option>
+          {categories.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
       </div>
 
       {/* 요약 카드 */}
       <div style={styles.summaryGrid}>
-        <div style={styles.summaryCard}>
-          <div style={styles.summaryLabel}>총 자산</div>
-          <div style={styles.summaryValue}>{totalKRW.toLocaleString()}원</div>
-          <div style={styles.summarySubtext}>{(totalKRW / 10000).toFixed(1)}만원</div>
+        <div style={styles.summaryCard(false)}>
+          <div style={styles.summaryLabel(false)}>총 자산</div>
+          <div style={styles.summaryValue(false)}>{(totalKRW / 10000).toFixed(0)}만</div>
+          <div style={styles.summarySubtext(false)}>₩{totalKRW.toLocaleString()}</div>
         </div>
-        <div style={styles.summaryCard}>
-          <div style={styles.summaryLabel}>목표 달성률</div>
-          <div style={styles.summaryValue}>{achievementRate.toFixed(1)}%</div>
-          <div style={styles.summarySubtext}>
-            {achievementRate >= 95 ? '🎯 목표 근접' : achievementRate >= 80 ? '📈 양호' : '⚠️ 조정 필요'}
+        <div style={styles.summaryCard(false)}>
+          <div style={styles.summaryLabel(false)}>보유 종목</div>
+          <div style={styles.summaryValue(false)}>{allHoldings.length}개</div>
+          <div style={styles.summarySubtext(false)}>{categories.length}개 카테고리</div>
+        </div>
+        <div style={styles.summaryCard(true)}>
+          <div style={styles.summaryLabel(true)}>조정 필요</div>
+          <div style={styles.summaryValue(true)}>
+            {recommendations.filter(r => r.action !== '유지').length}건
+          </div>
+          <div style={styles.summarySubtext(true)}>
+            매수 {recommendations.filter(r => r.action.includes('매수')).length} /
+            매도 {recommendations.filter(r => r.action.includes('매도')).length}
           </div>
         </div>
-        <div style={styles.summaryCard}>
-          <div style={styles.summaryLabel}>리밸런싱 필요</div>
-          <div style={{ ...styles.summaryValue, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={styles.statusBadge(needsRebalance)}>
-              {needsRebalance ? '조정 필요' : '균형 상태'}
-            </span>
+        <div style={styles.summaryCard(false)}>
+          <div style={styles.summaryLabel(false)}>표시 종목</div>
+          <div style={styles.summaryValue(false)}>{filteredHoldings.length}개</div>
+          <div style={styles.summarySubtext(false)}>
+            {filterCategory === 'all' ? '전체' : filterCategory}
           </div>
-          {needsRebalance && (
-            <div style={styles.summarySubtext}>
-              매수 +{totalBuy.toLocaleString()}원 / 매도 -{totalSell.toLocaleString()}원
-            </div>
-          )}
         </div>
       </div>
 
-      {/* 비중 비교 테이블 */}
+      {/* 카테고리별 비중 */}
       <div style={styles.card}>
         <div style={styles.cardTitle}>
-          <span>{portfolio?.icon}</span>
-          <span>{portfolio?.name} 비중 비교</span>
+          <span>📊</span>
+          <span>카테고리별 비중</span>
         </div>
 
-        {portfolio?.holdings.length === 0 ? (
-          <div style={styles.emptyState}>
-            <div style={styles.emptyIcon}>📭</div>
-            <p>아직 보유 종목이 없습니다</p>
-            <p style={{ fontSize: '13px', marginTop: '8px' }}>
-              목표 비중에 맞게 종목을 매수해보세요
-            </p>
-          </div>
-        ) : (
-          <div style={styles.tableWrapper}>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>종목</th>
-                  <th style={{ ...styles.th, textAlign: 'center' }}>목표</th>
-                  <th style={{ ...styles.th, textAlign: 'center' }}>현재</th>
-                  <th style={styles.th}>비중 비교</th>
-                  <th style={{ ...styles.th, textAlign: 'right' }}>편차</th>
-                  <th style={{ ...styles.th, textAlign: 'right' }}>조정 금액</th>
-                  <th style={{ ...styles.th, textAlign: 'center' }}>액션</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rebalanceData.map((item, idx) => {
-                  const color = CATEGORY_COLORS[item.category] || '#9CA3AF'
-                  const maxWeight = Math.max(item.targetWeight, item.currentWeight, 1)
+        <div style={styles.categoryBar}>
+          {Object.entries(categoryTotals)
+            .sort((a, b) => b[1] - a[1])
+            .map(([cat, amount]) => {
+              const percent = (amount / totalKRW) * 100
+              const color = CATEGORY_COLORS[cat] || '#9CA3AF'
+              return (
+                <div
+                  key={cat}
+                  style={styles.categorySegment(color, percent)}
+                  title={`${cat}: ${percent.toFixed(1)}%`}
+                >
+                  {percent >= 8 ? `${percent.toFixed(0)}%` : ''}
+                </div>
+              )
+            })}
+        </div>
 
+        <div style={styles.categoryList}>
+          {Object.entries(categoryTotals)
+            .sort((a, b) => b[1] - a[1])
+            .map(([cat, amount]) => {
+              const percent = (amount / totalKRW) * 100
+              const color = CATEGORY_COLORS[cat] || '#9CA3AF'
+              const holdings = categoryHoldings[cat] || []
+              return (
+                <div key={cat} style={styles.categoryItem}>
+                  <div style={styles.categoryDot(color)} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28' }}>{cat}</div>
+                      <div style={{ fontSize: '13px', fontWeight: '700', color: '#191F28' }}>
+                        {percent.toFixed(1)}%
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#8B95A1', marginTop: '2px' }}>
+                      {(amount / 10000).toFixed(0)}만원
+                    </div>
+                    <div style={{ marginTop: '6px' }}>
+                      {holdings.map((name, idx) => (
+                        <span key={idx} style={styles.holdingTag}>{name}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+        </div>
+      </div>
+
+      {/* 리밸런싱 의견 */}
+      <div style={styles.card}>
+        <div style={styles.cardTitle}>
+          <span>💡</span>
+          <span>리밸런싱 의견</span>
+        </div>
+
+        <div style={styles.tableWrapper}>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th(false)}>카테고리</th>
+                <th style={{ ...styles.th(false), textAlign: 'center' }}>현재</th>
+                <th style={{ ...styles.th(false), textAlign: 'center' }}>목표</th>
+                <th style={{ ...styles.th(false), textAlign: 'center' }}>차이</th>
+                <th style={{ ...styles.th(false), textAlign: 'center' }}>의견</th>
+                <th style={{ ...styles.th(false), textAlign: 'right' }}>조정 금액</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recommendations
+                .filter(r => r.action !== '유지')
+                .map((rec, idx) => {
+                  const color = CATEGORY_COLORS[rec.category] || '#9CA3AF'
                   return (
                     <tr key={idx}>
                       <td style={styles.td}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <div style={styles.colorDot(color)} />
                           <div>
-                            <div style={{ fontWeight: '600' }}>{item.name}</div>
-                            <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.category}</div>
+                            <div style={{ fontWeight: '600' }}>{rec.category}</div>
+                            {rec.holdings.length > 0 && (
+                              <div style={{ fontSize: '10px', color: '#8B95A1', marginTop: '2px' }}>
+                                {rec.holdings.slice(0, 3).join(', ')}
+                                {rec.holdings.length > 3 && ` 외 ${rec.holdings.length - 3}개`}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>
                       <td style={{ ...styles.td, textAlign: 'center', fontWeight: '600' }}>
-                        {item.targetWeight}%
+                        {rec.currentWeight.toFixed(1)}%
+                      </td>
+                      <td style={{ ...styles.td, textAlign: 'center', fontWeight: '600', color: '#3182F6' }}>
+                        {rec.targetWeight.toFixed(1)}%
+                      </td>
+                      <td style={{
+                        ...styles.td,
+                        textAlign: 'center',
+                        fontWeight: '600',
+                        color: rec.diff > 0 ? '#2E7D32' : '#C62828'
+                      }}>
+                        {rec.diff > 0 ? '+' : ''}{rec.diff.toFixed(1)}%
                       </td>
                       <td style={{ ...styles.td, textAlign: 'center' }}>
-                        {item.currentWeight.toFixed(1)}%
-                      </td>
-                      <td style={styles.td}>
-                        <div style={styles.barContainer}>
-                          <div style={styles.barWrapper}>
-                            <div
-                              style={{
-                                ...styles.barTarget,
-                                width: `${(item.targetWeight / maxWeight) * 100}%`
-                              }}
-                            />
-                            <div
-                              style={{
-                                ...styles.barCurrent(color),
-                                width: `${(item.currentWeight / maxWeight) * 100}%`
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'right' }}>
-                        <span style={styles.diffText(item.diffPercent >= 0)}>
-                          {item.diffPercent >= 0 ? '+' : ''}{item.diffPercent.toFixed(1)}%
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          backgroundColor: rec.action.includes('매수') ? '#E8F5E9' : '#FFEBEE',
+                          color: rec.actionColor,
+                          fontSize: '12px',
+                          fontWeight: '600',
+                        }}>
+                          {rec.icon} {rec.action}
                         </span>
                       </td>
-                      <td style={{ ...styles.td, textAlign: 'right' }}>
-                        <span style={styles.diffText(item.diffKRW >= 0)}>
-                          {item.diffKRW >= 0 ? '+' : ''}{item.diffKRW.toLocaleString()}원
-                        </span>
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' }}>
-                        <span style={styles.badge(item.action)}>
-                          {item.action === 'buy' ? '매수' : item.action === 'sell' ? '매도' : '유지'}
-                        </span>
+                      <td style={{
+                        ...styles.td,
+                        textAlign: 'right',
+                        fontWeight: '600',
+                        color: rec.diff > 0 ? '#2E7D32' : '#C62828'
+                      }}>
+                        {rec.diff > 0 ? '+' : ''}{(rec.diffKRW / 10000).toFixed(0)}만원
                       </td>
                     </tr>
                   )
                 })}
-              </tbody>
-            </table>
+            </tbody>
+          </table>
+        </div>
+
+        {recommendations.filter(r => r.action !== '유지').length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#8B95A1' }}>
+            <div style={{ fontSize: '32px', marginBottom: '12px' }}>✅</div>
+            <div>포트폴리오가 목표 비중과 잘 맞습니다!</div>
           </div>
         )}
       </div>
 
-      {/* 리밸런싱 액션 요약 */}
-      {needsRebalance && (
-        <div style={styles.card}>
-          <div style={styles.cardTitle}>
-            <span>📋</span>
-            <span>리밸런싱 액션 요약</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {rebalanceData.filter(i => i.action !== 'hold').map((item, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px 16px',
-                  backgroundColor: item.action === 'buy' ? '#E8F5E9' : '#FFEBEE',
-                  borderRadius: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '20px' }}>
-                    {item.action === 'buy' ? '📈' : '📉'}
-                  </span>
-                  <div>
-                    <div style={{ fontWeight: '600', color: '#191F28' }}>{item.name}</div>
-                    <div style={{ fontSize: '12px', color: '#8B95A1' }}>
-                      {item.currentWeight.toFixed(1)}% → {item.targetWeight}%
-                    </div>
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{
-                    fontWeight: '700',
-                    color: item.action === 'buy' ? '#2E7D32' : '#C62828',
-                  }}>
-                    {item.action === 'buy' ? '+' : ''}{item.diffKRW.toLocaleString()}원
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#8B95A1' }}>
-                    {item.action === 'buy' ? '매수' : '매도'}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* 전체 종목 테이블 */}
+      <div style={styles.card}>
+        <div style={styles.cardTitle}>
+          <span>📋</span>
+          <span>전체 보유 종목</span>
         </div>
-      )}
+
+        <div style={styles.tableWrapper}>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th(true)} onClick={() => setSortBy('category')}>
+                  종목 {sortBy === 'category' && '▼'}
+                </th>
+                <th style={{ ...styles.th(false), textAlign: 'center' }}>계좌</th>
+                <th style={{ ...styles.th(true), textAlign: 'right' }} onClick={() => setSortBy('amount')}>
+                  금액 {sortBy === 'amount' && '▼'}
+                </th>
+                <th style={{ ...styles.th(true), textAlign: 'right' }} onClick={() => setSortBy('weight')}>
+                  비중 {sortBy === 'weight' && '▼'}
+                </th>
+                <th style={styles.th(false)}>비중 바</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredHoldings.map((item, idx) => {
+                const color = CATEGORY_COLORS[item.category] || '#9CA3AF'
+                const maxWeight = sortedHoldings[0]?.weight || 1
+
+                return (
+                  <tr key={idx}>
+                    <td style={styles.td}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={styles.colorDot(color)} />
+                        <div>
+                          <div style={{ fontWeight: '600' }}>{item.name}</div>
+                          <div style={{ fontSize: '11px', color: '#8B95A1' }}>{item.category}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ ...styles.td, textAlign: 'center' }}>
+                      <span style={styles.accountBadge}>{item.account}</span>
+                    </td>
+                    <td style={{ ...styles.td, textAlign: 'right', fontWeight: '600' }}>
+                      {item.currentKRW >= 10000
+                        ? `${(item.currentKRW / 10000).toFixed(0)}만`
+                        : `${item.currentKRW.toLocaleString()}원`
+                      }
+                    </td>
+                    <td style={{ ...styles.td, textAlign: 'right', fontWeight: '600' }}>
+                      {item.weight.toFixed(1)}%
+                    </td>
+                    <td style={{ ...styles.td, width: '100px' }}>
+                      <div style={styles.barWrapper}>
+                        <div style={styles.barFill(color, (item.weight / maxWeight) * 100)} />
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   )
 }

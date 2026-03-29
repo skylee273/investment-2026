@@ -216,6 +216,18 @@ export default function MonthlyReportPage() {
     return acc
   }, {})
 
+  // 카테고리별 종목 그룹핑
+  const categoryHoldings = (monthData?.holdings || []).reduce((acc, h) => {
+    const cat = h.category || '기타'
+    if (!acc[cat]) acc[cat] = []
+    // 중복 제거 (같은 이름 종목)
+    const shortName = h.name.replace(/\s*\([^)]*\)/g, '') // 괄호 제거
+    if (!acc[cat].includes(shortName)) {
+      acc[cat].push(shortName)
+    }
+    return acc
+  }, {})
+
   // 스냅샷 저장
   const saveSnapshot = () => {
     const yearMonth = selectedMonth
@@ -403,7 +415,7 @@ export default function MonthlyReportPage() {
     },
     categoryItem: {
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       gap: '10px',
       padding: '12px',
       backgroundColor: '#F7F8FA',
@@ -414,7 +426,19 @@ export default function MonthlyReportPage() {
       height: '12px',
       borderRadius: '4px',
       backgroundColor: color,
+      marginTop: '2px',
     }),
+    holdingTag: {
+      display: 'inline-block',
+      padding: '2px 6px',
+      borderRadius: '4px',
+      fontSize: '10px',
+      fontWeight: '500',
+      backgroundColor: '#E5E8EB',
+      color: '#4E5968',
+      marginRight: '4px',
+      marginTop: '4px',
+    },
     emptyState: {
       textAlign: 'center',
       padding: '60px 20px',
@@ -585,17 +609,27 @@ export default function MonthlyReportPage() {
                 .map(([cat, amount]) => {
                   const percent = (amount / monthData.totalKRW) * 100
                   const color = CATEGORY_COLORS[cat] || '#9CA3AF'
+                  const holdings = categoryHoldings[cat] || []
                   return (
                     <div key={cat} style={styles.categoryItem}>
                       <div style={styles.categoryDot(color)} />
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28' }}>{cat}</div>
-                        <div style={{ fontSize: '11px', color: '#8B95A1' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28' }}>{cat}</div>
+                          <div style={{ fontSize: '13px', fontWeight: '700', color: '#191F28' }}>
+                            {percent.toFixed(1)}%
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#8B95A1', marginTop: '2px' }}>
                           {(amount / 10000).toFixed(0)}만원
                         </div>
-                      </div>
-                      <div style={{ fontSize: '13px', fontWeight: '700', color: '#191F28' }}>
-                        {percent.toFixed(1)}%
+                        {holdings.length > 0 && (
+                          <div style={{ marginTop: '6px' }}>
+                            {holdings.map((name, idx) => (
+                              <span key={idx} style={styles.holdingTag}>{name}</span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )
