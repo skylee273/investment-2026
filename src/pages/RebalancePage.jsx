@@ -27,74 +27,133 @@ const CATEGORY_COLORS = {
   '나스닥': '#7C3AED',
 }
 
-// ========== 워렌 버핏 스타일 의견 ==========
-const BUFFETT_ADVICE = {
-  'Big Tech': {
-    buy: '기술 해자가 깊은 기업에 투자하세요. 이들은 10년 후에도 시장을 지배할 것입니다.',
-    sell: '과도한 집중은 위험합니다. 훌륭한 기업도 적정 비중을 유지해야 합니다.',
-  },
-  'S&P500': {
-    buy: '미국 500대 기업에 분산투자하는 것은 가장 안전한 장기 전략입니다.',
-    sell: '인덱스 비중이 너무 높으면 개별 우량주의 초과수익 기회를 놓칩니다.',
-  },
-  '국내주식': {
-    buy: '한국 시장은 저평가되어 있습니다. 장기적으로 가치가 회복될 것입니다.',
-    sell: '홈 바이어스를 경계하세요. 글로벌 분산이 리스크를 줄입니다.',
-  },
-  '에너지': {
-    buy: '에너지는 문명의 기반입니다. 배당과 함께 인플레이션 헤지 역할을 합니다.',
-    sell: '에너지 섹터는 변동성이 큽니다. 과도한 노출은 피하세요.',
-  },
-  '반도체': {
-    buy: 'AI 시대의 핵심 인프라입니다. 장기 성장 잠재력이 높습니다.',
-    sell: '사이클 산업입니다. 과열 시 비중 조절이 필요합니다.',
-  },
-  '헬스케어': {
-    buy: '고령화 사회에서 수요는 계속 증가합니다. 방어적이면서 성장하는 섹터입니다.',
-    sell: '규제 리스크가 있습니다. 다른 성장 섹터와 균형을 맞추세요.',
-  },
-  '금융': {
-    buy: '금리 상승기에 은행은 이익이 증가합니다. 경기 회복의 수혜를 받습니다.',
-    sell: '금융 위기에 취약합니다. 방어적 자산과 균형을 맞추세요.',
-  },
-  '채권': {
-    buy: '주식 하락기에 포트폴리오를 보호합니다. 안정적인 현금흐름을 제공합니다.',
-    sell: '인플레이션이 높을 때 실질 수익률이 낮아집니다.',
-  },
-  '암호화폐': {
-    buy: '소량의 비트코인은 인플레이션 헤지와 분산 효과가 있습니다.',
-    sell: '투기 자산의 비중은 낮게 유지하세요. 잃어도 괜찮은 금액만 투자하세요.',
-  },
-  '현금성': {
-    buy: '현금은 기회입니다. 시장 폭락 시 저가 매수의 총알이 됩니다.',
-    sell: '현금은 인플레이션에 잠식됩니다. 장기적으로 주식이 더 나은 선택입니다.',
-  },
-  '배당주': {
-    buy: '꾸준한 배당은 복리의 마법을 만듭니다. 시간이 당신 편입니다.',
-    sell: '배당주도 분산이 필요합니다. 한 섹터에 집중하지 마세요.',
-  },
-  '나스닥': {
-    buy: '기술 혁신의 최전선입니다. 장기 성장을 원한다면 필수입니다.',
-    sell: '고성장 기업은 변동성이 큽니다. 안정적 자산과 균형을 맞추세요.',
-  },
-  '신흥국': {
-    buy: '신흥국은 성장 잠재력이 높습니다. 글로벌 분산의 핵심입니다.',
-    sell: '정치적 리스크가 있습니다. 선진국 비중과 균형을 맞추세요.',
-  },
-  '금': {
-    buy: '금은 수천 년간 가치를 보존해왔습니다. 위기 시 안전자산 역할을 합니다.',
-    sell: '금은 현금흐름이 없습니다. 주식처럼 복리로 성장하지 않습니다.',
-  },
-  '연금': {
-    buy: '세제혜택을 최대한 활용하세요. 절세는 확실한 수익입니다.',
-    sell: '연금은 장기 자산입니다. 단기 비중 조절보다 꾸준한 납입이 중요합니다.',
-  },
+// ========== 2026년 3월 시장 상황 (실시간 데이터 기반) ==========
+const MARKET_CONTEXT = {
+  cape: 39.0,                    // 쉴러 P/E - 역대 2위 (닷컴버블 다음)
+  sp500YTD: -11,                 // 2026년 YTD 수익률
+  buffettCash: 3730,             // 버핏 현금 보유량 (억 달러)
+  buffettAction: 'selling',      // 버핏이 주식 매도 중
+  marketPhase: 'correction',     // 조정장
+  valuationLevel: 'overvalued',  // 고평가
+  fearGreed: 35,                 // 공포 구간
 }
 
-const getBuffettAdvice = (category, action) => {
-  const advice = BUFFETT_ADVICE[category]
-  if (!advice) return '분산투자는 무지에 대한 보호입니다. 균형 잡힌 포트폴리오를 유지하세요.'
-  return action.includes('매수') ? advice.buy : advice.sell
+// 시장 상황을 고려한 냉철한 의견
+const getSmartAdvice = (category, action, currentWeight, targetWeight) => {
+  const { cape, sp500YTD, marketPhase, valuationLevel } = MARKET_CONTEXT
+  const diff = targetWeight - currentWeight
+  const isBuy = action.includes('매수')
+
+  // 현금성 자산 특별 처리 - 버핏의 현재 전략 반영
+  if (category === '현금성' || category === 'CMA') {
+    if (isBuy) {
+      return {
+        advice: `버핏이 $3,730억 현금을 쌓은 이유가 있습니다. CAPE 39는 닷컴버블 이후 최고치입니다. 지금은 현금이 기회비용이 아니라 "옵션"입니다. 시장이 20-30% 더 빠지면 그때가 진짜 매수 타이밍입니다.`,
+        urgency: 'high',
+        buffettDoing: '현금 축적 중',
+      }
+    } else {
+      return {
+        advice: `현금 비중을 줄이라는 신호지만, 신중하세요. S&P 500이 YTD -11%인 지금도 CAPE 39는 역사적 고점입니다. 버핏은 여전히 "비싸다"고 판단해 매수하지 않고 있습니다. 급하게 투자하지 마세요.`,
+        urgency: 'low',
+        buffettDoing: '관망 중',
+      }
+    }
+  }
+
+  // 주식 카테고리 처리
+  const stockCategories = ['Big Tech', 'S&P500', '나스닥', '반도체', '국내주식']
+  if (stockCategories.includes(category)) {
+    if (isBuy) {
+      if (marketPhase === 'correction' && diff > 5) {
+        return {
+          advice: `목표 비중까지 ${diff.toFixed(1)}% 부족하지만, 한 번에 매수하지 마세요. 버핏은 애플을 $1,000억 넘게 매도했습니다. 시장은 아직 비쌉니다. 3-6개월에 걸쳐 분할 매수하고, 추가 하락 시 더 공격적으로 매수하세요.`,
+          urgency: 'medium',
+          buffettDoing: '주식 매도 중',
+        }
+      }
+      return {
+        advice: `조정장에서 우량주 비중 확대는 옳은 방향입니다. 단, CAPE 39는 경고 신호입니다. 분할 매수로 리스크를 분산하세요. "공포에 매수"하되, 공포가 극대화될 때까지 현금을 남겨두세요.`,
+        urgency: 'medium',
+        buffettDoing: '선별적 매수 검토',
+      }
+    } else {
+      return {
+        advice: `과도한 주식 비중은 위험합니다. 버핏이 애플, 뱅크오브아메리카를 대량 매도한 이유를 생각하세요. 시장이 더 빠지면 손실이 커집니다. 일부 이익 실현으로 현금을 확보하세요.`,
+        urgency: 'high',
+        buffettDoing: '대량 매도 완료',
+      }
+    }
+  }
+
+  // 방어적 자산 (채권, 금, 배당주)
+  const defensiveCategories = ['채권', '금', '배당주']
+  if (defensiveCategories.includes(category)) {
+    if (isBuy) {
+      return {
+        advice: `불확실성이 높은 지금, 방어적 자산 확대는 현명합니다. 채권은 주식 폭락 시 포트폴리오를 보호하고, 금은 위기의 보험입니다. 배당주는 하락장에서 현금흐름을 제공합니다.`,
+        urgency: 'medium',
+        buffettDoing: '현금+단기채 선호',
+      }
+    } else {
+      return {
+        advice: `방어적 자산을 줄이기 전에 재고하세요. S&P 500이 -11%인 지금, 추가 하락 가능성이 있습니다. 방어적 자산은 폭풍우 속의 닻입니다. 시장이 안정될 때까지 유지하세요.`,
+        urgency: 'low',
+        buffettDoing: '방어적 포지션 유지',
+      }
+    }
+  }
+
+  // 고위험 자산 (암호화폐, 신흥국)
+  const riskyCategories = ['암호화폐', '신흥국']
+  if (riskyCategories.includes(category)) {
+    if (isBuy) {
+      return {
+        advice: `고위험 자산은 포트폴리오의 3-5%를 넘지 마세요. 버핏은 암호화폐를 "쥐약의 제곱"이라 불렀습니다. 지금처럼 불확실한 시장에서 투기 자산을 늘리는 것은 위험합니다. 잃어도 괜찮은 금액만 투자하세요.`,
+        urgency: 'low',
+        buffettDoing: '암호화폐 투자 안 함',
+      }
+    } else {
+      return {
+        advice: `과도한 고위험 노출을 줄이는 것은 현명합니다. 시장 변동성이 클 때 고위험 자산은 가장 먼저 폭락합니다. 이익이 있다면 일부 실현하고, 안정적 자산으로 재배분하세요.`,
+        urgency: 'high',
+        buffettDoing: '위험자산 회피',
+      }
+    }
+  }
+
+  // 에너지
+  if (category === '에너지') {
+    if (isBuy) {
+      return {
+        advice: `에너지는 인플레이션 헤지와 배당 수익을 제공합니다. 버핏도 옥시덴탈 페트롤리엄을 대량 보유 중입니다. 다만 유가 변동성이 크니 분할 매수하세요.`,
+        urgency: 'medium',
+        buffettDoing: '에너지주 보유 유지',
+      }
+    } else {
+      return {
+        advice: `에너지 섹터 비중이 높다면 일부 차익 실현을 고려하세요. 경기 침체 우려 시 에너지 수요가 감소할 수 있습니다. 분산 투자 관점에서 조정이 필요합니다.`,
+        urgency: 'medium',
+        buffettDoing: '선별적 보유',
+      }
+    }
+  }
+
+  // 연금/세제혜택
+  if (category === '연금' || category === 'IRP') {
+    return {
+      advice: `세제혜택 계좌는 시장 상황과 무관하게 한도까지 채우세요. 연 최대 900만원 세액공제(연금저축 600만+IRP 300만)는 확정 수익입니다. 시장이 불안할수록 절세가 중요합니다.`,
+      urgency: 'high',
+      buffettDoing: '세금 최적화 중시',
+    }
+  }
+
+  // 기본값
+  return {
+    advice: `현재 CAPE 39는 시장이 고평가되어 있음을 의미합니다. 모든 투자 결정에서 "지금 사지 않으면 손해"라는 FOMO를 경계하세요. 버핏은 항상 말합니다: "다른 사람들이 탐욕스러울 때 두려워하라."`,
+    urgency: 'medium',
+    buffettDoing: '신중한 관망',
+  }
 }
 
 // ========== 하우가 패밀리 목표 비중 (카테고리별) ==========
@@ -587,6 +646,72 @@ export default function RebalancePage() {
         </div>
       </div>
 
+      {/* 시장 상황 요약 */}
+      <div style={{
+        backgroundColor: '#1E293B',
+        borderRadius: '16px',
+        padding: '20px',
+        marginBottom: '24px',
+        color: 'white',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          marginBottom: '16px',
+        }}>
+          <span style={{ fontSize: '18px' }}>📊</span>
+          <span style={{ fontSize: '15px', fontWeight: '700' }}>2026년 3월 시장 상황</span>
+          <span style={{
+            marginLeft: 'auto',
+            padding: '4px 10px',
+            backgroundColor: '#EF4444',
+            borderRadius: '6px',
+            fontSize: '11px',
+            fontWeight: '600',
+          }}>고평가 구간</span>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+          gap: '16px',
+        }}>
+          <div>
+            <div style={{ fontSize: '11px', color: '#94A3B8', marginBottom: '4px' }}>CAPE (쉴러 P/E)</div>
+            <div style={{ fontSize: '20px', fontWeight: '700', color: '#F87171' }}>39.0</div>
+            <div style={{ fontSize: '10px', color: '#94A3B8' }}>역대 2위 (닷컴버블 다음)</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '11px', color: '#94A3B8', marginBottom: '4px' }}>S&P 500 YTD</div>
+            <div style={{ fontSize: '20px', fontWeight: '700', color: '#F87171' }}>-11%</div>
+            <div style={{ fontSize: '10px', color: '#94A3B8' }}>조정장 진행 중</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '11px', color: '#94A3B8', marginBottom: '4px' }}>버핏 현금</div>
+            <div style={{ fontSize: '20px', fontWeight: '700', color: '#34D399' }}>$3,730억</div>
+            <div style={{ fontSize: '10px', color: '#94A3B8' }}>역대 최대 현금 보유</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '11px', color: '#94A3B8', marginBottom: '4px' }}>버핏 행동</div>
+            <div style={{ fontSize: '20px', fontWeight: '700', color: '#FBBF24' }}>매도</div>
+            <div style={{ fontSize: '10px', color: '#94A3B8' }}>애플, BoA 대량 매도</div>
+          </div>
+        </div>
+
+        <div style={{
+          marginTop: '16px',
+          padding: '12px',
+          backgroundColor: 'rgba(251, 191, 36, 0.1)',
+          borderRadius: '8px',
+          borderLeft: '3px solid #FBBF24',
+        }}>
+          <div style={{ fontSize: '12px', color: '#FDE68A', lineHeight: '1.5' }}>
+            💡 <strong>버핏의 메시지:</strong> "다른 사람들이 탐욕스러울 때 두려워하고, 다른 사람들이 두려워할 때 탐욕스러워라." 지금은 아직 완전한 공포 구간이 아닙니다. 현금을 무기로 남겨두세요.
+          </div>
+        </div>
+      </div>
+
       {/* 요약 카드 */}
       <div style={styles.summaryGrid}>
         <div style={styles.summaryCard(false)}>
@@ -734,25 +859,68 @@ export default function RebalancePage() {
                   </div>
                 </div>
 
-                {/* 워렌 버핏 의견 */}
-                <div style={{
-                  padding: '12px 16px',
-                  backgroundColor: '#FFFBEB',
-                  borderTop: '1px solid #FEF3C7',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '8px',
-                }}>
-                  <span style={{ fontSize: '14px' }}>💬</span>
-                  <div style={{
-                    fontSize: '12px',
-                    color: '#92400E',
-                    fontStyle: 'italic',
-                    lineHeight: '1.5',
-                  }}>
-                    "{getBuffettAdvice(rec.category, rec.action)}"
-                  </div>
-                </div>
+                {/* 시장 분석 기반 의견 */}
+                {(() => {
+                  const smartAdvice = getSmartAdvice(rec.category, rec.action, rec.currentWeight, rec.targetWeight)
+                  const urgencyColors = {
+                    high: { bg: '#FEE2E2', border: '#FECACA', text: '#991B1B', badge: '#DC2626' },
+                    medium: { bg: '#FEF3C7', border: '#FDE68A', text: '#92400E', badge: '#D97706' },
+                    low: { bg: '#DBEAFE', border: '#BFDBFE', text: '#1E40AF', badge: '#2563EB' },
+                  }
+                  const colors = urgencyColors[smartAdvice.urgency] || urgencyColors.medium
+                  return (
+                    <div style={{
+                      padding: '14px 16px',
+                      backgroundColor: colors.bg,
+                      borderTop: `1px solid ${colors.border}`,
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '10px',
+                        flexWrap: 'wrap',
+                        gap: '8px',
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                        }}>
+                          <span style={{ fontSize: '14px' }}>🎯</span>
+                          <span style={{
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            color: colors.badge,
+                            textTransform: 'uppercase',
+                          }}>
+                            {smartAdvice.urgency === 'high' ? '중요' : smartAdvice.urgency === 'medium' ? '참고' : '낮음'}
+                          </span>
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '3px 8px',
+                          backgroundColor: 'rgba(0,0,0,0.05)',
+                          borderRadius: '4px',
+                        }}>
+                          <span style={{ fontSize: '11px' }}>👴</span>
+                          <span style={{ fontSize: '10px', color: '#6B7280', fontWeight: '500' }}>
+                            버핏: {smartAdvice.buffettDoing}
+                          </span>
+                        </div>
+                      </div>
+                      <div style={{
+                        fontSize: '13px',
+                        color: colors.text,
+                        lineHeight: '1.6',
+                      }}>
+                        {smartAdvice.advice}
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* 종목별 상세 */}
                 {rec.stockRecommendations && rec.stockRecommendations.length > 0 && (
