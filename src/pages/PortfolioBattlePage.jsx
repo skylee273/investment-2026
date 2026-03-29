@@ -39,6 +39,8 @@ const HAUGA_HOLDINGS = [
   { ticker: 'KODEX150_I', name: 'KODEX 코스닥150 (ISA)', currentKRW: 99150, investedKRW: 101075, gainPercent: -1.90 },
   { ticker: 'TIGER_SP_I', name: 'TIGER 미국S&P500 (ISA)', currentKRW: 195360, investedKRW: 196840, gainPercent: -0.75 },
   { ticker: 'TIGER_BOND', name: 'TIGER 미국채10년선물', currentKRW: 202875, investedKRW: 198375, gainPercent: 2.27 },
+  // 업비트 - 암호화폐
+  { ticker: 'BTC', name: '비트코인', currentKRW: 165490, investedKRW: 167040, gainPercent: -0.93 },
 ]
 
 // ========== 가윤 달리오 실제 데이터 - 2026.03.29 기준 ==========

@@ -94,6 +94,11 @@ const TOSS_HOLDINGS = [
   { name: 'SPY', currentKRW: 16890, investedKRW: 17704, gainKRW: -813, gainPercent: -4.59 },
 ]
 
+// 업비트 암호화폐 보유 종목 (2026.03.29 기준)
+const CRYPTO_HOLDINGS = [
+  { name: '비트코인 (BTC)', currentKRW: 165490, investedKRW: 167040, gainKRW: -1552, gainPercent: -0.93 },
+]
+
 // 미래에셋 전체 보유 종목 (기존 코드 호환용)
 const MIRAE_HOLDINGS = MIRAE_ACCOUNTS.flatMap(acc => acc.holdings)
 
@@ -337,7 +342,7 @@ function PortfolioChart({ icon, title, subtitle, amount, gainKRW, gainPercent, s
   )
 }
 
-// 전체 보유 종목 통합 (미래에셋 + 토스)
+// 전체 보유 종목 통합 (미래에셋 + 토스 + 암호화폐)
 const ALL_HOLDINGS = [
   // 미래에셋증권 (계좌별)
   ...MIRAE_ACCOUNTS.flatMap(acc =>
@@ -355,6 +360,14 @@ const ALL_HOLDINGS = [
     broker: '토스증권',
     account: '해외주식',
     accountIcon: '🌏',
+    ticker: h.name,
+  })),
+  // 업비트 암호화폐
+  ...CRYPTO_HOLDINGS.map(h => ({
+    ...h,
+    broker: '업비트',
+    account: '암호화폐',
+    accountIcon: '₿',
     ticker: h.name,
   })),
 ]
@@ -1023,6 +1036,12 @@ export default function PortfolioPage() {
       totalGain += item.gainKRW || 0
     })
 
+    // 업비트 암호화폐
+    CRYPTO_HOLDINGS.forEach(item => {
+      totalCost += item.investedKRW || 0
+      totalGain += item.gainKRW || 0
+    })
+
     const totalValue = totalCost + totalGain
     const totalGainPercent = totalCost > 0 ? (totalGain / totalCost) * 100 : 0
     return { totalCost, totalValue, totalGain, totalGainPercent }
@@ -1031,6 +1050,7 @@ export default function PortfolioPage() {
   // 총 투자금액 계산
   const TOTAL_INVESTMENT = MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.holdings.reduce((s, h) => s + h.investedKRW, 0), 0)
     + TOSS_HOLDINGS.reduce((sum, h) => sum + h.investedKRW, 0)
+    + CRYPTO_HOLDINGS.reduce((sum, h) => sum + h.investedKRW, 0)
 
   const portfolioStats = calculatePortfolioValue()
 
