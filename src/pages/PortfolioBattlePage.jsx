@@ -13,10 +13,32 @@ const BATTLE_INFO = {
 
 // ========== 하우가 패밀리 (하늘) 실제 데이터 - 2026.03.29 기준 ==========
 const HAUGA_HOLDINGS = [
-  // 토스증권 전체 (13개 종목) - 평가손익 -62,601원, -10.07%
-  { ticker: 'TOSS', name: '토스증권 (해외주식)', currentKRW: 559097, investedKRW: 621698, gainPercent: -10.07 },
-  // 미래에셋 전체 (12개 종목) - 평가손익 -73,767원, -1.89%
-  { ticker: 'MIRAE', name: '미래에셋 (종합)', currentKRW: 4189547, investedKRW: 4263314, gainPercent: -1.73 },
+  // 토스증권 해외주식 (12개 종목) - 총 557,857원, 원금 621,337원, -10.21%
+  { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 41152, investedKRW: 47590, gainPercent: -13.52 },
+  { ticker: 'META', name: '메타', currentKRW: 19672, investedKRW: 23670, gainPercent: -16.88 },
+  { ticker: 'BAC', name: '뱅크오브아메리카', currentKRW: 19012, investedKRW: 20702, gainPercent: -8.16 },
+  { ticker: 'AVGO', name: '브로드컴', currentKRW: 2686, investedKRW: 2973, gainPercent: -9.64 },
+  { ticker: 'VST', name: '비스트라 에너지', currentKRW: 925, investedKRW: 986, gainPercent: -6.16 },
+  { ticker: 'AMZN', name: '아마존', currentKRW: 365295, investedKRW: 405610, gainPercent: -9.93 },
+  { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 16903, investedKRW: 19727, gainPercent: -14.31 },
+  { ticker: 'GOOG', name: '알파벳 C', currentKRW: 58467, investedKRW: 63641, gainPercent: -8.12 },
+  { ticker: 'ISRG', name: '인튜이티브 서지컬', currentKRW: 7313, investedKRW: 7882, gainPercent: -7.21 },
+  { ticker: 'QCOM', name: '퀄컴', currentKRW: 6850, investedKRW: 7883, gainPercent: -13.09 },
+  { ticker: 'TSLA', name: '테슬라', currentKRW: 2687, investedKRW: 2969, gainPercent: -9.48 },
+  { ticker: 'SPY', name: 'SPY', currentKRW: 16890, investedKRW: 17704, gainPercent: -4.59 },
+  // 미래에셋 - 종합 (12개 종목)
+  { ticker: 'TIGER_SP', name: 'TIGER 미국S&P500', currentKRW: 170940, investedKRW: 174090, gainPercent: -1.81 },
+  { ticker: '1Q_HYB', name: '1Q 미국S&P500미국채혼합', currentKRW: 116200, investedKRW: 116250, gainPercent: -0.04 },
+  { ticker: 'CVX', name: '셰브론', currentKRW: 636068, investedKRW: 568711, gainPercent: 11.84 },
+  { ticker: 'GOOG_M', name: '알파벳 C (미래)', currentKRW: 412337, investedKRW: 468022, gainPercent: -11.90 },
+  { ticker: 'USD', name: '미국달러', currentKRW: 271, investedKRW: 271, gainPercent: 0.00 },
+  { ticker: 'CMA', name: '발행어음CMA', currentKRW: 610106, investedKRW: 610000, gainPercent: 0.02 },
+  { ticker: 'KODEX200', name: 'KODEX 200', currentKRW: 1055925, investedKRW: 1131700, gainPercent: -6.70 },
+  { ticker: 'KODEX150_P', name: 'KODEX 코스닥150 (연금)', currentKRW: 337110, investedKRW: 344775, gainPercent: -2.22 },
+  { ticker: 'IRP', name: '이하늘 개인형IRP', currentKRW: 250069, investedKRW: 250069, gainPercent: 0.00 },
+  { ticker: 'KODEX150_I', name: 'KODEX 코스닥150 (ISA)', currentKRW: 99150, investedKRW: 101075, gainPercent: -1.90 },
+  { ticker: 'TIGER_SP_I', name: 'TIGER 미국S&P500 (ISA)', currentKRW: 195360, investedKRW: 196840, gainPercent: -0.75 },
+  { ticker: 'TIGER_BOND', name: 'TIGER 미국채10년선물', currentKRW: 202875, investedKRW: 198375, gainPercent: 2.27 },
 ]
 
 // ========== 가윤 달리오 실제 데이터 - 2026.03.03 기준 ==========
