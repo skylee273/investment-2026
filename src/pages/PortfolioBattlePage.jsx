@@ -574,6 +574,187 @@ export default function PortfolioBattlePage() {
           <div>5. 중간 리밸런싱/매매 자유</div>
         </div>
       </div>
+
+      {/* 수익률 측정 방식 안내 */}
+      <div style={{
+        backgroundColor: '#FFF8E1',
+        borderRadius: '16px',
+        padding: '24px',
+        border: '1px solid #FFE082',
+        marginTop: '24px',
+      }}>
+        <div style={{
+          fontSize: '18px',
+          fontWeight: '800',
+          color: '#F57F17',
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}>
+          <span>⚖️</span> 왜 이 방식이 가장 공정한가요?
+        </div>
+
+        <div style={{
+          backgroundColor: '#FFFDE7',
+          borderRadius: '12px',
+          padding: '16px',
+          marginBottom: '16px',
+        }}>
+          <div style={{ fontSize: '14px', fontWeight: '700', color: '#F57F17', marginBottom: '8px' }}>
+            ❌ 단순 현재 수익률 캡처가 불공정한 이유
+          </div>
+          <div style={{ fontSize: '13px', color: '#5D4037', lineHeight: '1.8' }}>
+            • 매입 시점이 다르면 비교 불가 (일찍 산 사람이 유리/불리)<br/>
+            • 중간 입금/출금 시 수익률 왜곡<br/>
+            • 계좌마다 수익률 계산 방식이 다름
+          </div>
+        </div>
+
+        <div style={{
+          backgroundColor: '#E8F5E9',
+          borderRadius: '12px',
+          padding: '16px',
+          marginBottom: '16px',
+        }}>
+          <div style={{ fontSize: '14px', fontWeight: '700', color: '#2E7D32', marginBottom: '8px' }}>
+            ✅ 우리의 공정한 방식: 대결 시작일 기준 수익률
+          </div>
+          <div style={{ fontSize: '13px', color: '#1B5E20', lineHeight: '1.8' }}>
+            • <strong>대결 시작일(2026.02.22)</strong> 총 평가금액을 기준점으로 설정<br/>
+            • 그 이후의 수익률만 비교<br/>
+            • 과거 매입 시점과 무관하게 <strong>같은 출발선</strong>에서 시작<br/>
+            • 순수하게 <strong>대결 기간 동안의 운용능력</strong>만 비교
+          </div>
+        </div>
+
+        <div style={{
+          backgroundColor: '#FFF3E0',
+          borderRadius: '12px',
+          padding: '16px',
+          marginBottom: '16px',
+        }}>
+          <div style={{ fontSize: '14px', fontWeight: '700', color: '#E65100', marginBottom: '8px' }}>
+            📐 수익률 계산 공식
+          </div>
+          <div style={{
+            fontSize: '15px',
+            fontWeight: '700',
+            color: '#BF360C',
+            textAlign: 'center',
+            padding: '12px',
+            backgroundColor: '#FBE9E7',
+            borderRadius: '8px',
+            fontFamily: 'monospace',
+          }}>
+            수익률 = (현재 평가금액 - 시작일 평가금액) / 시작일 평가금액 × 100
+          </div>
+        </div>
+
+        <div style={{
+          backgroundColor: '#E3F2FD',
+          borderRadius: '12px',
+          padding: '16px',
+        }}>
+          <div style={{ fontSize: '14px', fontWeight: '700', color: '#1565C0', marginBottom: '12px' }}>
+            📱 주식 앱에서 데이터 전달하는 방법
+          </div>
+          <div style={{ fontSize: '13px', color: '#0D47A1', lineHeight: '1.8', marginBottom: '12px' }}>
+            각 계좌별로 <strong>"총 평가금액"</strong>만 알려주면 됩니다!
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: '12px',
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              padding: '12px',
+              border: '1px solid #BBDEFB',
+            }}>
+              <div style={{ fontSize: '12px', fontWeight: '700', color: '#1565C0', marginBottom: '8px' }}>
+                방법 1: 텍스트로 전달
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: '#37474F',
+                lineHeight: '1.6',
+                backgroundColor: '#F5F5F5',
+                padding: '8px',
+                borderRadius: '6px',
+                fontFamily: 'monospace',
+              }}>
+                삼성증권: 24,140,146원<br/>
+                미래에셋: 4,500,000원<br/>
+                합계: 28,640,146원
+              </div>
+            </div>
+
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              padding: '12px',
+              border: '1px solid #BBDEFB',
+            }}>
+              <div style={{ fontSize: '12px', fontWeight: '700', color: '#1565C0', marginBottom: '8px' }}>
+                방법 2: 스크린샷 전달
+              </div>
+              <div style={{ fontSize: '12px', color: '#37474F', lineHeight: '1.6' }}>
+                각 증권사 앱에서<br/>
+                <strong>"내 자산"</strong> 또는 <strong>"총 평가금액"</strong><br/>
+                화면 스크린샷 전송
+              </div>
+            </div>
+          </div>
+
+          <div style={{
+            marginTop: '12px',
+            padding: '10px',
+            backgroundColor: '#FFECB3',
+            borderRadius: '8px',
+            fontSize: '12px',
+            color: '#FF6F00',
+            fontWeight: '600',
+          }}>
+            💡 TIP: 매월 말일에 업데이트하면 추적하기 편해요!
+          </div>
+        </div>
+      </div>
+
+      {/* 중간 입출금 처리 안내 */}
+      <div style={{
+        backgroundColor: '#F3E5F5',
+        borderRadius: '16px',
+        padding: '24px',
+        border: '1px solid #CE93D8',
+        marginTop: '16px',
+      }}>
+        <div style={{
+          fontSize: '16px',
+          fontWeight: '700',
+          color: '#7B1FA2',
+          marginBottom: '12px',
+        }}>
+          💰 중간에 돈을 입금하거나 출금하면?
+        </div>
+        <div style={{ fontSize: '13px', color: '#4A148C', lineHeight: '1.8' }}>
+          <strong>입금 시:</strong> 입금액만큼 "시작일 평가금액"에 더해줌<br/>
+          <strong>출금 시:</strong> 출금액만큼 "시작일 평가금액"에서 빼줌<br/><br/>
+          <div style={{
+            backgroundColor: '#EDE7F6',
+            padding: '12px',
+            borderRadius: '8px',
+            fontFamily: 'monospace',
+            fontSize: '12px',
+          }}>
+            예시: 시작 1,000만원 → 중간에 200만원 입금<br/>
+            → 조정된 시작금액 = 1,200만원<br/>
+            → 현재 1,500만원이면 수익률 = (1,500-1,200)/1,200 = 25%
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
