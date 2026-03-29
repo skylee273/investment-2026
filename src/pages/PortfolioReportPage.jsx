@@ -1,35 +1,39 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// 실제 보유 종목 (2026.03.02 기준)
+// 실제 보유 종목 (2026.03.29 기준)
 const ACTUAL_HOLDINGS = {
   isa: {
-    investedKRW: 6985235,  // PLUS신흥국 + TIGER미국채 + KODEX금
-    currentKRW: 7026625,
-    gainKRW: 41390,
-    gainPercent: 0.59,
+    investedKRW: 19988835,  // KODEX200 + TIGER나스닥 + PLUS신흥국 + TIGER미국채 + TIGER S&P + KODEX금
+    currentKRW: 19381115,
+    gainKRW: -607720,
+    gainPercent: -3.04,
     holdings: [
-      { name: 'PLUS 신흥국MSCI', investedKRW: 2997060, currentKRW: 2991835, gainKRW: -5225, gainPercent: -0.17 },
-      { name: 'TIGER 미국채10년선물', investedKRW: 2003535, currentKRW: 2030310, gainKRW: 26775, gainPercent: 1.34 },
-      { name: 'KODEX 금액티브', investedKRW: 1984640, currentKRW: 2004480, gainKRW: 19840, gainPercent: 1.00 },
+      { name: 'KODEX 200', investedKRW: 5223390, currentKRW: 5117175, gainKRW: -106215, gainPercent: -2.03 },
+      { name: 'TIGER 미국S&P500', investedKRW: 4888810, currentKRW: 4835160, gainKRW: -53650, gainPercent: -1.10 },
+      { name: 'TIGER 미국나스닥100', investedKRW: 2891400, currentKRW: 2857680, gainKRW: -33720, gainPercent: -1.17 },
+      { name: 'PLUS 신흥국MSCI', investedKRW: 2997060, currentKRW: 2695055, gainKRW: -302005, gainPercent: -10.08 },
+      { name: 'TIGER 미국채10년선물', investedKRW: 2003535, currentKRW: 2069325, gainKRW: 65790, gainPercent: 3.28 },
+      { name: 'KODEX 금액티브', investedKRW: 1984640, currentKRW: 1806720, gainKRW: -177920, gainPercent: -8.96 },
     ],
   },
   pension: {
-    investedKRW: 1977045,
-    currentKRW: 1976520,
-    gainKRW: -525,
-    gainPercent: -0.03,
+    investedKRW: 5997025,
+    currentKRW: 5538195,
+    gainKRW: -458830,
+    gainPercent: -7.65,
     holdings: [
-      { name: 'KODEX 200', investedKRW: 1977045, currentKRW: 1976520, gainKRW: -525, gainPercent: -0.03 },
+      { name: 'KODEX 200', investedKRW: 4912225, currentKRW: 4467375, gainKRW: -444850, gainPercent: -9.06 },
+      { name: 'KODEX 코스닥150', investedKRW: 1084800, currentKRW: 1070820, gainKRW: -13980, gainPercent: -1.29 },
     ],
   },
   irp: {
-    investedKRW: 200000,
-    currentKRW: 273323,
-    gainKRW: 73323,
-    gainPercent: 36.66,
+    investedKRW: 267479,
+    currentKRW: 265937,
+    gainKRW: -1542,
+    gainPercent: -0.58,
     holdings: [
-      { name: 'IRP 투자상품', investedKRW: 200000, currentKRW: 273323, gainKRW: 73323, gainPercent: 36.66 },
+      { name: 'TDF2025', investedKRW: 267479, currentKRW: 265937, gainKRW: -1542, gainPercent: -0.58 },
     ],
   },
   pensionExtra: {
