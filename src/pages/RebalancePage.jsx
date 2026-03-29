@@ -1021,7 +1021,7 @@ export default function RebalancePage() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
           gap: '16px',
         }}>
           {/* 워렌 버핏 */}
@@ -1184,6 +1184,60 @@ export default function RebalancePage() {
               <strong>핵심:</strong> 버핏보다 공격적, 기회 포착 준비
             </div>
           </div>
+
+          {/* 찰리 멍거 */}
+          <div style={{
+            backgroundColor: '#1E293B',
+            borderRadius: '12px',
+            padding: '20px',
+            borderTop: '3px solid #8B5CF6',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '12px',
+            }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#374151',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+              }}>🦉</div>
+              <div>
+                <div style={{ fontWeight: '700', fontSize: '14px' }}>찰리 멍거</div>
+                <div style={{ fontSize: '11px', color: '#94A3B8' }}>버크셔 부회장 (1924-2023)</div>
+              </div>
+            </div>
+            <div style={{
+              padding: '8px 12px',
+              backgroundColor: '#8B5CF6',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: '600',
+              marginBottom: '12px',
+              textAlign: 'center',
+              color: 'white',
+            }}>
+              🟣 현자의 지혜
+            </div>
+            <div style={{ fontSize: '12px', color: '#E2E8F0', lineHeight: '1.6', marginBottom: '12px' }}>
+              "대부분의 투자자 문제는 너무 자주 행동한다는 것입니다. 아무것도 하지 않는 것이 최선일 때가 많습니다. 어리석은 일을 피하는 것이 영리해지려는 것보다 중요합니다."
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: '#94A3B8',
+              padding: '8px',
+              backgroundColor: '#0F172A',
+              borderRadius: '6px',
+            }}>
+              <strong>핵심:</strong> 덜 행동하기, 어리석음 회피
+            </div>
+          </div>
         </div>
 
         {/* 패널 합의 */}
@@ -1200,13 +1254,14 @@ export default function RebalancePage() {
             color: '#F59E0B',
             marginBottom: '8px',
           }}>
-            📋 3인 패널 합의점
+            📋 4인 패널 합의점
           </div>
           <div style={{ fontSize: '12px', color: '#E2E8F0', lineHeight: '1.6' }}>
             • <strong>공통:</strong> 시장은 고평가 상태, 조급함은 금물<br />
             • <strong>버핏:</strong> 현금 유지가 최선 (CAPE 39 = 닷컴버블급)<br />
             • <strong>애크먼:</strong> 확신 있는 AI 우량주는 분할 매수 가능<br />
-            • <strong>아벨:</strong> 현금은 무기, 추가 하락 시 공격적 매수 준비
+            • <strong>아벨:</strong> 현금은 무기, 추가 하락 시 공격적 매수 준비<br />
+            • <strong>멍거:</strong> 아무것도 안 하는 것이 최선일 때가 있다
           </div>
         </div>
       </div>
@@ -1242,11 +1297,11 @@ export default function RebalancePage() {
           lineHeight: '1.8',
           whiteSpace: 'pre-line',
         }}>
-{`▎결론: 버핏(수비) + 애크먼(선별 공격) + 아벨(기회 대기) = 최적 전략
+{`▎결론: 버핏(수비) + 애크먼(선별 공격) + 아벨(기회 대기) + 멍거(인내) = 최적 전략
 
-세 거장의 공통점은 "지금은 올인할 때가 아니다"입니다. 버핏은 역사상 최대 현금을 쌓았고, 애크먼은 -14% 손실에도 확신 있는 종목만 추가 매수하며, 아벨은 "드라이 파우더" 전략으로 기회를 노리고 있습니다.
+네 거장의 공통점은 "지금은 올인할 때가 아니다"입니다. 버핏은 역사상 최대 현금을 쌓았고, 애크먼은 -14% 손실에도 확신 있는 종목만 추가 매수하며, 아벨은 "드라이 파우더" 전략으로 기회를 노리고, 멍거는 "아무것도 안 하는 것의 가치"를 강조합니다.
 
-▎당신의 전략 (3인 합성):
+▎당신의 전략 (4인 합성):
 ① 현금 20-30% 유지 - 버핏처럼 총알을 남겨두세요
 ② 확신 종목만 분할 매수 - 애크먼처럼 AI 빅테크 중 확신 있는 것만
 ③ 추가 하락 대비 - 아벨처럼 S&P -20~30%면 공격적 매수 준비
