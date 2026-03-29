@@ -8,44 +8,15 @@ const BATTLE_INFO = {
   startDate: '2026-02-22',
   endDate: '2026-12-24',
   prize: '치킨 사주기 🍗',
-  lastUpdate: '2026.03.03',
+  lastUpdate: '2026.03.29',
 }
 
-// ========== 하우가 패밀리 (하늘) 실제 데이터 - 2026.03.03 기준 ==========
+// ========== 하우가 패밀리 (하늘) 실제 데이터 - 2026.03.29 기준 ==========
 const HAUGA_HOLDINGS = [
-  // 토스증권 해외주식 (18개 종목)
-  { ticker: 'ADA', name: '에이다 (카르다노)', currentKRW: 63529, investedKRW: 60077, gainPercent: 5.75 },
-  { ticker: 'AMZN', name: '아마존', currentKRW: 357500, investedKRW: 405609, gainPercent: -11.8 },
-  { ticker: 'GOOG', name: '알파벳 C', currentKRW: 61640, investedKRW: 63640, gainPercent: -3.1 },
-  { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 42545, investedKRW: 47589, gainPercent: -10.5 },
-  { ticker: 'CVX', name: '셰브론', currentKRW: 28864, investedKRW: 26635, gainPercent: 8.3 },
-  { ticker: 'META', name: '메타', currentKRW: 22607, investedKRW: 23669, gainPercent: -4.4 },
-  { ticker: 'AXP', name: '아메리칸 익스프레스', currentKRW: 21474, investedKRW: 25591, gainPercent: -16.0 },
-  { ticker: 'BAC', name: '뱅크오브아메리카', currentKRW: 18877, investedKRW: 20701, gainPercent: -8.8 },
-  { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 17793, investedKRW: 19726, gainPercent: -9.7 },
-  { ticker: 'SPY', name: 'SPY', currentKRW: 17155, investedKRW: 17703, gainPercent: -3.0 },
-  { ticker: 'MP', name: 'MP 머티리얼스', currentKRW: 7964, investedKRW: 8854, gainPercent: -10.0 },
-  { ticker: 'ISRG', name: '인튜이티브 서지컬', currentKRW: 7656, investedKRW: 7881, gainPercent: -2.8 },
-  { ticker: 'QCOM', name: '퀄컴', currentKRW: 7193, investedKRW: 7882, gainPercent: -8.7 },
-  { ticker: 'PLTR', name: '팔란티어', currentKRW: 3097, investedKRW: 2970, gainPercent: 4.2 },
-  { ticker: 'TSLA', name: '테슬라', currentKRW: 2765, investedKRW: 2968, gainPercent: -6.8 },
-  { ticker: 'AVGO', name: '브로드컴', currentKRW: 2640, investedKRW: 2972, gainPercent: -11.1 },
-  { ticker: 'VRT', name: '버티브 홀딩스', currentKRW: 1933, investedKRW: 1993, gainPercent: -3.0 },
-  { ticker: 'VST', name: '비스트라 에너지', currentKRW: 955, investedKRW: 985, gainPercent: -3.0 },
-  // 미래에셋 - 연금저축
-  { ticker: 'KODEX200_P', name: 'KODEX 200 (연금)', currentKRW: 658840, investedKRW: 617700, gainPercent: 6.66 },
-  { ticker: 'KODEX150_P', name: 'KODEX 코스닥150 (연금)', currentKRW: 105500, investedKRW: 101300, gainPercent: 4.15 },
-  // 미래에셋 - ISA
-  { ticker: 'KODEX150_I', name: 'KODEX 코스닥150 (ISA)', currentKRW: 105500, investedKRW: 101075, gainPercent: 4.38 },
-  { ticker: 'TIGER_BOND', name: 'TIGER 미국채10년 (ISA)', currentKRW: 199050, investedKRW: 198375, gainPercent: 0.34 },
-  { ticker: 'TIGER_SP_I', name: 'TIGER 미국S&P500 (ISA)', currentKRW: 196520, investedKRW: 196840, gainPercent: -0.16 },
-  // 미래에셋 - 종합_주식
-  { ticker: 'GOOG_S', name: '알파벳 C (종합)', currentKRW: 443632, investedKRW: 442635, gainPercent: 0.23 },
-  { ticker: 'TIGER_SP_S', name: 'TIGER 미국S&P500 (종합)', currentKRW: 171955, investedKRW: 174090, gainPercent: -1.23 },
-  { ticker: '1Q_HYB', name: '1Q 미국S&P500미국채혼합', currentKRW: 113550, investedKRW: 116250, gainPercent: -2.32 },
-  // 미래에셋 - CMA
-  { ticker: 'CMA_E', name: '비상금 CMA', currentKRW: 600179, investedKRW: 600032, gainPercent: 0.02 },
-  { ticker: 'CMA_F', name: '가족여행 CMA', currentKRW: 410119, investedKRW: 410000, gainPercent: 0.03 },
+  // 토스증권 전체 (13개 종목) - 평가손익 -62,601원, -10.07%
+  { ticker: 'TOSS', name: '토스증권 (해외주식)', currentKRW: 559097, investedKRW: 621698, gainPercent: -10.07 },
+  // 미래에셋 전체 (12개 종목) - 평가손익 -73,767원, -1.89%
+  { ticker: 'MIRAE', name: '미래에셋 (종합)', currentKRW: 4189547, investedKRW: 4263314, gainPercent: -1.73 },
 ]
 
 // ========== 가윤 달리오 실제 데이터 - 2026.03.03 기준 ==========
