@@ -994,6 +994,78 @@ export default function RebalancePage() {
         )}
       </div>
 
+      {/* 종합 의견 */}
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        padding: '24px',
+        border: '2px solid #1E293B',
+        marginBottom: '20px',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '20px',
+        }}>
+          <span style={{ fontSize: '24px' }}>🧠</span>
+          <div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: '#191F28' }}>
+              종합 의견
+            </div>
+            <div style={{ fontSize: '12px', color: '#8B95A1' }}>
+              2026년 3월 시장 분석 · 냉철한 T의 시선
+            </div>
+          </div>
+        </div>
+
+        <div style={{
+          fontSize: '14px',
+          color: '#374151',
+          lineHeight: '1.8',
+          whiteSpace: 'pre-line',
+        }}>
+{`▎결론부터: 지금은 "공격"이 아니라 "수비"의 시간입니다.
+
+CAPE 39는 역사상 두 번째로 높은 수치입니다. 첫 번째는 2000년 닷컴버블이었고, 그 후 S&P 500은 49% 폭락했습니다. 물론 역사가 반복된다는 보장은 없지만, 확률의 게임에서 지금은 유리한 패가 아닙니다.
+
+버핏이 $3,730억 현금을 쌓은 이유를 생각해보세요. 94세의 투자 귀재가 애플, 뱅크오브아메리카를 대량 매도하고 현금을 쌓았습니다. 그는 "비쌀 때 사지 않는 것"이 수익의 핵심임을 알고 있습니다.
+
+▎당신이 해야 할 것:
+① 현금 비중 유지/확대 - 현금은 "기회비용"이 아니라 "옵션"입니다
+② 분할 매수 - 한 번에 몰빵하지 말고 3-6개월에 걸쳐 분산
+③ 방어적 자산 확보 - 채권, 금, 배당주로 하방 리스크 헤지
+④ 고위험 자산 축소 - 암호화폐, 고PER 성장주 비중 조절
+
+▎당신이 하지 말아야 할 것:
+✗ "지금 안 사면 더 오른다"는 FOMO에 휩쓸리기
+✗ 레버리지나 신용 사용
+✗ 단기 급등락에 감정적 대응
+
+시장은 언제나 다시 기회를 줍니다. S&P 500이 20-30% 더 빠지면, 그때 현금을 가진 당신이 진짜 승자가 됩니다. 인내심이 최고의 무기입니다.`}
+        </div>
+
+        <div style={{
+          marginTop: '20px',
+          padding: '12px 16px',
+          backgroundColor: '#F8FAFC',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+        }}>
+          <span style={{ fontSize: '20px' }}>👴</span>
+          <div style={{
+            fontSize: '13px',
+            color: '#64748B',
+            fontStyle: 'italic',
+          }}>
+            "주식시장은 인내심 없는 사람의 돈을 인내심 있는 사람에게 이전하는 장치다."
+            <br />— 워렌 버핏
+          </div>
+        </div>
+      </div>
+
       {/* 전체 종목 테이블 */}
       <div style={styles.card}>
         <div style={styles.cardTitle}>
