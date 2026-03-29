@@ -27,6 +27,76 @@ const CATEGORY_COLORS = {
   '나스닥': '#7C3AED',
 }
 
+// ========== 워렌 버핏 스타일 의견 ==========
+const BUFFETT_ADVICE = {
+  'Big Tech': {
+    buy: '기술 해자가 깊은 기업에 투자하세요. 이들은 10년 후에도 시장을 지배할 것입니다.',
+    sell: '과도한 집중은 위험합니다. 훌륭한 기업도 적정 비중을 유지해야 합니다.',
+  },
+  'S&P500': {
+    buy: '미국 500대 기업에 분산투자하는 것은 가장 안전한 장기 전략입니다.',
+    sell: '인덱스 비중이 너무 높으면 개별 우량주의 초과수익 기회를 놓칩니다.',
+  },
+  '국내주식': {
+    buy: '한국 시장은 저평가되어 있습니다. 장기적으로 가치가 회복될 것입니다.',
+    sell: '홈 바이어스를 경계하세요. 글로벌 분산이 리스크를 줄입니다.',
+  },
+  '에너지': {
+    buy: '에너지는 문명의 기반입니다. 배당과 함께 인플레이션 헤지 역할을 합니다.',
+    sell: '에너지 섹터는 변동성이 큽니다. 과도한 노출은 피하세요.',
+  },
+  '반도체': {
+    buy: 'AI 시대의 핵심 인프라입니다. 장기 성장 잠재력이 높습니다.',
+    sell: '사이클 산업입니다. 과열 시 비중 조절이 필요합니다.',
+  },
+  '헬스케어': {
+    buy: '고령화 사회에서 수요는 계속 증가합니다. 방어적이면서 성장하는 섹터입니다.',
+    sell: '규제 리스크가 있습니다. 다른 성장 섹터와 균형을 맞추세요.',
+  },
+  '금융': {
+    buy: '금리 상승기에 은행은 이익이 증가합니다. 경기 회복의 수혜를 받습니다.',
+    sell: '금융 위기에 취약합니다. 방어적 자산과 균형을 맞추세요.',
+  },
+  '채권': {
+    buy: '주식 하락기에 포트폴리오를 보호합니다. 안정적인 현금흐름을 제공합니다.',
+    sell: '인플레이션이 높을 때 실질 수익률이 낮아집니다.',
+  },
+  '암호화폐': {
+    buy: '소량의 비트코인은 인플레이션 헤지와 분산 효과가 있습니다.',
+    sell: '투기 자산의 비중은 낮게 유지하세요. 잃어도 괜찮은 금액만 투자하세요.',
+  },
+  '현금성': {
+    buy: '현금은 기회입니다. 시장 폭락 시 저가 매수의 총알이 됩니다.',
+    sell: '현금은 인플레이션에 잠식됩니다. 장기적으로 주식이 더 나은 선택입니다.',
+  },
+  '배당주': {
+    buy: '꾸준한 배당은 복리의 마법을 만듭니다. 시간이 당신 편입니다.',
+    sell: '배당주도 분산이 필요합니다. 한 섹터에 집중하지 마세요.',
+  },
+  '나스닥': {
+    buy: '기술 혁신의 최전선입니다. 장기 성장을 원한다면 필수입니다.',
+    sell: '고성장 기업은 변동성이 큽니다. 안정적 자산과 균형을 맞추세요.',
+  },
+  '신흥국': {
+    buy: '신흥국은 성장 잠재력이 높습니다. 글로벌 분산의 핵심입니다.',
+    sell: '정치적 리스크가 있습니다. 선진국 비중과 균형을 맞추세요.',
+  },
+  '금': {
+    buy: '금은 수천 년간 가치를 보존해왔습니다. 위기 시 안전자산 역할을 합니다.',
+    sell: '금은 현금흐름이 없습니다. 주식처럼 복리로 성장하지 않습니다.',
+  },
+  '연금': {
+    buy: '세제혜택을 최대한 활용하세요. 절세는 확실한 수익입니다.',
+    sell: '연금은 장기 자산입니다. 단기 비중 조절보다 꾸준한 납입이 중요합니다.',
+  },
+}
+
+const getBuffettAdvice = (category, action) => {
+  const advice = BUFFETT_ADVICE[category]
+  if (!advice) return '분산투자는 무지에 대한 보호입니다. 균형 잡힌 포트폴리오를 유지하세요.'
+  return action.includes('매수') ? advice.buy : advice.sell
+}
+
 // ========== 하우가 패밀리 목표 비중 (카테고리별) ==========
 const HAUGA_TARGET_WEIGHTS = {
   'Big Tech': 25,
@@ -517,29 +587,6 @@ export default function RebalancePage() {
         </div>
       </div>
 
-      {/* 필터/정렬 */}
-      <div style={styles.filterRow}>
-        <select
-          style={styles.select}
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
-          <option value="amount">금액순</option>
-          <option value="weight">비중순</option>
-          <option value="category">카테고리순</option>
-        </select>
-        <select
-          style={styles.select}
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-        >
-          <option value="all">전체 카테고리</option>
-          {categories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-      </div>
-
       {/* 요약 카드 */}
       <div style={styles.summaryGrid}>
         <div style={styles.summaryCard(false)}>
@@ -563,11 +610,9 @@ export default function RebalancePage() {
           </div>
         </div>
         <div style={styles.summaryCard(false)}>
-          <div style={styles.summaryLabel(false)}>표시 종목</div>
-          <div style={styles.summaryValue(false)}>{filteredHoldings.length}개</div>
-          <div style={styles.summarySubtext(false)}>
-            {filterCategory === 'all' ? '전체' : filterCategory}
-          </div>
+          <div style={styles.summaryLabel(false)}>카테고리</div>
+          <div style={styles.summaryValue(false)}>{categories.length}개</div>
+          <div style={styles.summarySubtext(false)}>분산투자</div>
         </div>
       </div>
 
@@ -686,6 +731,26 @@ export default function RebalancePage() {
                         : `${Math.abs(rec.diffKRW).toLocaleString()}원`
                       }
                     </span>
+                  </div>
+                </div>
+
+                {/* 워렌 버핏 의견 */}
+                <div style={{
+                  padding: '12px 16px',
+                  backgroundColor: '#FFFBEB',
+                  borderTop: '1px solid #FEF3C7',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '8px',
+                }}>
+                  <span style={{ fontSize: '14px' }}>💬</span>
+                  <div style={{
+                    fontSize: '12px',
+                    color: '#92400E',
+                    fontStyle: 'italic',
+                    lineHeight: '1.5',
+                  }}>
+                    "{getBuffettAdvice(rec.category, rec.action)}"
                   </div>
                 </div>
 
