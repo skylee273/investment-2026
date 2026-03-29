@@ -18,7 +18,6 @@ const HAUGA_HOLDINGS = [
   { ticker: 'META', name: '메타', currentKRW: 19672, investedKRW: 23670, gainPercent: -16.88 },
   { ticker: 'BAC', name: '뱅크오브아메리카', currentKRW: 19012, investedKRW: 20702, gainPercent: -8.16 },
   { ticker: 'AVGO', name: '브로드컴', currentKRW: 2686, investedKRW: 2973, gainPercent: -9.64 },
-  { ticker: 'VST', name: '비스트라 에너지', currentKRW: 925, investedKRW: 986, gainPercent: -6.16 },
   { ticker: 'AMZN', name: '아마존', currentKRW: 365295, investedKRW: 405610, gainPercent: -9.93 },
   { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 16903, investedKRW: 19727, gainPercent: -14.31 },
   { ticker: 'GOOG', name: '알파벳 C', currentKRW: 58467, investedKRW: 63641, gainPercent: -8.12 },

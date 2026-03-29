@@ -66,7 +66,6 @@ const DIVIDEND_MONTHLY_PORTFOLIO = [
   { ticker: 'AMZN', name: '아마존', category: '기술', targetWeight: 17, risk: 3 },
   { ticker: 'CVX', name: '쉐브론', category: '에너지', targetWeight: 17, risk: 3 },
   { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 16, risk: 5 },
-  { ticker: 'VST', name: '비스트라 에너지', category: '에너지', targetWeight: 16, risk: 4 },
 ]
 
 // 실시간 추적 자산 (매입가 기준 수익률 계산)

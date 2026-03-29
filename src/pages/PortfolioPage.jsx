@@ -13,12 +13,12 @@ const MIRAE_ACCOUNTS = [
     name: '연금저축계좌',
     accountNo: '010-8784-7546-2',
     icon: '🧓',
-    totalKRW: 1493152,
-    gainKRW: 16677,
-    gainPercent: 1.13,
+    totalKRW: 1393035,
+    gainKRW: -83440,
+    gainPercent: -5.65,
     holdings: [
-      { name: 'KODEX 200', shares: 14, currentKRW: 1138008, investedKRW: 1131700, gainKRW: 6308, gainPercent: 0.56 },
-      { name: 'KODEX 코스닥150', shares: 18, currentKRW: 355144, investedKRW: 344775, gainKRW: 10369, gainPercent: 3.01 },
+      { name: 'KODEX 200', shares: 13, currentKRW: 1055925, investedKRW: 1131700, gainKRW: -75775, gainPercent: -6.70 },
+      { name: 'KODEX 코스닥150', shares: 17, currentKRW: 337110, investedKRW: 344775, gainKRW: -7665, gainPercent: -2.22 },
     ]
   },
   {
@@ -26,13 +26,13 @@ const MIRAE_ACCOUNTS = [
     name: 'ISA (중개형)',
     accountNo: '660-9824-0136-0',
     icon: '📊',
-    totalKRW: 500404,
-    gainKRW: 3019,
-    gainPercent: 0.61,
+    totalKRW: 497385,
+    gainKRW: 1095,
+    gainPercent: 0.22,
     holdings: [
-      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 98680, investedKRW: 101075, gainKRW: -2395, gainPercent: -2.37 },
-      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 204375, investedKRW: 198375, gainKRW: 6000, gainPercent: 3.02 },
-      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 197349, investedKRW: 196840, gainKRW: 509, gainPercent: 0.26 },
+      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 99150, investedKRW: 101075, gainKRW: -1925, gainPercent: -1.90 },
+      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 202875, investedKRW: 198375, gainKRW: 4500, gainPercent: 2.27 },
+      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 195360, investedKRW: 196840, gainKRW: -1480, gainPercent: -0.75 },
     ]
   },
   {
@@ -40,14 +40,14 @@ const MIRAE_ACCOUNTS = [
     name: '종합 (해외주식)',
     accountNo: '종합계좌',
     icon: '🌍',
-    totalKRW: 1335816,
-    gainKRW: -41638,
-    gainPercent: -3.02,
+    totalKRW: 1385816,
+    gainKRW: 8472,
+    gainPercent: 0.62,
     holdings: [
-      { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 172690, investedKRW: 174090, gainKRW: -1400, gainPercent: -0.80 },
-      { name: '1Q 미국S&P500미국채혼합', shares: 10, currentKRW: 116100, investedKRW: 116250, gainKRW: -150, gainPercent: -0.13 },
-      { name: '셰브론 (CVX)', shares: 2, currentKRW: 620068, investedKRW: 568711, gainKRW: 51357, gainPercent: 9.03 },
-      { name: '알파벳 C (GOOG)', shares: 1, currentKRW: 376687, investedKRW: 468022, gainKRW: -91335, gainPercent: -19.51 },
+      { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 170940, investedKRW: 174090, gainKRW: -3150, gainPercent: -1.81 },
+      { name: '1Q 미국S&P500미국채혼합', shares: 10, currentKRW: 116200, investedKRW: 116250, gainKRW: -50, gainPercent: -0.04 },
+      { name: '셰브론 (CVX)', shares: 2, currentKRW: 636068, investedKRW: 568711, gainKRW: 67357, gainPercent: 11.84 },
+      { name: '알파벳 C (GOOG)', shares: 1, currentKRW: 412337, investedKRW: 468022, gainKRW: -55685, gainPercent: -11.90 },
       { name: '미국달러', shares: 0.18, currentKRW: 271, investedKRW: 271, gainKRW: 0, gainPercent: 0.00 },
       { name: '화이자 (PFE)', shares: 2, currentKRW: 50000, investedKRW: 50000, gainKRW: 0, gainPercent: 0.00 },
     ]
@@ -84,7 +84,6 @@ const TOSS_HOLDINGS = [
   { name: '메타 (META)', currentKRW: 19672, investedKRW: 23670, gainKRW: -3997, gainPercent: -16.88 },
   { name: '뱅크오브아메리카 (BAC)', currentKRW: 19012, investedKRW: 20702, gainKRW: -1689, gainPercent: -8.16 },
   { name: '브로드컴 (AVGO)', currentKRW: 2686, investedKRW: 2973, gainKRW: -286, gainPercent: -9.64 },
-  { name: '비스트라 에너지 (VST)', currentKRW: 925, investedKRW: 986, gainKRW: -60, gainPercent: -6.16 },
   { name: '아마존 (AMZN)', currentKRW: 365295, investedKRW: 405610, gainKRW: -40314, gainPercent: -9.93 },
   { name: '알파벳 A (GOOGL)', currentKRW: 16903, investedKRW: 19727, gainKRW: -2823, gainPercent: -14.31 },
   { name: '알파벳 C (GOOG)', currentKRW: 58467, investedKRW: 63641, gainKRW: -5173, gainPercent: -8.12 },
@@ -154,12 +153,11 @@ const IRP_PORTFOLIO = [
 // 배당주 매월 1주 포트폴리오 (가장 많이 떨어진 종목 매수)
 // 배당주 매월 1주 포트폴리오 (1년 1000만원)
 const DIVIDEND_MONTHLY_PORTFOLIO = [
-  { ticker: 'GOOG', name: '알파벳 C (구글)', category: '기술', targetWeight: 17, risk: 3 },
-  { ticker: 'KO', name: '코카콜라', category: '필수소비재', targetWeight: 17, risk: 2 },
-  { ticker: 'AMZN', name: '아마존', category: '기술', targetWeight: 17, risk: 3 },
-  { ticker: 'CVX', name: '쉐브론', category: '에너지', targetWeight: 17, risk: 3 },
-  { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 16, risk: 5 },
-  { ticker: 'VST', name: '비스트라 에너지', category: '에너지', targetWeight: 16, risk: 4 },
+  { ticker: 'GOOG', name: '알파벳 C (구글)', category: '기술', targetWeight: 20, risk: 3 },
+  { ticker: 'KO', name: '코카콜라', category: '필수소비재', targetWeight: 20, risk: 2 },
+  { ticker: 'AMZN', name: '아마존', category: '기술', targetWeight: 20, risk: 3 },
+  { ticker: 'CVX', name: '쉐브론', category: '에너지', targetWeight: 20, risk: 3 },
+  { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 20, risk: 5 },
 ]
 
 // 추가 연금저축 포트폴리오 (900만원 목표)

@@ -49,7 +49,6 @@ const HAUGA_PORTFOLIOS = {
       { ticker: 'QCOM', name: '퀄컴', currentKRW: 6850, category: '반도체' },
       { ticker: 'AVGO', name: '브로드컴', currentKRW: 2686, category: '반도체' },
       { ticker: 'TSLA', name: '테슬라', currentKRW: 2687, category: 'Big Tech' },
-      { ticker: 'VST', name: '비스트라 에너지', currentKRW: 925, category: '에너지' },
     ],
   },
   pension: {
@@ -60,8 +59,8 @@ const HAUGA_PORTFOLIOS = {
       { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 25 },
     ],
     holdings: [
-      { name: 'KODEX 200', ticker: '069500', currentKRW: 1138008, category: '국내대형' },
-      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 355144, category: '국내중소' },
+      { name: 'KODEX 200', ticker: '069500', currentKRW: 1055925, category: '국내대형' },
+      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 337110, category: '국내중소' },
     ],
   },
   isa: {
@@ -73,9 +72,9 @@ const HAUGA_PORTFOLIOS = {
       { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20 },
     ],
     holdings: [
-      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 98680, category: '국내중소' },
-      { name: 'TIGER 미국채10년선물', ticker: '305080', currentKRW: 204375, category: '채권' },
-      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 197349, category: 'S&P500' },
+      { name: 'KODEX 코스닥150', ticker: '229200', currentKRW: 99150, category: '국내중소' },
+      { name: 'TIGER 미국채10년선물', ticker: '305080', currentKRW: 202875, category: '채권' },
+      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 195360, category: 'S&P500' },
     ],
   },
   stock: {
@@ -88,10 +87,10 @@ const HAUGA_PORTFOLIOS = {
       { ticker: '484790', name: '1Q 미국S&P500미국채혼합', category: 'ETF', targetWeight: 10 },
     ],
     holdings: [
-      { name: '셰브론', ticker: 'CVX', currentKRW: 620068, category: '에너지' },
-      { name: '알파벳 C', ticker: 'GOOG', currentKRW: 376687, category: 'Big Tech' },
-      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 172690, category: 'S&P500' },
-      { name: '1Q 미국S&P500미국채혼합', ticker: '484790', currentKRW: 116100, category: 'ETF' },
+      { name: '셰브론', ticker: 'CVX', currentKRW: 636068, category: '에너지' },
+      { name: '알파벳 C', ticker: 'GOOG', currentKRW: 412337, category: 'Big Tech' },
+      { name: 'TIGER 미국S&P500', ticker: '360750', currentKRW: 170940, category: 'S&P500' },
+      { name: '1Q 미국S&P500미국채혼합', ticker: '484790', currentKRW: 116200, category: 'ETF' },
       { name: '화이자', ticker: 'PFE', currentKRW: 50000, category: '헬스케어' },
     ],
   },
