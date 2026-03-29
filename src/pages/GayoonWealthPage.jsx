@@ -1546,8 +1546,8 @@ export default function GayoonWealthPage() {
         </div>
 
         {/* 테이블 */}
-        <div style={{ overflowX: isMobile ? 'hidden' : 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? 'auto' : '900px', tableLayout: 'fixed' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? '320px' : '900px', tableLayout: 'fixed' }}>
             <thead>
               <tr>
                 {!isMobile && <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8B95A1', backgroundColor: '#F7F8FA', borderBottom: '1px solid #E5E8EB', width: '90px' }}>계좌</th>}
