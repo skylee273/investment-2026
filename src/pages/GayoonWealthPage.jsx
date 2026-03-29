@@ -83,6 +83,18 @@ const TRACKED_ASSETS = [
     gainPercent: -8.13,
     note: '한투 · 9주',
   },
+  {
+    id: 'bitcoin',
+    name: '비트코인 (BTC)',
+    icon: '₿',
+    type: 'crypto',
+    btcAmount: 0.01076814,
+    investedKRW: 1098351,
+    currentKRW: 1091846,
+    gainKRW: -6504,
+    gainPercent: -0.59,
+    note: '업비트 · 0.0108 BTC',
+  },
 ]
 
 // 1. 고정자산 (빼면 손해나는 자산) - 청년도약계좌, 청약저축, ISA, 연금저축
@@ -299,6 +311,20 @@ const GAYOON_ALL_HOLDINGS = [
     gainKRW: -1542,
     gainPercent: -0.58,
     risk: 2,
+  },
+  // 업비트 - 암호화폐
+  {
+    ticker: 'BTC',
+    name: '비트코인 (BTC)',
+    category: '암호화폐',
+    account: '암호화폐',
+    accountIcon: '₿',
+    btcAmount: 0.01076814,
+    investedKRW: 1098351,
+    currentKRW: 1091846,
+    gainKRW: -6504,
+    gainPercent: -0.59,
+    risk: 5,
   },
 ]
 

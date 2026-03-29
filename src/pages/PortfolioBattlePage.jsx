@@ -68,6 +68,8 @@ const GAYOON_HOLDINGS = [
   // 미래에셋 - IRP
   { ticker: 'TDF2025', name: 'TDF2025 (IRP)', currentKRW: 265937, investedKRW: 267479, gainPercent: -0.58 },
   { ticker: 'IRP_CASH', name: 'IRP 현금성자산', currentKRW: 89, investedKRW: 89, gainPercent: 0.00 },
+  // 업비트 - 암호화폐
+  { ticker: 'BTC', name: '비트코인', currentKRW: 1091846, investedKRW: 1098351, gainPercent: -0.59 },
 ]
 
 // 수익률 계산
