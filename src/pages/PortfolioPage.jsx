@@ -403,7 +403,16 @@ const QUARTERLY_PORTFOLIOS = {
   'Q2': {
     label: '2026년 2분기',
     period: '2026.04 - 2026.06',
-    portfolio: [] // 나중에 리밸런싱
+    portfolio: [
+      { ticker: '069500.KS', displayTicker: 'KODEX200', name: 'KODEX 200', type: 'ETF', currency: 'KRW', targetWeight: 30, investedKRW: 0, gainKRW: 0, per: null, pbr: null },
+      { ticker: '360750.KS', displayTicker: 'TIGER S&P', name: 'Tiger S&P 500', type: 'ETF', currency: 'KRW', targetWeight: 10, investedKRW: 0, gainKRW: 0, per: null, pbr: null },
+      { ticker: '472160.KS', displayTicker: 'TIGER혼합50', name: 'TIGER 미국S&P500채권혼합50액티브', type: 'ETF', currency: 'KRW', targetWeight: 10, investedKRW: 0, gainKRW: 0, per: null, pbr: null },
+      { ticker: 'CVX', displayTicker: 'CVX', name: '셰브론', type: 'Stock', currency: 'USD', targetWeight: 10, investedKRW: 0, gainKRW: 0, per: null, pbr: null },
+      { ticker: 'AMZN', displayTicker: 'AMZN', name: '아마존', type: 'Stock', currency: 'USD', targetWeight: 10, investedKRW: 0, gainKRW: 0, per: null, pbr: null },
+      { ticker: 'GOOG', displayTicker: 'GOOG', name: '알파벳 C (A+C 합산)', type: 'Stock', currency: 'USD', targetWeight: 12, investedKRW: 0, gainKRW: 0, per: null, pbr: null },
+      { ticker: '229200.KS', displayTicker: 'KODEX코스닥150', name: 'KODEX 코스닥150', type: 'ETF', currency: 'KRW', targetWeight: 13, investedKRW: 0, gainKRW: 0, per: null, pbr: null },
+      { ticker: 'ADA-USD', displayTicker: 'ADA', name: '에이다 (카르다노)', type: 'Crypto', currency: 'USD', targetWeight: 5, investedKRW: 0, gainKRW: 0, per: null, pbr: null },
+    ]
   },
   'Q3': {
     label: '2026년 3분기',
@@ -763,7 +772,7 @@ const getPieChartStyle = (portfolio) => {
 }
 
 export default function PortfolioPage() {
-  const [currentQuarter, setCurrentQuarter] = useState('Q1')
+  const [currentQuarter, setCurrentQuarter] = useState('Q2')
   const [data, setData] = useState({})
   const [lastUpdate, setLastUpdate] = useState(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -1410,29 +1419,30 @@ export default function PortfolioPage() {
 
           {/* 필터 */}
           <div style={{
-            padding: '12px 20px',
+            padding: isMobile ? '8px 12px' : '12px 20px',
             borderBottom: '1px solid #E5E8EB',
             display: 'flex',
-            gap: '16px',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: isMobile ? '8px' : '16px',
             flexWrap: 'wrap',
-            alignItems: 'center',
+            alignItems: isMobile ? 'stretch' : 'center',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '12px', color: '#8B95A1' }}>증권사:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#8B95A1' }}>증권사:</span>
               {[
                 { value: 'all', label: '전체' },
-                { value: '미래에셋', label: '미래에셋' },
-                { value: '토스증권', label: '토스증권' },
+                { value: '미래에셋', label: '미래' },
+                { value: '토스증권', label: '토스' },
                 { value: '업비트', label: '업비트' },
               ].map(opt => (
                 <button
                   key={opt.value}
                   onClick={() => setHoldingsFilter({ ...holdingsFilter, broker: opt.value })}
                   style={{
-                    padding: '4px 10px',
+                    padding: isMobile ? '3px 6px' : '4px 10px',
                     borderRadius: '6px',
                     border: 'none',
-                    fontSize: '12px',
+                    fontSize: isMobile ? '10px' : '12px',
                     fontWeight: '500',
                     cursor: 'pointer',
                     backgroundColor: holdingsFilter.broker === opt.value ? '#3182F6' : '#F2F4F6',
@@ -1444,16 +1454,16 @@ export default function PortfolioPage() {
               ))}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '12px', color: '#8B95A1' }}>계좌:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px' }}>
+              <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#8B95A1' }}>계좌:</span>
               <select
                 value={holdingsFilter.account}
                 onChange={(e) => setHoldingsFilter({ ...holdingsFilter, account: e.target.value })}
                 style={{
-                  padding: '4px 8px',
+                  padding: isMobile ? '3px 4px' : '4px 8px',
                   borderRadius: '6px',
                   border: '1px solid #E5E8EB',
-                  fontSize: '12px',
+                  fontSize: isMobile ? '10px' : '12px',
                   color: '#4E5968',
                   cursor: 'pointer',
                 }}
@@ -1461,63 +1471,93 @@ export default function PortfolioPage() {
                 <option value="all">전체</option>
                 <option value="연금저축계좌">연금저축</option>
                 <option value="ISA (중개형)">ISA</option>
-                <option value="비상금 CMA">비상금 CMA</option>
-                <option value="하우가 가족여행 CMA">가족여행 CMA</option>
+                <option value="비상금 CMA">비상금</option>
+                <option value="하우가 가족여행 CMA">가족여행</option>
               </select>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '12px', color: '#8B95A1' }}>정렬:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px' }}>
+              <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#8B95A1' }}>정렬:</span>
               <select
                 value={holdingsFilter.sort}
                 onChange={(e) => setHoldingsFilter({ ...holdingsFilter, sort: e.target.value })}
                 style={{
-                  padding: '4px 8px',
+                  padding: isMobile ? '3px 4px' : '4px 8px',
                   borderRadius: '6px',
                   border: '1px solid #E5E8EB',
-                  fontSize: '12px',
+                  fontSize: isMobile ? '10px' : '12px',
                   color: '#4E5968',
                   cursor: 'pointer',
                 }}
               >
-                <option value="value">평가금액순</option>
-                <option value="gain">수익률순</option>
-                <option value="name">이름순</option>
+                <option value="value">평가금액</option>
+                <option value="gain">수익률</option>
+                <option value="name">이름</option>
               </select>
             </div>
           </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ ...styles.table, tableLayout: 'fixed', minWidth: '900px' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table style={{ ...styles.table, tableLayout: 'fixed', minWidth: isMobile ? '320px' : '900px' }}>
               <thead>
                 <tr>
-                  <th style={{ ...styles.th, width: '120px' }}>증권사/계좌</th>
+                  {!isMobile && <th style={{ ...styles.th, width: '120px' }}>증권사/계좌</th>}
                   <th
-                    style={{ ...styles.th, width: '130px', cursor: 'pointer' }}
+                    style={{
+                      ...styles.th,
+                      width: isMobile ? 'auto' : '130px',
+                      cursor: 'pointer',
+                      padding: isMobile ? '8px 4px 8px 8px' : '12px 16px',
+                      fontSize: isMobile ? '10px' : '12px',
+                      color: holdingsFilter.sort === 'name' ? '#3182F6' : '#8B95A1',
+                    }}
                     onClick={() => toggleSort('name')}
                   >
                     종목명<SortArrow column="name" />
                   </th>
-                  <th style={{ ...styles.thRight, width: '60px' }}>수량</th>
+                  {!isMobile && <th style={{ ...styles.thRight, width: '60px' }}>수량</th>}
                   <th
-                    style={{ ...styles.thRight, width: '95px', cursor: 'pointer' }}
+                    style={{
+                      ...styles.thRight,
+                      width: isMobile ? 'auto' : '95px',
+                      cursor: 'pointer',
+                      padding: isMobile ? '8px 2px' : '12px 16px',
+                      fontSize: isMobile ? '10px' : '12px',
+                      color: holdingsFilter.sort === 'invested' ? '#3182F6' : '#8B95A1',
+                    }}
                     onClick={() => toggleSort('invested')}
                   >
-                    매입금액<SortArrow column="invested" />
+                    매입<SortArrow column="invested" />
                   </th>
                   <th
-                    style={{ ...styles.thRight, width: '110px', cursor: 'pointer' }}
+                    style={{
+                      ...styles.thRight,
+                      width: isMobile ? 'auto' : '110px',
+                      cursor: 'pointer',
+                      padding: isMobile ? '8px 2px' : '12px 16px',
+                      fontSize: isMobile ? '10px' : '12px',
+                      color: holdingsFilter.sort === 'value' ? '#3182F6' : '#8B95A1',
+                    }}
                     onClick={() => toggleSort('value')}
                   >
-                    평가금액<SortArrow column="value" />
+                    평가<SortArrow column="value" />
                   </th>
+                  {!isMobile && (
+                    <th
+                      style={{ ...styles.thRight, width: '115px', cursor: 'pointer' }}
+                      onClick={() => toggleSort('gainKRW')}
+                    >
+                      손익<SortArrow column="gainKRW" />
+                    </th>
+                  )}
                   <th
-                    style={{ ...styles.thRight, width: '115px', cursor: 'pointer' }}
-                    onClick={() => toggleSort('gainKRW')}
-                  >
-                    손익<SortArrow column="gainKRW" />
-                  </th>
-                  <th
-                    style={{ ...styles.thRight, width: '90px', cursor: 'pointer' }}
+                    style={{
+                      ...styles.thRight,
+                      width: isMobile ? 'auto' : '90px',
+                      cursor: 'pointer',
+                      padding: isMobile ? '8px 8px 8px 2px' : '12px 16px',
+                      fontSize: isMobile ? '10px' : '12px',
+                      color: holdingsFilter.sort === 'gain' ? '#3182F6' : '#8B95A1',
+                    }}
                     onClick={() => toggleSort('gain')}
                   >
                     수익률<SortArrow column="gain" />
@@ -1550,86 +1590,93 @@ export default function PortfolioPage() {
                     const investedAmount = item.investedKRW !== undefined ? item.investedKRW : (item.currentKRW - item.gainKRW)
                     return (
                       <tr key={`${item.broker}-${item.account}-${item.name}-${idx}`}>
-                        {/* 증권사/계좌 */}
-                        <td style={styles.td}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <span style={{
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              color: '#FF6B35',
-                            }}>
-                              {item.broker}
-                            </span>
-                            <span style={{ fontSize: '11px', color: '#8B95A1' }}>
-                              {item.accountIcon} {item.account}
-                            </span>
-                          </div>
-                        </td>
+                        {/* 증권사/계좌 - PC만 */}
+                        {!isMobile && (
+                          <td style={styles.td}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <span style={{
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                color: '#FF6B35',
+                              }}>
+                                {item.broker}
+                              </span>
+                              <span style={{ fontSize: '11px', color: '#8B95A1' }}>
+                                {item.accountIcon} {item.account}
+                              </span>
+                            </div>
+                          </td>
+                        )}
                         {/* 종목명 */}
-                        <td style={styles.td}>
-                          <div style={styles.tickerCell}>
-                            <div style={styles.tickerInfo}>
-                              <span style={styles.tickerSymbol}>
-                                {item.ticker || item.name}
-                                {item.isLive && (
-                                  <span style={{
-                                    marginLeft: '6px',
-                                    fontSize: '9px',
-                                    color: '#00C853',
-                                    fontWeight: '500'
-                                  }}>●</span>
-                                )}
-                              </span>
-                              <span style={styles.tickerName}>
-                                {item.ticker && item.ticker !== item.name ? item.name : ''}
-                                {item.type === 'crypto' && ' (암호화폐)'}
-                              </span>
+                        <td style={{ ...styles.td, padding: isMobile ? '8px 2px 8px 8px' : '14px 16px', fontSize: isMobile ? '11px' : '14px' }}>
+                          <div>
+                            <div style={{ fontWeight: '600', fontSize: isMobile ? '11px' : '13px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                              {isMobile && <span style={{ fontSize: '10px' }}>{item.accountIcon}</span>}
+                              {item.ticker || item.name}
+                              {item.isLive && (
+                                <span style={{
+                                  marginLeft: '4px',
+                                  fontSize: '9px',
+                                  color: '#00C853',
+                                  fontWeight: '500'
+                                }}>●</span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: isMobile ? '9px' : '11px', color: '#8B95A1' }}>
+                              {item.ticker && item.ticker !== item.name ? item.name : ''}
+                              {item.type === 'crypto' && ' (암호화폐)'}
                             </div>
                           </div>
                         </td>
-                        {/* 수량 */}
-                        <td style={styles.tdRight}>
-                          {item.shares > 0 ? (
-                            <span style={{ fontWeight: '500', fontSize: '13px' }}>
-                              {item.shares < 1 ? item.shares.toFixed(4) : item.shares.toLocaleString()}
-                            </span>
-                          ) : '-'}
-                        </td>
+                        {/* 수량 - PC만 */}
+                        {!isMobile && (
+                          <td style={styles.tdRight}>
+                            {item.shares > 0 ? (
+                              <span style={{ fontWeight: '500', fontSize: '13px' }}>
+                                {item.shares < 1 ? item.shares.toFixed(4) : item.shares.toLocaleString()}
+                              </span>
+                            ) : '-'}
+                          </td>
+                        )}
                         {/* 매입금액 */}
-                        <td style={styles.tdRight}>
-                          <span style={{ color: '#8B95A1', fontSize: '13px' }}>
-                            ₩{Math.round(investedAmount).toLocaleString()}
+                        <td style={{ ...styles.tdRight, padding: isMobile ? '8px 2px' : '14px 16px', fontSize: isMobile ? '10px' : '13px' }}>
+                          <span style={{ color: '#8B95A1' }}>
+                            {isMobile ? `${(investedAmount / 10000).toFixed(0)}만` : `₩${Math.round(investedAmount).toLocaleString()}`}
                           </span>
                         </td>
                         {/* 평가금액 */}
-                        <td style={styles.tdRight}>
+                        <td style={{ ...styles.tdRight, padding: isMobile ? '8px 2px' : '14px 16px', fontSize: isMobile ? '11px' : '14px' }}>
                           <span style={{ fontWeight: '600' }}>
-                            ₩{Math.round(item.currentKRW).toLocaleString()}
+                            {isMobile ? `${(item.currentKRW / 10000).toFixed(0)}만` : `₩${Math.round(item.currentKRW).toLocaleString()}`}
                           </span>
                         </td>
-                        {/* 손익 */}
-                        <td style={styles.tdRight}>
-                          <span style={{
-                            color: item.gainKRW > 0 ? '#00C853' : item.gainKRW < 0 ? '#F04438' : '#8B95A1',
-                            fontWeight: '600',
-                            fontSize: '13px',
-                          }}>
-                            {item.gainKRW >= 0 ? '+' : '-'}₩{Math.abs(Math.round(item.gainKRW)).toLocaleString()}
-                          </span>
-                        </td>
+                        {/* 손익 - PC만 */}
+                        {!isMobile && (
+                          <td style={styles.tdRight}>
+                            <span style={{
+                              color: item.gainKRW > 0 ? '#00C853' : item.gainKRW < 0 ? '#F04438' : '#8B95A1',
+                              fontWeight: '600',
+                              fontSize: '13px',
+                            }}>
+                              {item.gainKRW >= 0 ? '+' : '-'}₩{Math.abs(Math.round(item.gainKRW)).toLocaleString()}
+                            </span>
+                          </td>
+                        )}
                         {/* 수익률 */}
-                        <td style={styles.tdRight}>
+                        <td style={{ ...styles.tdRight, padding: isMobile ? '8px 8px 8px 2px' : '14px 16px' }}>
                           <span style={{
                             display: 'inline-block',
-                            padding: '4px 8px',
+                            padding: isMobile ? '2px 4px' : '4px 8px',
                             borderRadius: '6px',
-                            fontSize: '12px',
+                            fontSize: isMobile ? '10px' : '12px',
                             fontWeight: '600',
-                            backgroundColor: gainPercent >= 5 ? '#E8F5E9' : gainPercent > 0 ? '#F0FFF4' : gainPercent < 0 ? '#FFEBEE' : '#F2F4F6',
-                            color: gainPercent > 0 ? '#00C853' : gainPercent < 0 ? '#F04438' : '#8B95A1',
+                            backgroundColor: gainPercent >= 5 ? '#E8F5E9' : gainPercent > 0 ? '#F0FFF4' : gainPercent <= -15 ? '#FFCDD2' : gainPercent <= -10 ? '#FFE0B2' : gainPercent < 0 ? '#FFEBEE' : '#F2F4F6',
+                            color: gainPercent > 0 ? '#00C853' : gainPercent <= -15 ? '#D32F2F' : gainPercent <= -10 ? '#F57C00' : gainPercent < 0 ? '#F04438' : '#8B95A1',
                           }}>
-                            {gainPercent >= 5 && '🔥 '}
-                            {gainPercent > 0 ? '+' : ''}{gainPercent.toFixed(2)}%
+                            {gainPercent >= 5 && '🔥'}
+                            {gainPercent <= -15 && '🚨'}
+                            {gainPercent > -15 && gainPercent <= -10 && '⚠️'}
+                            {gainPercent > 0 ? '+' : ''}{gainPercent.toFixed(isMobile ? 1 : 2)}%
                           </span>
                         </td>
                       </tr>
@@ -1725,23 +1772,28 @@ export default function PortfolioPage() {
           </div>
           {/* 범례 */}
           <div style={{
-            padding: isMobile ? '12px 16px' : '16px 20px',
+            padding: isMobile ? '10px 12px' : '16px 20px',
             borderTop: '1px solid #E5E8EB',
             backgroundColor: '#FAFAFA',
           }}>
             <div style={{
               display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
               flexWrap: 'wrap',
-              gap: isMobile ? '10px' : '16px',
-              fontSize: isMobile ? '11px' : '12px',
+              gap: isMobile ? '4px' : '16px',
+              fontSize: isMobile ? '10px' : '12px',
               color: '#4E5968',
             }}>
-              <span><strong style={{ color: '#00C853' }}>🔥</strong> = 내 수익 +5% 이상</span>
-              <span><strong style={{ color: '#F57F17' }}>⚠️</strong> = 매수후고점 대비 -10% 이상</span>
-              <span><strong style={{ color: '#F04438' }}>🚨</strong> = 매수후고점 대비 -15% 이상 (손절 고려)</span>
-              <span><strong>PER</strong> = 주가수익비율</span>
-              <span><strong>PBR</strong> = 주가순자산비율</span>
-              <span><strong>ROE</strong> = 자기자본이익률 (15%+ 우량)</span>
+              <span><strong style={{ color: '#00C853' }}>🔥</strong> +5%↑</span>
+              <span><strong style={{ color: '#F57C00' }}>⚠️</strong> -10%↓</span>
+              <span><strong style={{ color: '#D32F2F' }}>🚨</strong> -15%↓ (손절)</span>
+              {!isMobile && (
+                <>
+                  <span><strong>PER</strong> = 주가수익비율</span>
+                  <span><strong>PBR</strong> = 주가순자산비율</span>
+                  <span><strong>ROE</strong> = 자기자본이익률</span>
+                </>
+              )}
             </div>
           </div>
         </div>

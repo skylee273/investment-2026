@@ -14,7 +14,14 @@ const QUARTERLY_PORTFOLIOS = {
       { ticker: 'TIGER S&P', name: 'TIGER 미국S&P500', type: 'ETF', investedKRW: 0, gainKRW: 0 },
     ]
   },
-  'Q2': { label: '2026년 2분기', period: '2026.04 - 2026.06', portfolio: [] },
+  'Q2': {
+    label: '2026년 2분기',
+    period: '2026.04 - 2026.06',
+    portfolio: [
+      { ticker: 'KODEX200', name: 'KODEX 200', type: 'ETF', investedKRW: 0, gainKRW: 0 },
+      { ticker: 'TIGER S&P', name: 'TIGER 미국S&P500', type: 'ETF', investedKRW: 0, gainKRW: 0 },
+    ]
+  },
   'Q3': { label: '2026년 3분기', period: '2026.07 - 2026.09', portfolio: [] },
   'Q4': { label: '2026년 4분기', period: '2026.10 - 2026.12', portfolio: [] },
 }
@@ -540,7 +547,7 @@ const styles = {
 
 export default function GayoonWealthPage() {
   const navigate = useNavigate()
-  const [currentQuarter, setCurrentQuarter] = useState('Q1')
+  const [currentQuarter, setCurrentQuarter] = useState('Q2')
 
   // 모바일 감지
   const [isMobile, setIsMobile] = useState(false)
