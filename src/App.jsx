@@ -12,7 +12,6 @@ import HaugaHousePage from './pages/HaugaHousePage'
 import RebalancePage from './pages/RebalancePage'
 import MonthlyReportPage from './pages/MonthlyReportPage'
 import GuruPortfolioPage from './pages/GuruPortfolioPage'
-import InvestmentNotesPage from './pages/InvestmentNotesPage'
 
 function App() {
   return (
@@ -32,7 +31,6 @@ function App() {
             <Route path="rebalance" element={<RebalancePage />} />
             <Route path="monthly" element={<MonthlyReportPage />} />
             <Route path="gurus" element={<GuruPortfolioPage />} />
-            <Route path="notes" element={<InvestmentNotesPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
