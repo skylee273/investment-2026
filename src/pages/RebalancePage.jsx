@@ -1890,71 +1890,79 @@ export default function RebalancePage() {
             {data.isaRebalance.sellStrategy && (
               <div style={{ marginTop: 24 }}>
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: '#333', marginBottom: 16 }}>📊 분할 매도/매수 전략</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20 }}>
-                  {/* 분할 매도 전략 */}
-                  <div style={{ backgroundColor: '#FFF5F5', borderRadius: 12, padding: 16 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 분할 매도 (5단계) · 총 {formatMoney(data.isaRebalance.sellTotal)}</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {data.isaRebalance.sellStrategy.map((item, idx) => (
-                        <div key={idx} style={{ backgroundColor: '#FFE4E4', borderRadius: 8, padding: 12 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                            <span style={{ fontWeight: 700, color: '#333' }}>{item.step}</span>
-                            <span style={{ color: '#FF6B6B', fontWeight: 600 }}>{item.rate} 도달 시</span>
-                            <span style={{ fontWeight: 700, color: '#FF6B6B' }}>{formatMoney(item.amount)}</span>
-                          </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                            {item.items.map((sub, subIdx) => (
-                              <span key={subIdx} style={{
-                                backgroundColor: '#fff',
-                                padding: '4px 8px',
-                                borderRadius: 4,
-                                fontSize: 12,
-                                color: '#666',
-                                border: '1px solid #FFB3B3'
-                              }}>
-                                {sub.name} <strong style={{ color: '#FF6B6B' }}>{formatMoney(sub.amount)}</strong>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: 13, color: '#666', marginTop: 12, padding: '8px 12px', backgroundColor: '#FFE4E4', borderRadius: 8 }}>
-                      ⚠️ {data.isaRebalance.sellNote}
-                    </p>
+
+                {/* 분할 매도 */}
+                <div style={{ marginBottom: 24 }}>
+                  <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    📉 분할 매도
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>총 {formatMoney(data.isaRebalance.sellTotal)}</span>
+                  </h4>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ ...styles.table, minWidth: 500 }}>
+                      <thead>
+                        <tr style={{ backgroundColor: '#FFF5F5' }}>
+                          <th style={{ ...styles.th, textAlign: 'center', width: 50 }}>단계</th>
+                          <th style={{ ...styles.th, textAlign: 'center', width: 60 }}>수익률</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>KODEX 200</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>S&P500</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>나스닥100</th>
+                          <th style={{ ...styles.th, textAlign: 'right', fontWeight: 700 }}>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.isaRebalance.sellStrategy.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={{ ...styles.td, textAlign: 'center', fontWeight: 600 }}>{item.step}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', color: '#FF6B6B', fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.items.find(i => i.name === 'KODEX 200')?.amount || 0)}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.items.find(i => i.name === 'S&P500')?.amount || 0)}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.items.find(i => i.name === '나스닥100')?.amount || 0)}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: '#FF6B6B' }}>{formatMoney(item.amount)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                  {/* 분할 매수 전략 */}
-                  <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 분할 매수 (9단계) · 총 {formatMoney(data.isaRebalance.buyTotal)}</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {data.isaRebalance.buyStrategy.map((item, idx) => (
-                        <div key={idx} style={{ backgroundColor: '#DCFCE7', borderRadius: 8, padding: 12 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                            <span style={{ fontWeight: 700, color: '#333' }}>{item.step}</span>
-                            <span style={{ color: COLORS.success, fontWeight: 600 }}>{item.rate} 하락 시</span>
-                            <span style={{ fontWeight: 700, color: COLORS.success }}>{formatMoney(item.amount)}</span>
-                          </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                            {item.items.map((sub, subIdx) => (
-                              <span key={subIdx} style={{
-                                backgroundColor: '#fff',
-                                padding: '4px 8px',
-                                borderRadius: 4,
-                                fontSize: 12,
-                                color: '#666',
-                                border: '1px solid #86EFAC'
-                              }}>
-                                {sub.name} <strong style={{ color: COLORS.success }}>{formatMoney(sub.amount)}</strong>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: 13, color: '#666', marginTop: 12, padding: '8px 12px', backgroundColor: '#DCFCE7', borderRadius: 8 }}>
-                      💡 {data.isaRebalance.buyNote}
-                    </p>
+                  <p style={{ fontSize: 12, color: '#888', marginTop: 8 }}>⚠️ {data.isaRebalance.sellNote}</p>
+                </div>
+
+                {/* 분할 매수 */}
+                <div>
+                  <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    📈 분할 매수
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>총 {formatMoney(data.isaRebalance.buyTotal)}</span>
+                  </h4>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ ...styles.table, minWidth: 700 }}>
+                      <thead>
+                        <tr style={{ backgroundColor: '#F0FFF4' }}>
+                          <th style={{ ...styles.th, textAlign: 'center', width: 50 }}>단계</th>
+                          <th style={{ ...styles.th, textAlign: 'center', width: 60 }}>하락률</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>미국채10년</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>금액티브</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>SOFR달러</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>신흥국</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>코스닥150</th>
+                          <th style={{ ...styles.th, textAlign: 'right', fontWeight: 700 }}>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.isaRebalance.buyStrategy.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={{ ...styles.td, textAlign: 'center', fontWeight: 600 }}>{item.step}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', color: COLORS.success, fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '미국채10년')?.amount ? formatMoney(item.items.find(i => i.name === '미국채10년').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '금액티브')?.amount ? formatMoney(item.items.find(i => i.name === '금액티브').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === 'SOFR달러')?.amount ? formatMoney(item.items.find(i => i.name === 'SOFR달러').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '신흥국')?.amount ? formatMoney(item.items.find(i => i.name === '신흥국').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '코스닥150')?.amount ? formatMoney(item.items.find(i => i.name === '코스닥150').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: COLORS.success }}>{formatMoney(item.amount)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
+                  <p style={{ fontSize: 12, color: '#888', marginTop: 8 }}>💡 {data.isaRebalance.buyNote}</p>
                 </div>
               </div>
             )}
@@ -2032,71 +2040,77 @@ export default function RebalancePage() {
             {data.pensionRebalance.sellStrategy && (
               <div style={{ marginTop: 24 }}>
                 <h3 style={{ fontSize: 18, fontWeight: 700, color: '#333', marginBottom: 16 }}>📊 분할 매도/매수 전략</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20 }}>
-                  {/* 분할 매도 전략 */}
-                  <div style={{ backgroundColor: '#FFF5F5', borderRadius: 12, padding: 16 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 분할 매도 (7단계) · 총 {formatMoney(data.pensionRebalance.sellTotal)}</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {data.pensionRebalance.sellStrategy.map((item, idx) => (
-                        <div key={idx} style={{ backgroundColor: '#FFE4E4', borderRadius: 8, padding: 12 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                            <span style={{ fontWeight: 700, color: '#333' }}>{item.step}</span>
-                            <span style={{ color: '#FF6B6B', fontWeight: 600 }}>{item.rate} 도달 시</span>
-                            <span style={{ fontWeight: 700, color: '#FF6B6B' }}>{formatMoney(item.amount)}</span>
-                          </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                            {item.items.map((sub, subIdx) => (
-                              <span key={subIdx} style={{
-                                backgroundColor: '#fff',
-                                padding: '4px 8px',
-                                borderRadius: 4,
-                                fontSize: 12,
-                                color: '#666',
-                                border: '1px solid #FFB3B3'
-                              }}>
-                                {sub.name} <strong style={{ color: '#FF6B6B' }}>{formatMoney(sub.amount)}</strong>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: 13, color: '#666', marginTop: 12, padding: '8px 12px', backgroundColor: '#FFE4E4', borderRadius: 8 }}>
-                      ⚠️ {data.pensionRebalance.sellNote}
-                    </p>
+
+                {/* 분할 매도 */}
+                <div style={{ marginBottom: 24 }}>
+                  <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    📉 분할 매도
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>총 {formatMoney(data.pensionRebalance.sellTotal)}</span>
+                  </h4>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ ...styles.table, minWidth: 400 }}>
+                      <thead>
+                        <tr style={{ backgroundColor: '#FFF5F5' }}>
+                          <th style={{ ...styles.th, textAlign: 'center', width: 50 }}>단계</th>
+                          <th style={{ ...styles.th, textAlign: 'center', width: 60 }}>수익률</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>KODEX 200</th>
+                          <th style={{ ...styles.th, textAlign: 'right', fontWeight: 700 }}>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.pensionRebalance.sellStrategy.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={{ ...styles.td, textAlign: 'center', fontWeight: 600 }}>{item.step}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', color: '#FF6B6B', fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.items[0]?.amount || 0)}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: '#FF6B6B' }}>{formatMoney(item.amount)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                  {/* 분할 매수 전략 */}
-                  <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 분할 매수 (4단계) · 총 {formatMoney(data.pensionRebalance.buyTotal)}</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {data.pensionRebalance.buyStrategy.map((item, idx) => (
-                        <div key={idx} style={{ backgroundColor: '#DCFCE7', borderRadius: 8, padding: 12 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                            <span style={{ fontWeight: 700, color: '#333' }}>{item.step}</span>
-                            <span style={{ color: COLORS.success, fontWeight: 600 }}>{item.rate} 하락 시</span>
-                            <span style={{ fontWeight: 700, color: COLORS.success }}>{formatMoney(item.amount)}</span>
-                          </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                            {item.items.map((sub, subIdx) => (
-                              <span key={subIdx} style={{
-                                backgroundColor: '#fff',
-                                padding: '4px 8px',
-                                borderRadius: 4,
-                                fontSize: 12,
-                                color: '#666',
-                                border: '1px solid #86EFAC'
-                              }}>
-                                {sub.name} <strong style={{ color: COLORS.success }}>{formatMoney(sub.amount)}</strong>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: 13, color: '#666', marginTop: 12, padding: '8px 12px', backgroundColor: '#DCFCE7', borderRadius: 8 }}>
-                      💡 {data.pensionRebalance.buyNote}
-                    </p>
+                  <p style={{ fontSize: 12, color: '#888', marginTop: 8 }}>⚠️ {data.pensionRebalance.sellNote}</p>
+                </div>
+
+                {/* 분할 매수 */}
+                <div>
+                  <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    📈 분할 매수
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>총 {formatMoney(data.pensionRebalance.buyTotal)}</span>
+                  </h4>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ ...styles.table, minWidth: 700 }}>
+                      <thead>
+                        <tr style={{ backgroundColor: '#F0FFF4' }}>
+                          <th style={{ ...styles.th, textAlign: 'center', width: 50 }}>단계</th>
+                          <th style={{ ...styles.th, textAlign: 'center', width: 60 }}>하락률</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>미국채10년</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>금액티브</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>SOFR달러</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>코스닥150</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>S&P500</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>나스닥100</th>
+                          <th style={{ ...styles.th, textAlign: 'right', fontWeight: 700 }}>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.pensionRebalance.buyStrategy.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={{ ...styles.td, textAlign: 'center', fontWeight: 600 }}>{item.step}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', color: COLORS.success, fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '미국채10년')?.amount ? formatMoney(item.items.find(i => i.name === '미국채10년').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '금액티브')?.amount ? formatMoney(item.items.find(i => i.name === '금액티브').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === 'SOFR달러')?.amount ? formatMoney(item.items.find(i => i.name === 'SOFR달러').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '코스닥150')?.amount ? formatMoney(item.items.find(i => i.name === '코스닥150').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === 'S&P500')?.amount ? formatMoney(item.items.find(i => i.name === 'S&P500').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '나스닥100')?.amount ? formatMoney(item.items.find(i => i.name === '나스닥100').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: COLORS.success }}>{formatMoney(item.amount)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
+                  <p style={{ fontSize: 12, color: '#888', marginTop: 8 }}>💡 {data.pensionRebalance.buyNote}</p>
                 </div>
               </div>
             )}
