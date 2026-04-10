@@ -1133,27 +1133,29 @@ export default function RebalancePage() {
           { asset: 'TIGER SOFR달러', amount: 500000 },
         ],
         reason: '차익 실현 시점, 안전자산 분배, 저평가된 코스닥/신흥국 재투자',
-        // 분할 매도 전략 (5단계)
+        // 분할 매도 전략 (5단계) - 총 600만원
         sellStrategy: [
-          { step: '1차', rate: '+7%', ratio: '20%' },
-          { step: '2차', rate: '+10%', ratio: '20%' },
-          { step: '3차', rate: '+13%', ratio: '20%' },
-          { step: '4차', rate: '+16%', ratio: '20%' },
-          { step: '5차', rate: '+20%', ratio: '20%' },
+          { step: '1차', rate: '+7%', ratio: '20%', amount: 1200000 },
+          { step: '2차', rate: '+10%', ratio: '20%', amount: 1200000 },
+          { step: '3차', rate: '+13%', ratio: '20%', amount: 1200000 },
+          { step: '4차', rate: '+16%', ratio: '20%', amount: 1200000 },
+          { step: '5차', rate: '+20%', ratio: '20%', amount: 1200000 },
         ],
+        sellTotal: 6000000,
         sellNote: '6월까지 미매도 시: 7% 이상이면 전량 매도',
-        // 분할 매수 전략 (9단계, 금액 점점 크게)
+        // 분할 매수 전략 (9단계, 금액 점점 크게) - 총 600만원
         buyStrategy: [
-          { step: '1차', rate: '-3%', ratio: '5%' },
-          { step: '2차', rate: '-5%', ratio: '7%' },
-          { step: '3차', rate: '-7%', ratio: '9%' },
-          { step: '4차', rate: '-10%', ratio: '11%' },
-          { step: '5차', rate: '-12%', ratio: '13%' },
-          { step: '6차', rate: '-14%', ratio: '15%' },
-          { step: '7차', rate: '-16%', ratio: '15%' },
-          { step: '8차', rate: '-18%', ratio: '12%' },
-          { step: '9차', rate: '-20%', ratio: '13%' },
+          { step: '1차', rate: '-3%', ratio: '5%', amount: 300000 },
+          { step: '2차', rate: '-5%', ratio: '7%', amount: 420000 },
+          { step: '3차', rate: '-7%', ratio: '9%', amount: 540000 },
+          { step: '4차', rate: '-10%', ratio: '11%', amount: 660000 },
+          { step: '5차', rate: '-12%', ratio: '13%', amount: 780000 },
+          { step: '6차', rate: '-14%', ratio: '15%', amount: 900000 },
+          { step: '7차', rate: '-16%', ratio: '15%', amount: 900000 },
+          { step: '8차', rate: '-18%', ratio: '12%', amount: 720000 },
+          { step: '9차', rate: '-20%', ratio: '13%', amount: 780000 },
         ],
+        buyTotal: 6000000,
         buyNote: '6월까지 미매수 시: 마이너스면 구매',
       },
       // 연금저축 리밸런싱 (미래에셋)
@@ -1170,24 +1172,26 @@ export default function RebalancePage() {
           { asset: 'TIGER 미국나스닥100', amount: 500000 },
         ],
         reason: '과세이연 혜택을 위해 해외주식 필요, 차익 실현 후 저평가 자산 + 안전자산 분산',
-        // 분할 매도 전략 (7단계, 금액 점점 작게)
+        // 분할 매도 전략 (7단계, 금액 점점 작게) - 총 400만원
         sellStrategy: [
-          { step: '1차', rate: '+7%', ratio: '25%', note: '가장 큼' },
-          { step: '2차', rate: '+9%', ratio: '20%' },
-          { step: '3차', rate: '+11%', ratio: '15%' },
-          { step: '4차', rate: '+14%', ratio: '13%' },
-          { step: '5차', rate: '+16%', ratio: '11%' },
-          { step: '6차', rate: '+18%', ratio: '9%' },
-          { step: '7차', rate: '+20%', ratio: '7%', note: '가장 작음' },
+          { step: '1차', rate: '+7%', ratio: '25%', amount: 1000000, note: '가장 큼' },
+          { step: '2차', rate: '+9%', ratio: '20%', amount: 800000 },
+          { step: '3차', rate: '+11%', ratio: '15%', amount: 600000 },
+          { step: '4차', rate: '+14%', ratio: '13%', amount: 520000 },
+          { step: '5차', rate: '+16%', ratio: '11%', amount: 440000 },
+          { step: '6차', rate: '+18%', ratio: '9%', amount: 360000 },
+          { step: '7차', rate: '+20%', ratio: '7%', amount: 280000, note: '가장 작음' },
         ],
+        sellTotal: 4000000,
         sellNote: '6월까지 미매도 시: 7% 이상이면 전량 매도',
-        // 분할 매수 전략 (4단계, 금액 점점 크게)
+        // 분할 매수 전략 (4단계, 금액 점점 크게) - 총 400만원
         buyStrategy: [
-          { step: '1차', rate: '-3%', ratio: '15%' },
-          { step: '2차', rate: '-5%', ratio: '20%' },
-          { step: '3차', rate: '-7%', ratio: '30%' },
-          { step: '4차', rate: '-10%', ratio: '35%' },
+          { step: '1차', rate: '-3%', ratio: '15%', amount: 600000 },
+          { step: '2차', rate: '-5%', ratio: '20%', amount: 800000 },
+          { step: '3차', rate: '-7%', ratio: '30%', amount: 1200000 },
+          { step: '4차', rate: '-10%', ratio: '35%', amount: 1400000 },
         ],
+        buyTotal: 4000000,
         buyNote: '6월까지 미매수 시: 마이너스면 구매',
       },
       sellRecommend: [
@@ -1817,13 +1821,14 @@ export default function RebalancePage() {
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
                   {/* 분할 매도 전략 */}
                   <div style={{ backgroundColor: '#FFF5F5', borderRadius: 12, padding: 16 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 분할 매도 (5단계)</h4>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 분할 매도 (5단계) · 총 {formatMoney(data.isaRebalance.sellTotal)}</h4>
                     <table style={{ ...styles.table, marginBottom: 0 }}>
                       <thead>
                         <tr>
                           <th style={{ ...styles.th, backgroundColor: '#FFE4E4' }}>단계</th>
                           <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'center' }}>수익률</th>
-                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'right' }}>비중</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'center' }}>비중</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'right' }}>금액</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1831,7 +1836,8 @@ export default function RebalancePage() {
                           <tr key={idx}>
                             <td style={styles.td}>{item.step}</td>
                             <td style={{ ...styles.td, textAlign: 'center', color: '#FF6B6B', fontWeight: 600 }}>{item.rate}</td>
-                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>{item.ratio}</td>
+                            <td style={{ ...styles.td, textAlign: 'center' }}>{item.ratio}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600, color: '#FF6B6B' }}>{formatMoney(item.amount)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1842,13 +1848,14 @@ export default function RebalancePage() {
                   </div>
                   {/* 분할 매수 전략 */}
                   <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 분할 매수 (9단계)</h4>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 분할 매수 (9단계) · 총 {formatMoney(data.isaRebalance.buyTotal)}</h4>
                     <table style={{ ...styles.table, marginBottom: 0 }}>
                       <thead>
                         <tr>
                           <th style={{ ...styles.th, backgroundColor: '#DCFCE7' }}>단계</th>
                           <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'center' }}>하락률</th>
-                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>금액 비중</th>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'center' }}>비중</th>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>금액</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1856,7 +1863,8 @@ export default function RebalancePage() {
                           <tr key={idx}>
                             <td style={styles.td}>{item.step}</td>
                             <td style={{ ...styles.td, textAlign: 'center', color: COLORS.success, fontWeight: 600 }}>{item.rate}</td>
-                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>{item.ratio}</td>
+                            <td style={{ ...styles.td, textAlign: 'center' }}>{item.ratio}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600, color: COLORS.success }}>{formatMoney(item.amount)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1945,14 +1953,14 @@ export default function RebalancePage() {
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
                   {/* 분할 매도 전략 */}
                   <div style={{ backgroundColor: '#FFF5F5', borderRadius: 12, padding: 16 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 분할 매도 (7단계, 비중 감소)</h4>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 분할 매도 (7단계) · 총 {formatMoney(data.pensionRebalance.sellTotal)}</h4>
                     <table style={{ ...styles.table, marginBottom: 0 }}>
                       <thead>
                         <tr>
                           <th style={{ ...styles.th, backgroundColor: '#FFE4E4' }}>단계</th>
                           <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'center' }}>수익률</th>
-                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'right' }}>비중</th>
-                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'center' }}>비고</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'center' }}>비중</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'right' }}>금액</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1960,8 +1968,8 @@ export default function RebalancePage() {
                           <tr key={idx}>
                             <td style={styles.td}>{item.step}</td>
                             <td style={{ ...styles.td, textAlign: 'center', color: '#FF6B6B', fontWeight: 600 }}>{item.rate}</td>
-                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>{item.ratio}</td>
-                            <td style={{ ...styles.td, textAlign: 'center', fontSize: 12, color: '#888' }}>{item.note || ''}</td>
+                            <td style={{ ...styles.td, textAlign: 'center' }}>{item.ratio}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600, color: '#FF6B6B' }}>{formatMoney(item.amount)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1972,13 +1980,14 @@ export default function RebalancePage() {
                   </div>
                   {/* 분할 매수 전략 */}
                   <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 분할 매수 (4단계, 비중 증가)</h4>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 분할 매수 (4단계) · 총 {formatMoney(data.pensionRebalance.buyTotal)}</h4>
                     <table style={{ ...styles.table, marginBottom: 0 }}>
                       <thead>
                         <tr>
                           <th style={{ ...styles.th, backgroundColor: '#DCFCE7' }}>단계</th>
                           <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'center' }}>하락률</th>
-                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>비중</th>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'center' }}>비중</th>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>금액</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1986,7 +1995,8 @@ export default function RebalancePage() {
                           <tr key={idx}>
                             <td style={styles.td}>{item.step}</td>
                             <td style={{ ...styles.td, textAlign: 'center', color: COLORS.success, fontWeight: 600 }}>{item.rate}</td>
-                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>{item.ratio}</td>
+                            <td style={{ ...styles.td, textAlign: 'center' }}>{item.ratio}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600, color: COLORS.success }}>{formatMoney(item.amount)}</td>
                           </tr>
                         ))}
                       </tbody>
