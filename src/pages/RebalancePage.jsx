@@ -1133,6 +1133,28 @@ export default function RebalancePage() {
           { asset: 'TIGER SOFR달러', amount: 500000 },
         ],
         reason: '차익 실현 시점, 안전자산 분배, 저평가된 코스닥/신흥국 재투자',
+        // 분할 매도 전략 (5단계)
+        sellStrategy: [
+          { step: '1차', rate: '+7%', ratio: '20%' },
+          { step: '2차', rate: '+10%', ratio: '20%' },
+          { step: '3차', rate: '+13%', ratio: '20%' },
+          { step: '4차', rate: '+16%', ratio: '20%' },
+          { step: '5차', rate: '+20%', ratio: '20%' },
+        ],
+        sellNote: '6월까지 미매도 시: 7% 이상이면 전량 매도',
+        // 분할 매수 전략 (9단계, 금액 점점 크게)
+        buyStrategy: [
+          { step: '1차', rate: '-3%', ratio: '5%' },
+          { step: '2차', rate: '-5%', ratio: '7%' },
+          { step: '3차', rate: '-7%', ratio: '9%' },
+          { step: '4차', rate: '-10%', ratio: '11%' },
+          { step: '5차', rate: '-12%', ratio: '13%' },
+          { step: '6차', rate: '-14%', ratio: '15%' },
+          { step: '7차', rate: '-16%', ratio: '15%' },
+          { step: '8차', rate: '-18%', ratio: '12%' },
+          { step: '9차', rate: '-20%', ratio: '13%' },
+        ],
+        buyNote: '6월까지 미매수 시: 마이너스면 구매',
       },
       // 연금저축 리밸런싱 (미래에셋)
       pensionRebalance: {
@@ -1148,6 +1170,25 @@ export default function RebalancePage() {
           { asset: 'TIGER 미국나스닥100', amount: 500000 },
         ],
         reason: '과세이연 혜택을 위해 해외주식 필요, 차익 실현 후 저평가 자산 + 안전자산 분산',
+        // 분할 매도 전략 (7단계, 금액 점점 작게)
+        sellStrategy: [
+          { step: '1차', rate: '+7%', ratio: '25%', note: '가장 큼' },
+          { step: '2차', rate: '+9%', ratio: '20%' },
+          { step: '3차', rate: '+11%', ratio: '15%' },
+          { step: '4차', rate: '+14%', ratio: '13%' },
+          { step: '5차', rate: '+16%', ratio: '11%' },
+          { step: '6차', rate: '+18%', ratio: '9%' },
+          { step: '7차', rate: '+20%', ratio: '7%', note: '가장 작음' },
+        ],
+        sellNote: '6월까지 미매도 시: 7% 이상이면 전량 매도',
+        // 분할 매수 전략 (4단계, 금액 점점 크게)
+        buyStrategy: [
+          { step: '1차', rate: '-3%', ratio: '15%' },
+          { step: '2차', rate: '-5%', ratio: '20%' },
+          { step: '3차', rate: '-7%', ratio: '30%' },
+          { step: '4차', rate: '-10%', ratio: '35%' },
+        ],
+        buyNote: '6월까지 미매수 시: 마이너스면 구매',
       },
       sellRecommend: [
         { asset: 'KODEX 200 (ISA)', current: 3000000, sell: 3000000, reason: 'ISA 차익실현' },
@@ -1768,6 +1809,65 @@ export default function RebalancePage() {
               <div style={styles.tipTitle('info')}>💡 리밸런싱 이유</div>
               <p style={styles.tipText}>{data.isaRebalance.reason}</p>
             </div>
+
+            {/* 분할 매도/매수 전략 */}
+            {data.isaRebalance.sellStrategy && (
+              <div style={{ marginTop: 24 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#333', marginBottom: 16 }}>📊 분할 매도/매수 전략</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
+                  {/* 분할 매도 전략 */}
+                  <div style={{ backgroundColor: '#FFF5F5', borderRadius: 12, padding: 16 }}>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 분할 매도 (5단계)</h4>
+                    <table style={{ ...styles.table, marginBottom: 0 }}>
+                      <thead>
+                        <tr>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4' }}>단계</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'center' }}>수익률</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'right' }}>비중</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.isaRebalance.sellStrategy.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={styles.td}>{item.step}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', color: '#FF6B6B', fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>{item.ratio}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p style={{ fontSize: 13, color: '#666', marginTop: 12, padding: '8px 12px', backgroundColor: '#FFE4E4', borderRadius: 8 }}>
+                      ⚠️ {data.isaRebalance.sellNote}
+                    </p>
+                  </div>
+                  {/* 분할 매수 전략 */}
+                  <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 분할 매수 (9단계)</h4>
+                    <table style={{ ...styles.table, marginBottom: 0 }}>
+                      <thead>
+                        <tr>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7' }}>단계</th>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'center' }}>하락률</th>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>금액 비중</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.isaRebalance.buyStrategy.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={styles.td}>{item.step}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', color: COLORS.success, fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>{item.ratio}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p style={{ fontSize: 13, color: '#666', marginTop: 12, padding: '8px 12px', backgroundColor: '#DCFCE7', borderRadius: 8 }}>
+                      💡 {data.isaRebalance.buyNote}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1837,6 +1937,67 @@ export default function RebalancePage() {
               <div style={styles.tipTitle('info')}>💡 리밸런싱 이유</div>
               <p style={styles.tipText}>{data.pensionRebalance.reason}</p>
             </div>
+
+            {/* 분할 매도/매수 전략 */}
+            {data.pensionRebalance.sellStrategy && (
+              <div style={{ marginTop: 24 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#333', marginBottom: 16 }}>📊 분할 매도/매수 전략</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
+                  {/* 분할 매도 전략 */}
+                  <div style={{ backgroundColor: '#FFF5F5', borderRadius: 12, padding: 16 }}>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 분할 매도 (7단계, 비중 감소)</h4>
+                    <table style={{ ...styles.table, marginBottom: 0 }}>
+                      <thead>
+                        <tr>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4' }}>단계</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'center' }}>수익률</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'right' }}>비중</th>
+                          <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'center' }}>비고</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.pensionRebalance.sellStrategy.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={styles.td}>{item.step}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', color: '#FF6B6B', fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>{item.ratio}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', fontSize: 12, color: '#888' }}>{item.note || ''}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p style={{ fontSize: 13, color: '#666', marginTop: 12, padding: '8px 12px', backgroundColor: '#FFE4E4', borderRadius: 8 }}>
+                      ⚠️ {data.pensionRebalance.sellNote}
+                    </p>
+                  </div>
+                  {/* 분할 매수 전략 */}
+                  <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 분할 매수 (4단계, 비중 증가)</h4>
+                    <table style={{ ...styles.table, marginBottom: 0 }}>
+                      <thead>
+                        <tr>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7' }}>단계</th>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'center' }}>하락률</th>
+                          <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>비중</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.pensionRebalance.buyStrategy.map((item, idx) => (
+                          <tr key={idx}>
+                            <td style={styles.td}>{item.step}</td>
+                            <td style={{ ...styles.td, textAlign: 'center', color: COLORS.success, fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>{item.ratio}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p style={{ fontSize: 13, color: '#666', marginTop: 12, padding: '8px 12px', backgroundColor: '#DCFCE7', borderRadius: 8 }}>
+                      💡 {data.pensionRebalance.buyNote}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
