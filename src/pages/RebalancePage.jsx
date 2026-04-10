@@ -1179,6 +1179,11 @@ export default function RebalancePage() {
           '연금저축 리밸런싱: 국내주식 → 해외ETF + 안전자산 분산',
           '손절 기준: 개별 종목 -20% 도달 시 재검토',
         ],
+        tradingStrategy: {
+          title: '분할 매수/매도 전략',
+          sellRule: '7~20% 수익 구간에서 차익 실현',
+          buyRule: '한 번에 몰빵 금지! 4월 동안 일자를 나눠서, 내려갈 때 조금씩 더 사는 방식으로 분할 매수',
+        },
       },
       // 월가 전설들 평가
       legends: [
@@ -1642,7 +1647,7 @@ export default function RebalancePage() {
               ))}
             </div>
 
-            <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: isMobile ? 16 : 20 }}>
+            <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: isMobile ? 16 : 20, marginBottom: 16 }}>
               <h3 style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, marginBottom: 12, color: '#90EE90' }}>
                 [핵심 권고사항]
               </h3>
@@ -1652,6 +1657,29 @@ export default function RebalancePage() {
                 </p>
               ))}
             </div>
+
+            {/* 분할 매수/매도 전략 */}
+            {data.haneulOpinion.tradingStrategy && (
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12, padding: isMobile ? 16 : 20, border: '2px dashed rgba(255,255,255,0.4)' }}>
+                <h3 style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, marginBottom: 16, color: '#FF69B4', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  ⚡ {data.haneulOpinion.tradingStrategy.title}
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
+                  <div style={{ backgroundColor: 'rgba(255,107,107,0.3)', borderRadius: 8, padding: 12 }}>
+                    <div style={{ fontSize: 12, color: '#FFB3B3', marginBottom: 4, fontWeight: 600 }}>📉 매도 타이밍</div>
+                    <div style={{ fontSize: isMobile ? 13 : 14, color: COLORS.white, fontWeight: 500 }}>
+                      {data.haneulOpinion.tradingStrategy.sellRule}
+                    </div>
+                  </div>
+                  <div style={{ backgroundColor: 'rgba(144,238,144,0.3)', borderRadius: 8, padding: 12 }}>
+                    <div style={{ fontSize: 12, color: '#90EE90', marginBottom: 4, fontWeight: 600 }}>📈 매수 방법</div>
+                    <div style={{ fontSize: isMobile ? 13 : 14, color: COLORS.white, fontWeight: 500 }}>
+                      {data.haneulOpinion.tradingStrategy.buyRule}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
