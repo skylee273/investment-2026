@@ -1163,50 +1163,44 @@ export default function RebalancePage() {
         ],
         sellTotal: 6000000,
         sellNote: '6월까지 미매도 시: 7% 이상이면 전량 매도',
-        // 분할 매수 전략 (9단계) - 총 600만원 (안전자산 우선 배치)
+        // 분할 매수 전략 (6단계) - 총 600만원 (안전자산 우선 배치)
         buyStrategy: [
-          { step: '1차', rate: '-3%', amount: 300000, items: [
-            { name: '미국채10년', amount: 150000 },
-            { name: '금액티브', amount: 100000 },
-            { name: 'SOFR달러', amount: 50000 },
-          ]},
-          { step: '2차', rate: '-5%', amount: 420000, items: [
+          { step: '1차', rate: '-3%', amount: 700000, items: [
             { name: '미국채10년', amount: 200000 },
-            { name: '금액티브', amount: 120000 },
-            { name: 'SOFR달러', amount: 100000 },
-          ]},
-          { step: '3차', rate: '-7%', amount: 540000, items: [
-            { name: '미국채10년', amount: 250000 },
-            { name: '금액티브', amount: 140000 },
+            { name: '금액티브', amount: 150000 },
             { name: 'SOFR달러', amount: 150000 },
+            { name: '신흥국', amount: 100000 },
+            { name: '코스닥150', amount: 100000 },
           ]},
-          { step: '4차', rate: '-10%', amount: 660000, items: [
+          { step: '2차', rate: '-5%', amount: 800000, items: [
             { name: '미국채10년', amount: 200000 },
-            { name: '금액티브', amount: 140000 },
-            { name: 'SOFR달러', amount: 120000 },
-            { name: '신흥국', amount: 200000 },
+            { name: '금액티브', amount: 150000 },
+            { name: 'SOFR달러', amount: 150000 },
+            { name: '신흥국', amount: 150000 },
+            { name: '코스닥150', amount: 150000 },
           ]},
-          { step: '5차', rate: '-12%', amount: 780000, items: [
+          { step: '3차', rate: '-7%', amount: 900000, items: [
             { name: '미국채10년', amount: 200000 },
-            { name: 'SOFR달러', amount: 80000 },
+            { name: '금액티브', amount: 100000 },
+            { name: 'SOFR달러', amount: 100000 },
             { name: '신흥국', amount: 250000 },
             { name: '코스닥150', amount: 250000 },
           ]},
-          { step: '6차', rate: '-14%', amount: 900000, items: [
-            { name: '신흥국', amount: 450000 },
-            { name: '코스닥150', amount: 450000 },
-          ]},
-          { step: '7차', rate: '-16%', amount: 900000, items: [
-            { name: '신흥국', amount: 450000 },
-            { name: '코스닥150', amount: 450000 },
-          ]},
-          { step: '8차', rate: '-18%', amount: 720000, items: [
-            { name: '신흥국', amount: 350000 },
-            { name: '코스닥150', amount: 370000 },
-          ]},
-          { step: '9차', rate: '-20%', amount: 780000, items: [
+          { step: '4차', rate: '-10%', amount: 1000000, items: [
+            { name: '미국채10년', amount: 200000 },
+            { name: '금액티브', amount: 100000 },
+            { name: 'SOFR달러', amount: 100000 },
             { name: '신흥국', amount: 300000 },
-            { name: '코스닥150', amount: 480000 },
+            { name: '코스닥150', amount: 300000 },
+          ]},
+          { step: '5차', rate: '-12%', amount: 1200000, items: [
+            { name: '미국채10년', amount: 200000 },
+            { name: '신흥국', amount: 500000 },
+            { name: '코스닥150', amount: 500000 },
+          ]},
+          { step: '6차', rate: '-15%', amount: 1400000, items: [
+            { name: '신흥국', amount: 700000 },
+            { name: '코스닥150', amount: 700000 },
           ]},
         ],
         buyTotal: 6000000,
@@ -1238,29 +1232,31 @@ export default function RebalancePage() {
         ],
         sellTotal: 4000000,
         sellNote: '6월까지 미매도 시: 7% 이상이면 전량 매도',
-        // 분할 매수 전략 (4단계) - 총 400만원 (안전자산 우선 배치)
+        // 분할 매수 전략 (3단계) - 총 400만원
         buyStrategy: [
-          { step: '1차', rate: '-3%', amount: 600000, items: [
+          { step: '1차', rate: '-3%', amount: 1000000, items: [
+            { name: '미국채10년', amount: 150000 },
+            { name: '금액티브', amount: 150000 },
+            { name: 'SOFR달러', amount: 150000 },
+            { name: '코스닥150', amount: 200000 },
+            { name: 'S&P500', amount: 200000 },
+            { name: '나스닥100', amount: 150000 },
+          ]},
+          { step: '2차', rate: '-5%', amount: 1300000, items: [
             { name: '미국채10년', amount: 200000 },
             { name: '금액티브', amount: 200000 },
             { name: 'SOFR달러', amount: 200000 },
+            { name: '코스닥150', amount: 300000 },
+            { name: 'S&P500', amount: 300000 },
+            { name: '나스닥100', amount: 100000 },
           ]},
-          { step: '2차', rate: '-5%', amount: 800000, items: [
-            { name: '미국채10년', amount: 300000 },
-            { name: '금액티브', amount: 300000 },
-            { name: 'SOFR달러', amount: 100000 },
-            { name: '코스닥150', amount: 100000 },
-          ]},
-          { step: '3차', rate: '-7%', amount: 1200000, items: [
-            { name: 'SOFR달러', amount: 200000 },
-            { name: '코스닥150', amount: 400000 },
-            { name: 'S&P500', amount: 400000 },
-            { name: '나스닥100', amount: 200000 },
-          ]},
-          { step: '4차', rate: '-10%', amount: 1400000, items: [
+          { step: '3차', rate: '-7%', amount: 1700000, items: [
+            { name: '미국채10년', amount: 150000 },
+            { name: '금액티브', amount: 150000 },
+            { name: 'SOFR달러', amount: 150000 },
             { name: '코스닥150', amount: 500000 },
-            { name: 'S&P500', amount: 600000 },
-            { name: '나스닥100', amount: 300000 },
+            { name: 'S&P500', amount: 500000 },
+            { name: '나스닥100', amount: 250000 },
           ]},
         ],
         buyTotal: 4000000,
