@@ -1112,16 +1112,161 @@ export default function RebalancePage() {
         { category: '신흥국/대체', current: 6, target: 10, gap: -4 },
         { category: '암호화폐', current: 2, target: 5, gap: -3 },
       ],
+      // 해외주식 전략
+      overseasStrategy: {
+        action: 'Hold (계속 보유)',
+        reason: '올해 이미 250만원 수익 실현, 매도 시 세금 발생',
+        stopLoss: '-20% 이상 하락 시 재검토',
+      },
+      // ISA 리밸런싱 (삼성증권)
+      isaRebalance: {
+        sell: [
+          { asset: 'KODEX 200 차익실현', amount: 3000000 },
+          { asset: 'TIGER 미국S&P500 차익실현', amount: 2000000 },
+          { asset: 'TIGER 미국나스닥100 차익실현', amount: 1000000 },
+        ],
+        buy: [
+          { asset: 'PLUS 신흥국MSCI', amount: 2000000 },
+          { asset: 'KODEX 코스닥150', amount: 2000000 },
+          { asset: 'TIGER 미국채10년', amount: 1000000 },
+          { asset: 'KODEX 금액티브', amount: 500000 },
+          { asset: 'TIGER SOFR달러', amount: 500000 },
+        ],
+        reason: '차익 실현 시점, 안전자산 분배, 저평가된 코스닥/신흥국 재투자',
+      },
+      // 연금저축 리밸런싱 (미래에셋)
+      pensionRebalance: {
+        sell: [
+          { asset: 'KODEX 200 차익실현', amount: 4000000 },
+        ],
+        buy: [
+          { asset: 'KODEX 코스닥150', amount: 1000000 },
+          { asset: 'TIGER 미국채10년', amount: 500000 },
+          { asset: 'KODEX 금액티브', amount: 500000 },
+          { asset: 'TIGER SOFR달러', amount: 500000 },
+          { asset: 'TIGER 미국S&P500', amount: 1000000 },
+          { asset: 'TIGER 미국나스닥100', amount: 500000 },
+        ],
+        reason: '과세이연 혜택을 위해 해외주식 필요, 차익 실현 후 저평가 자산 + 안전자산 분산',
+      },
       sellRecommend: [
-        { asset: 'CMA', current: 14030000, sell: 7000000, reason: '현금 과다 조정' },
-        { asset: 'KODEX 200(연금)', current: 4470000, sell: 2000000, reason: '국내주식 비중 축소' },
+        { asset: 'KODEX 200 (ISA)', current: 3000000, sell: 3000000, reason: 'ISA 차익실현' },
+        { asset: 'TIGER S&P500 (ISA)', current: 2000000, sell: 2000000, reason: 'ISA 차익실현' },
+        { asset: 'TIGER 나스닥100 (ISA)', current: 1000000, sell: 1000000, reason: 'ISA 차익실현' },
+        { asset: 'KODEX 200 (연금)', current: 4000000, sell: 4000000, reason: '연금 차익실현' },
       ],
       buyRecommend: [
-        { asset: 'VOO', target: 19320000, buy: 4000000, reason: 'S&P500 비중 확대' },
-        { asset: 'TIGER 미국채10년', target: 2070000, buy: 2000000, reason: '채권 비중 확대' },
-        { asset: '비트코인', target: 1090000, buy: 2000000, reason: '암호화폐 목표 5%' },
-        { asset: 'IRP 투자 (나스닥ETF)', target: 270000, buy: 1000000, reason: '세제혜택 활용' },
+        { asset: 'PLUS 신흥국MSCI', target: 0, buy: 2000000, reason: '신흥국 저평가 구간' },
+        { asset: 'KODEX 코스닥150', target: 0, buy: 3000000, reason: '코스닥 저평가 구간' },
+        { asset: 'TIGER 미국채10년', target: 2070000, buy: 1500000, reason: '안전자산 확보' },
+        { asset: 'KODEX 금액티브', target: 0, buy: 1000000, reason: '인플레 헤지' },
+        { asset: 'TIGER SOFR달러', target: 0, buy: 1000000, reason: '달러 + 금리 수익' },
+        { asset: 'TIGER 미국S&P500 (연금)', target: 0, buy: 1000000, reason: '해외주식 과세이연' },
+        { asset: 'TIGER 미국나스닥100 (연금)', target: 0, buy: 500000, reason: '성장주 노출' },
       ],
+      // 하늘버핏의 리밸런싱 의견
+      haneulOpinion: {
+        title: '하늘버핏의 리밸런싱 의견',
+        summary: '가윤님의 포트폴리오는 "핵심-위성" 전략의 교과서적인 구성입니다. VOO와 SCHD가 핵심 자산(37.5%)을 형성하고, ISA 내 6개 자산군 분산이 리스크를 효과적으로 관리하고 있습니다.',
+        situation: [
+          '해외주식: +250만원 수익 중. 양도소득세 고려 시 계속 보유가 유리',
+          'ISA/연금: 국내 대형주(KODEX 200) 비중이 높아 차익 실현 적기',
+          '시장 전망: 코스닥/신흥국 저평가 구간, 안전자산 분산 필요',
+        ],
+        recommendations: [
+          '해외주식(VOO, SCHD, 아마존): Hold - 세금 효율성 우선',
+          'ISA 리밸런싱: KODEX 200 → 신흥국/코스닥 재투자',
+          '연금저축 리밸런싱: 국내주식 → 해외ETF + 안전자산 분산',
+          '손절 기준: 개별 종목 -20% 도달 시 재검토',
+        ],
+      },
+      // 월가 전설들 평가
+      legends: [
+        {
+          name: '워렌 버핏',
+          style: '가치투자',
+          icon: '🎩',
+          color: '#F59E0B',
+          rating: 'B+',
+          comment: 'VOO와 SCHD 보유는 합리적이나, 차익 실현 후 재투자 종목의 본질적 가치를 충분히 분석했는지 확인이 필요합니다. 신흥국 투자는 이해 범위 밖일 수 있습니다.',
+        },
+        {
+          name: '레이 달리오',
+          style: '올웨더',
+          icon: '🌊',
+          color: '#3182F6',
+          rating: 'A-',
+          comment: '채권, 금, 주식의 분산은 좋습니다. SOFR 달러 추가로 인플레이션 헤지도 고려한 점이 훌륭합니다. 다만 원자재 비중이 금에만 한정된 점은 아쉽습니다.',
+        },
+        {
+          name: '피터 린치',
+          style: '성장주',
+          icon: '📈',
+          color: '#10B981',
+          rating: 'B',
+          comment: '나스닥 ETF를 통한 성장주 노출은 좋지만, 개별 종목 발굴 기회가 제한적입니다. \'10루타 종목\'을 직접 찾아볼 여지를 남겨두세요.',
+        },
+        {
+          name: '존 보글',
+          style: '인덱스',
+          icon: '📊',
+          color: '#8B5CF6',
+          rating: 'A',
+          comment: '저비용 인덱스 ETF 중심의 리밸런싱은 제가 평생 주장한 원칙과 일치합니다. VOO, TIGER S&P500 같은 저비용 상품 선택은 현명한 결정입니다.',
+        },
+        {
+          name: '하워드 막스',
+          style: '리스크',
+          icon: '⚖️',
+          color: '#EF4444',
+          rating: 'B+',
+          comment: '차익 실현 타이밍이 적절합니다. \'2차 사고\'를 할 수 있는 현금 여력을 확보한 점이 좋습니다. 신흥국 재투자는 \'떨어지는 칼날\'일 수 있으니 분할 매수를 권합니다.',
+        },
+        {
+          name: '하늘버핏',
+          style: '미래의 전설',
+          icon: '🌤️',
+          color: '#667EEA',
+          rating: 'A',
+          comment: '가윤이 포트폴리오 구성 아주 좋아요! VOO+SCHD 코어 전략에 ISA/연금 세제혜택까지 완벽하게 활용하고 있어요. 현금 확보하면서 기회 매수 노리는 것도 현명한 판단! 앞으로 떨어지는 우량주 하나씩 줍줍하면서 부자 됩시다~ 움하하하하 🚀',
+        },
+      ],
+      overallGrade: 'B+',
+      overallComment: '안정적인 코어-위성 전략에 적절한 리밸런싱. 세금 효율성과 자산배분 모두 고려한 합리적 판단.',
+      // 기회 매수 전략
+      opportunityBuy: {
+        title: '기회 매수 전략',
+        cashStrategy: {
+          title: 'CMA 현금 확보 전략',
+          reason: '오빠한테 받을 돈(2,000만원)과 전세 보증금(4,500만원)을 고려하면 현금 확보가 중요합니다. 새 집 계약 시 필요한 자금이기도 하고, 시장 하락 시 기회 매수 여력을 확보하는 전략입니다.',
+          status: '현재 CMA 유지 권장',
+        },
+        monthlyPlan: {
+          title: '월별 기회 매수 플랜',
+          description: '현금을 확보한 상태에서 많이 떨어진 우량 기업들을 한 달에 1~2개씩 기회가 되면 조금씩 줍줍하는 전략입니다.',
+          frequency: '월 1~2종목',
+          amount: '종목당 30~50만원',
+        },
+        thisMonth: {
+          title: '2026년 4월 추천 종목',
+          picks: [
+            {
+              ticker: 'ORCL',
+              name: '오라클 (Oracle)',
+              reason: '한국 대기업을 포함한 글로벌 기업들이 오라클 DB를 쉽게 대체할 수 없음. 현재 가격이 매우 매력적인 구간!',
+              sector: '기술/클라우드',
+              color: '#F80000',
+            },
+            {
+              ticker: 'CVX',
+              name: '쉐브론 (Chevron)',
+              reason: '전쟁이 끝나면 유가 하락? 그래도 "유가" 자체는 안전 투자. 안정적 배당(4%+)으로 꾸준히 하나씩 모아두면 배당으로 두둑히 챙길 수 있음!',
+              sector: '에너지/배당',
+              color: '#0066CC',
+            },
+          ],
+        },
+      },
     }
 
     const data = personalTab === 'haneul' ? haneulData : gayoonData
@@ -1471,6 +1616,362 @@ export default function RebalancePage() {
             </>
           )}
         </div>
+
+        {/* 가윤달리오 전용: 하늘버핏의 리밸런싱 의견 */}
+        {personalTab === 'gayoon' && data.haneulOpinion && (
+          <div style={{
+            ...styles.card,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: COLORS.white,
+          }}>
+            <h2 style={{ ...styles.cardTitle, color: COLORS.white }}>
+              🧠 {data.haneulOpinion.title}
+            </h2>
+            <p style={{ ...styles.paragraph, color: 'rgba(255,255,255,0.95)', fontSize: isMobile ? 14 : 16, lineHeight: 1.8 }}>
+              {data.haneulOpinion.summary}
+            </p>
+
+            <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: isMobile ? 16 : 20, marginBottom: 16 }}>
+              <h3 style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, marginBottom: 12, color: '#FFD700' }}>
+                [현재 상황 분석]
+              </h3>
+              {data.haneulOpinion.situation.map((item, idx) => (
+                <p key={idx} style={{ fontSize: isMobile ? 13 : 14, marginBottom: 8, color: 'rgba(255,255,255,0.9)' }}>
+                  • {item}
+                </p>
+              ))}
+            </div>
+
+            <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: isMobile ? 16 : 20 }}>
+              <h3 style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, marginBottom: 12, color: '#90EE90' }}>
+                [핵심 권고사항]
+              </h3>
+              {data.haneulOpinion.recommendations.map((item, idx) => (
+                <p key={idx} style={{ fontSize: isMobile ? 13 : 14, marginBottom: 8, color: 'rgba(255,255,255,0.9)' }}>
+                  {idx + 1}. {item}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 가윤달리오 전용: 해외주식 전략 */}
+        {personalTab === 'gayoon' && data.overseasStrategy && (
+          <div style={{ ...styles.card, border: `2px solid ${COLORS.success}` }}>
+            <h2 style={{ ...styles.cardTitle, color: COLORS.success }}>🌍 해외주식 전략 (VOO, SCHD, 아마존)</h2>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+              <span style={{ ...styles.badge(COLORS.success), fontSize: 14, padding: '8px 16px' }}>
+                {data.overseasStrategy.action}
+              </span>
+            </div>
+            <p style={styles.paragraph}>
+              <strong>이유:</strong> {data.overseasStrategy.reason}
+            </p>
+            <div style={styles.tipBox('warning')}>
+              <div style={styles.tipTitle('warning')}>손절 기준</div>
+              <p style={styles.tipText}>{data.overseasStrategy.stopLoss}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 가윤달리오 전용: ISA 리밸런싱 가이드 */}
+        {personalTab === 'gayoon' && data.isaRebalance && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>📋 ISA 리밸런싱 가이드 (삼성증권)</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
+              {/* 매도 */}
+              <div style={{ backgroundColor: '#FFF5F5', borderRadius: 12, padding: 16 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 매도</h3>
+                <table style={{ ...styles.table, marginBottom: 0 }}>
+                  <thead>
+                    <tr>
+                      <th style={{ ...styles.th, backgroundColor: '#FFE4E4' }}>종목</th>
+                      <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'right' }}>금액</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.isaRebalance.sell.map((item, idx) => (
+                      <tr key={idx}>
+                        <td style={styles.td}>{item.asset}</td>
+                        <td style={{ ...styles.td, textAlign: 'right', color: '#FF6B6B', fontWeight: 600 }}>
+                          {formatMoney(item.amount)}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr style={{ backgroundColor: '#FFE4E4' }}>
+                      <td style={{ ...styles.td, fontWeight: 700 }}>합계</td>
+                      <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: '#FF6B6B' }}>
+                        {formatMoney(data.isaRebalance.sell.reduce((sum, i) => sum + i.amount, 0))}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              {/* 매수 */}
+              <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 매수</h3>
+                <table style={{ ...styles.table, marginBottom: 0 }}>
+                  <thead>
+                    <tr>
+                      <th style={{ ...styles.th, backgroundColor: '#DCFCE7' }}>종목</th>
+                      <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>금액</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.isaRebalance.buy.map((item, idx) => (
+                      <tr key={idx}>
+                        <td style={styles.td}>{item.asset}</td>
+                        <td style={{ ...styles.td, textAlign: 'right', color: COLORS.success, fontWeight: 600 }}>
+                          {formatMoney(item.amount)}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr style={{ backgroundColor: '#DCFCE7' }}>
+                      <td style={{ ...styles.td, fontWeight: 700 }}>합계</td>
+                      <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: COLORS.success }}>
+                        {formatMoney(data.isaRebalance.buy.reduce((sum, i) => sum + i.amount, 0))}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div style={{ ...styles.tipBox('info'), marginTop: 16, marginBottom: 0 }}>
+              <div style={styles.tipTitle('info')}>💡 리밸런싱 이유</div>
+              <p style={styles.tipText}>{data.isaRebalance.reason}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 가윤달리오 전용: 연금저축 리밸런싱 가이드 */}
+        {personalTab === 'gayoon' && data.pensionRebalance && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>📋 연금저축 리밸런싱 가이드 (미래에셋)</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
+              {/* 매도 */}
+              <div style={{ backgroundColor: '#FFF5F5', borderRadius: 12, padding: 16 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#FF6B6B', marginBottom: 12 }}>📉 매도</h3>
+                <table style={{ ...styles.table, marginBottom: 0 }}>
+                  <thead>
+                    <tr>
+                      <th style={{ ...styles.th, backgroundColor: '#FFE4E4' }}>종목</th>
+                      <th style={{ ...styles.th, backgroundColor: '#FFE4E4', textAlign: 'right' }}>금액</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.pensionRebalance.sell.map((item, idx) => (
+                      <tr key={idx}>
+                        <td style={styles.td}>{item.asset}</td>
+                        <td style={{ ...styles.td, textAlign: 'right', color: '#FF6B6B', fontWeight: 600 }}>
+                          {formatMoney(item.amount)}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr style={{ backgroundColor: '#FFE4E4' }}>
+                      <td style={{ ...styles.td, fontWeight: 700 }}>합계</td>
+                      <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: '#FF6B6B' }}>
+                        {formatMoney(data.pensionRebalance.sell.reduce((sum, i) => sum + i.amount, 0))}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              {/* 매수 */}
+              <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 매수</h3>
+                <table style={{ ...styles.table, marginBottom: 0 }}>
+                  <thead>
+                    <tr>
+                      <th style={{ ...styles.th, backgroundColor: '#DCFCE7' }}>종목</th>
+                      <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>금액</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.pensionRebalance.buy.map((item, idx) => (
+                      <tr key={idx}>
+                        <td style={styles.td}>{item.asset}</td>
+                        <td style={{ ...styles.td, textAlign: 'right', color: COLORS.success, fontWeight: 600 }}>
+                          {formatMoney(item.amount)}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr style={{ backgroundColor: '#DCFCE7' }}>
+                      <td style={{ ...styles.td, fontWeight: 700 }}>합계</td>
+                      <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: COLORS.success }}>
+                        {formatMoney(data.pensionRebalance.buy.reduce((sum, i) => sum + i.amount, 0))}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div style={{ ...styles.tipBox('info'), marginTop: 16, marginBottom: 0 }}>
+              <div style={styles.tipTitle('info')}>💡 리밸런싱 이유</div>
+              <p style={styles.tipText}>{data.pensionRebalance.reason}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 가윤달리오 전용: 월가 전설들 평가 */}
+        {personalTab === 'gayoon' && data.legends && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>🏛️ 월가 전설들의 평가</h2>
+
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 24 }}>
+              {data.legends.map((legend, idx) => (
+                <div key={idx} style={{
+                  backgroundColor: COLORS.background,
+                  borderRadius: 12,
+                  padding: 16,
+                  borderLeft: `4px solid ${legend.color}`,
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 24 }}>{legend.icon}</span>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: COLORS.textPrimary }}>{legend.name}</div>
+                        <div style={{ fontSize: 12, color: COLORS.textSecondary }}>{legend.style}</div>
+                      </div>
+                    </div>
+                    <div style={{
+                      backgroundColor: legend.color,
+                      color: COLORS.white,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                    }}>
+                      {legend.rating}
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 13, lineHeight: 1.6, color: COLORS.textPrimary, margin: 0 }}>
+                    "{legend.comment}"
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* 종합 평점 */}
+            <div style={{
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+              borderRadius: 16,
+              padding: isMobile ? 20 : 28,
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>종합 평점</div>
+              <div style={{
+                fontSize: isMobile ? 48 : 64,
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginBottom: 12,
+              }}>
+                {data.overallGrade}
+              </div>
+              <p style={{ fontSize: isMobile ? 14 : 16, color: 'rgba(255,255,255,0.9)', margin: 0, lineHeight: 1.6 }}>
+                "{data.overallComment}"
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 가윤달리오 전용: 기회 매수 전략 */}
+        {personalTab === 'gayoon' && data.opportunityBuy && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>🎯 {data.opportunityBuy.title}</h2>
+
+            {/* CMA 현금 확보 전략 */}
+            <div style={{
+              backgroundColor: '#FFF9E6',
+              borderRadius: 12,
+              padding: isMobile ? 16 : 20,
+              marginBottom: 20,
+              borderLeft: '4px solid #F59E0B',
+            }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#B45309', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                💰 {data.opportunityBuy.cashStrategy.title}
+              </h3>
+              <p style={{ fontSize: isMobile ? 13 : 14, lineHeight: 1.7, color: COLORS.textPrimary, marginBottom: 8 }}>
+                {data.opportunityBuy.cashStrategy.reason}
+              </p>
+              <span style={{
+                display: 'inline-block',
+                backgroundColor: '#F59E0B',
+                color: COLORS.white,
+                fontSize: 13,
+                fontWeight: 600,
+                padding: '6px 12px',
+                borderRadius: 20,
+              }}>
+                {data.opportunityBuy.cashStrategy.status}
+              </span>
+            </div>
+
+            {/* 월별 기회 매수 플랜 */}
+            <div style={{
+              backgroundColor: COLORS.primaryLight,
+              borderRadius: 12,
+              padding: isMobile ? 16 : 20,
+              marginBottom: 20,
+            }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.primary, marginBottom: 12 }}>
+                📅 {data.opportunityBuy.monthlyPlan.title}
+              </h3>
+              <p style={{ fontSize: isMobile ? 13 : 14, lineHeight: 1.7, color: COLORS.textPrimary, marginBottom: 12 }}>
+                {data.opportunityBuy.monthlyPlan.description}
+              </p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <span style={styles.badge(COLORS.primary)}>{data.opportunityBuy.monthlyPlan.frequency}</span>
+                <span style={styles.badge(COLORS.success)}>{data.opportunityBuy.monthlyPlan.amount}</span>
+              </div>
+            </div>
+
+            {/* 이번 달 추천 종목 */}
+            <div style={{
+              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+              borderRadius: 16,
+              padding: isMobile ? 20 : 24,
+            }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFD700', marginBottom: 20, textAlign: 'center' }}>
+                ⭐ {data.opportunityBuy.thisMonth.title}
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+                {data.opportunityBuy.thisMonth.picks.map((pick, idx) => (
+                  <div key={idx} style={{
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderRadius: 12,
+                    padding: 16,
+                    borderTop: `4px solid ${pick.color}`,
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <div>
+                        <div style={{ fontSize: 20, fontWeight: 800, color: COLORS.white }}>{pick.ticker}</div>
+                        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{pick.name}</div>
+                      </div>
+                      <span style={{
+                        backgroundColor: pick.color,
+                        color: COLORS.white,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                      }}>
+                        {pick.sector}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: 13, lineHeight: 1.6, color: 'rgba(255,255,255,0.85)', margin: 0 }}>
+                      {pick.reason}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginTop: 16, marginBottom: 0 }}>
+                * 하락 시 분할 매수 권장 | 투자 전 본인의 판단 필요
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* 실행 우선순위 */}
         <div style={styles.card}>

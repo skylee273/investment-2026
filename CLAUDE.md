@@ -147,11 +147,42 @@ src/
 │   ├── GayoonWealthPage.jsx # 가윤 달리오 (실시간 시세)
 │   ├── PortfolioReportPage.jsx # 포트폴리오 리포트
 │   ├── PortfolioBattlePage.jsx # 수익률 대결
+│   ├── RebalancePage.jsx    # 리밸런싱 가이드
 │   └── TaxGuidePage.jsx     # 절세 가이드 (iframe)
 ├── components/
 │   └── Layout/Layout.jsx    # 사이드바 네비게이션 (반응형)
 └── public/
     └── tax-guide.html       # 절세 브로셔 원본 HTML
+```
+
+---
+
+## Claude Code Skills (슬래시 커맨드)
+
+월간 데이터 업데이트 자동화를 위한 4개의 skill이 등록되어 있습니다.
+
+| 커맨드 | 설명 | 대상 파일 |
+|--------|------|----------|
+| `/monthly-update` | 증권사 스크린샷 → 하늘버핏/가윤달리오 데이터 업데이트 | PortfolioPage.jsx, GayoonWealthPage.jsx |
+| `/battle-update` | 수익률 대결 데이터 업데이트 | PortfolioBattlePage.jsx |
+| `/report-update` | 세제혜택 계좌 보유 종목 업데이트 | PortfolioReportPage.jsx |
+| `/rebalance-guide` | 맞춤 분석 탭 + 월가 전설들 평가 | RebalancePage.jsx |
+
+### 사용법
+```
+/monthly-update     # 스크린샷과 함께 실행
+/battle-update      # 대결 현황 업데이트
+/report-update      # 월간 리포트 갱신
+/rebalance-guide    # 리밸런싱 의견 작성
+```
+
+### Skill 파일 위치
+```
+.claude/skills/
+├── monthly-update.md    # 월간 데이터 업데이트
+├── battle-update.md     # 수익률 대결 업데이트
+├── report-update.md     # 월간 리포트 업데이트
+└── rebalance-guide.md   # 리밸런싱 가이드 작성
 ```
 
 ## 외부 데이터 소스
