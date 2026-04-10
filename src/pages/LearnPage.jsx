@@ -26,6 +26,60 @@ const WISE_QUOTES = [
 ]
 
 // ============================================
+// 이달의 추천 도서 (2026년 4월)
+// ============================================
+const RECOMMENDED_BOOKS = {
+  month: '2026년 4월',
+  books: [
+    {
+      title: '돈의 심리학',
+      author: '모건 하우절',
+      category: '금융',
+      color: '#3182F6',
+      emoji: '🧠',
+      description: '부의 축적은 지능이 아닌 행동에서 시작된다. 돈과 관련된 20가지 심리 법칙.',
+      why: '투자 전 마인드셋을 잡아주는 필독서',
+    },
+    {
+      title: '현명한 투자자',
+      author: '벤저민 그레이엄',
+      category: '주식',
+      color: '#10B981',
+      emoji: '📈',
+      description: '가치투자의 아버지가 전하는 투자 철학. 워렌 버핏의 스승.',
+      why: '주식 투자의 교과서, 평생 곁에 둘 책',
+    },
+    {
+      title: '부자 아빠 가난한 아빠',
+      author: '로버트 기요사키',
+      category: '재테크',
+      color: '#F59E0B',
+      emoji: '💰',
+      description: '자산과 부채의 차이, 현금흐름의 중요성을 깨닫게 해주는 책.',
+      why: '재테크 입문자의 관점을 바꿔주는 책',
+    },
+    {
+      title: '부동산 투자의 정석',
+      author: '김학렬',
+      category: '부동산',
+      color: '#8B5CF6',
+      emoji: '🏠',
+      description: '부동산 투자의 기본 원리부터 실전 전략까지.',
+      why: '내 집 마련 전 반드시 읽어야 할 책',
+    },
+    {
+      title: '배당주 투자',
+      author: '강환국',
+      category: '배당',
+      color: '#EF4444',
+      emoji: '💵',
+      description: '월급처럼 들어오는 배당금으로 경제적 자유를 향해.',
+      why: 'SCHD 투자자라면 공감 100%',
+    },
+  ],
+}
+
+// ============================================
 // 학습 카드 데이터 (Level 1~5)
 // ============================================
 const LEARNING_CARDS = [
@@ -1276,7 +1330,7 @@ export default function LearnPage() {
 
           {/* 최근 노트 */}
           {notes.length > 0 && (
-            <div>
+            <div style={{ marginBottom: '24px' }}>
               <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '12px' }}>
                 📝 최근 노트
               </div>
@@ -1296,6 +1350,67 @@ export default function LearnPage() {
               ))}
             </div>
           )}
+
+          {/* 이달의 추천 도서 */}
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: '700', color: '#191F28', marginBottom: '4px' }}>
+              📚 이달의 추천 도서
+            </div>
+            <div style={{ fontSize: '13px', color: '#8B95A1', marginBottom: '16px' }}>
+              {RECOMMENDED_BOOKS.month} | 금융 · 주식 · 부동산
+            </div>
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {RECOMMENDED_BOOKS.books.map((book, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    ...styles.card,
+                    borderLeft: `4px solid ${book.color}`,
+                    display: 'flex',
+                    gap: '16px',
+                    alignItems: 'flex-start',
+                  }}
+                >
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    backgroundColor: book.color + '20',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    flexShrink: 0,
+                  }}>
+                    {book.emoji}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: '700', color: '#191F28', fontSize: '15px' }}>{book.title}</span>
+                      <span style={styles.badge(book.color)}>{book.category}</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#6B7684', marginBottom: '4px' }}>
+                      {book.author}
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#4E5968', lineHeight: '1.5', marginBottom: '8px' }}>
+                      {book.description}
+                    </div>
+                    <div style={{
+                      fontSize: '12px',
+                      color: book.color,
+                      fontWeight: '600',
+                      backgroundColor: book.color + '15',
+                      padding: '6px 10px',
+                      borderRadius: '6px',
+                      display: 'inline-block',
+                    }}>
+                      💡 {book.why}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
