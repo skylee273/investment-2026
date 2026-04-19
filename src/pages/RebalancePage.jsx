@@ -1118,184 +1118,229 @@ export default function RebalancePage() {
         reason: '올해 이미 250만원 수익 실현, 매도 시 세금 발생',
         stopLoss: '-20% 이상 하락 시 재검토',
       },
-      // ISA 리밸런싱 (삼성증권)
+      // ISA 리밸런싱 (삼성증권) - 목표 비중 기반
       isaRebalance: {
+        targetTotal: 12000000, // ISA 목표 1,200만원 (전체 2,000만원 중 60%)
         sell: [
-          { asset: 'KODEX 200 차익실현', amount: 3000000 },
-          { asset: 'TIGER 미국S&P500 차익실현', amount: 2000000 },
-          { asset: 'TIGER 미국나스닥100 차익실현', amount: 1000000 },
+          { asset: 'KODEX 200 전량', amount: 3000000 },
+          { asset: 'PLUS 신흥국MSCI 전량', amount: 3000000 },
         ],
         buy: [
-          { asset: 'PLUS 신흥국MSCI', amount: 2000000 },
-          { asset: 'KODEX 코스닥150', amount: 2000000 },
-          { asset: 'TIGER 미국채10년', amount: 1000000 },
-          { asset: 'KODEX 금액티브', amount: 500000 },
-          { asset: 'TIGER SOFR달러', amount: 500000 },
+          { asset: 'TIGER S&P500', amount: 3000000, ratio: 25 },
+          { asset: 'TIGER 미국배당다우존스', amount: 2400000, ratio: 20 },
+          { asset: 'TIGER 나스닥100', amount: 1200000, ratio: 10 },
+          { asset: 'TIGER 미국채30년선물', amount: 1200000, ratio: 10 },
+          { asset: 'TIGER 미국채10년선물', amount: 1200000, ratio: 10 },
+          { asset: 'KODEX 금액티브', amount: 1200000, ratio: 10 },
+          { asset: 'TIGER CD금리액티브', amount: 960000, ratio: 8 },
+          { asset: 'TIGER SOFR금리액티브', amount: 840000, ratio: 7 },
         ],
-        reason: '차익 실현 시점, 안전자산 분배, 저평가된 코스닥/신흥국 재투자',
-        // 분할 매도 전략 (5단계) - 총 600만원
+        reason: '목표 포트폴리오 비중에 맞춰 리밸런싱 (국내주식/신흥국 → 미국배당+채권 분산)',
+        // 분할 매도 전략 (6단계) - 총 600만원
         sellStrategy: [
-          { step: '1차', rate: '+7%', amount: 1200000, items: [
-            { name: 'KODEX 200', amount: 600000 },
-            { name: 'S&P500', amount: 400000 },
-            { name: '나스닥100', amount: 200000 },
+          { step: '1차', rate: '+5%', amount: 1000000, items: [
+            { name: 'KODEX 200', amount: 500000 },
+            { name: '신흥국MSCI', amount: 500000 },
           ]},
-          { step: '2차', rate: '+10%', amount: 1200000, items: [
-            { name: 'KODEX 200', amount: 600000 },
-            { name: 'S&P500', amount: 400000 },
-            { name: '나스닥100', amount: 200000 },
+          { step: '2차', rate: '+7%', amount: 1000000, items: [
+            { name: 'KODEX 200', amount: 500000 },
+            { name: '신흥국MSCI', amount: 500000 },
           ]},
-          { step: '3차', rate: '+13%', amount: 1200000, items: [
-            { name: 'KODEX 200', amount: 600000 },
-            { name: 'S&P500', amount: 400000 },
-            { name: '나스닥100', amount: 200000 },
+          { step: '3차', rate: '+10%', amount: 1000000, items: [
+            { name: 'KODEX 200', amount: 500000 },
+            { name: '신흥국MSCI', amount: 500000 },
           ]},
-          { step: '4차', rate: '+16%', amount: 1200000, items: [
-            { name: 'KODEX 200', amount: 600000 },
-            { name: 'S&P500', amount: 400000 },
-            { name: '나스닥100', amount: 200000 },
+          { step: '4차', rate: '+12%', amount: 1000000, items: [
+            { name: 'KODEX 200', amount: 500000 },
+            { name: '신흥국MSCI', amount: 500000 },
           ]},
-          { step: '5차', rate: '+20%', amount: 1200000, items: [
-            { name: 'KODEX 200', amount: 600000 },
-            { name: 'S&P500', amount: 400000 },
-            { name: '나스닥100', amount: 200000 },
+          { step: '5차', rate: '+15%', amount: 1000000, items: [
+            { name: 'KODEX 200', amount: 500000 },
+            { name: '신흥국MSCI', amount: 500000 },
+          ]},
+          { step: '6차', rate: '+18%', amount: 1000000, items: [
+            { name: 'KODEX 200', amount: 500000 },
+            { name: '신흥국MSCI', amount: 500000 },
           ]},
         ],
         sellTotal: 6000000,
-        sellNote: '6월까지 미매도 시: 7% 이상이면 전량 매도',
-        // 분할 매수 전략 (6단계) - 총 600만원 (안전자산 우선 배치)
+        sellNote: '6월까지 미매도 시: 5% 이상이면 전량 매도',
+        // 분할 매수 전략 (6단계) - 총 600만원 (목표 비중대로)
         buyStrategy: [
-          { step: '1차', rate: '-3%', amount: 700000, items: [
-            { name: '미국채10년', amount: 200000 },
-            { name: '금액티브', amount: 150000 },
-            { name: 'SOFR달러', amount: 150000 },
-            { name: '신흥국', amount: 100000 },
-            { name: '코스닥150', amount: 100000 },
-          ]},
-          { step: '2차', rate: '-5%', amount: 800000, items: [
-            { name: '미국채10년', amount: 200000 },
-            { name: '금액티브', amount: 150000 },
-            { name: 'SOFR달러', amount: 150000 },
-            { name: '신흥국', amount: 150000 },
-            { name: '코스닥150', amount: 150000 },
-          ]},
-          { step: '3차', rate: '-7%', amount: 900000, items: [
-            { name: '미국채10년', amount: 200000 },
+          { step: '1차', rate: '-3%', amount: 1000000, items: [
+            { name: 'S&P500', amount: 250000 },
+            { name: '배당다우존스', amount: 200000 },
+            { name: '미국채30년', amount: 150000 },
+            { name: '미국채10년', amount: 150000 },
             { name: '금액티브', amount: 100000 },
-            { name: 'SOFR달러', amount: 100000 },
-            { name: '신흥국', amount: 250000 },
-            { name: '코스닥150', amount: 250000 },
+            { name: 'CD금리', amount: 80000 },
+            { name: 'SOFR', amount: 70000 },
+          ]},
+          { step: '2차', rate: '-5%', amount: 1000000, items: [
+            { name: 'S&P500', amount: 250000 },
+            { name: '배당다우존스', amount: 200000 },
+            { name: '나스닥100', amount: 100000 },
+            { name: '미국채30년', amount: 150000 },
+            { name: '미국채10년', amount: 150000 },
+            { name: '금액티브', amount: 100000 },
+            { name: 'SOFR', amount: 50000 },
+          ]},
+          { step: '3차', rate: '-7%', amount: 1000000, items: [
+            { name: 'S&P500', amount: 250000 },
+            { name: '배당다우존스', amount: 200000 },
+            { name: '나스닥100', amount: 100000 },
+            { name: '미국채30년', amount: 100000 },
+            { name: '미국채10년', amount: 100000 },
+            { name: '금액티브', amount: 100000 },
+            { name: 'CD금리', amount: 80000 },
+            { name: 'SOFR', amount: 70000 },
           ]},
           { step: '4차', rate: '-10%', amount: 1000000, items: [
-            { name: '미국채10년', amount: 200000 },
+            { name: 'S&P500', amount: 250000 },
+            { name: '배당다우존스', amount: 200000 },
+            { name: '나스닥100', amount: 200000 },
+            { name: '미국채30년', amount: 100000 },
+            { name: '미국채10년', amount: 100000 },
             { name: '금액티브', amount: 100000 },
-            { name: 'SOFR달러', amount: 100000 },
-            { name: '신흥국', amount: 300000 },
-            { name: '코스닥150', amount: 300000 },
+            { name: 'SOFR', amount: 50000 },
           ]},
-          { step: '5차', rate: '-12%', amount: 1200000, items: [
-            { name: '미국채10년', amount: 200000 },
-            { name: '신흥국', amount: 500000 },
-            { name: '코스닥150', amount: 500000 },
+          { step: '5차', rate: '-12%', amount: 1000000, items: [
+            { name: 'S&P500', amount: 250000 },
+            { name: '배당다우존스', amount: 300000 },
+            { name: '나스닥100', amount: 200000 },
+            { name: '미국채10년', amount: 100000 },
+            { name: '금액티브', amount: 100000 },
+            { name: 'SOFR', amount: 50000 },
           ]},
-          { step: '6차', rate: '-15%', amount: 1400000, items: [
-            { name: '신흥국', amount: 700000 },
-            { name: '코스닥150', amount: 700000 },
+          { step: '6차', rate: '-15%', amount: 1000000, items: [
+            { name: 'S&P500', amount: 250000 },
+            { name: '배당다우존스', amount: 300000 },
+            { name: '나스닥100', amount: 200000 },
+            { name: '미국채30년', amount: 100000 },
+            { name: '미국채10년', amount: 100000 },
+            { name: 'SOFR', amount: 50000 },
           ]},
         ],
         buyTotal: 6000000,
-        buyNote: '6월까지 미매수 시: 마이너스면 구매',
+        buyNote: '6월까지 미매수 시: 마이너스면 목표 비중대로 일괄 매수',
       },
-      // 연금저축 리밸런싱 (미래에셋)
+      // 연금저축 리밸런싱 (미래에셋) - 목표 비중 기반
       pensionRebalance: {
+        targetTotal: 8000000, // 연금저축+IRP 목표 800만원 (전체 2,000만원 중 40%)
         sell: [
-          { asset: 'KODEX 200 차익실현', amount: 4000000 },
+          { asset: 'KODEX 200 전량', amount: 2000000 },
         ],
         buy: [
-          { asset: 'KODEX 코스닥150', amount: 1000000 },
-          { asset: 'TIGER 미국채10년', amount: 500000 },
-          { asset: 'KODEX 금액티브', amount: 500000 },
-          { asset: 'TIGER SOFR달러', amount: 500000 },
-          { asset: 'TIGER 미국S&P500', amount: 1000000 },
-          { asset: 'TIGER 미국나스닥100', amount: 500000 },
+          { asset: 'TIGER S&P500', amount: 2000000, ratio: 25 },
+          { asset: 'TIGER 미국배당다우존스', amount: 1600000, ratio: 20 },
+          { asset: 'TIGER 나스닥100', amount: 800000, ratio: 10 },
+          { asset: 'TIGER 미국채30년선물', amount: 800000, ratio: 10 },
+          { asset: 'TIGER 미국채10년선물', amount: 800000, ratio: 10 },
+          { asset: 'KODEX 금액티브', amount: 800000, ratio: 10 },
+          { asset: 'TIGER CD금리액티브', amount: 640000, ratio: 8 },
+          { asset: 'TIGER SOFR금리액티브', amount: 560000, ratio: 7 },
         ],
-        reason: '과세이연 혜택을 위해 해외주식 필요, 차익 실현 후 저평가 자산 + 안전자산 분산',
-        // 분할 매도 전략 (7단계) - 총 400만원
+        reason: '목표 포트폴리오 비중에 맞춰 리밸런싱 (국내주식 → 해외ETF+채권 분산)',
+        // 분할 매도 전략 (5단계) - 총 200만원
         sellStrategy: [
-          { step: '1차', rate: '+7%', amount: 1000000, items: [{ name: 'KODEX 200', amount: 1000000 }]},
-          { step: '2차', rate: '+9%', amount: 800000, items: [{ name: 'KODEX 200', amount: 800000 }]},
-          { step: '3차', rate: '+11%', amount: 600000, items: [{ name: 'KODEX 200', amount: 600000 }]},
-          { step: '4차', rate: '+14%', amount: 520000, items: [{ name: 'KODEX 200', amount: 520000 }]},
-          { step: '5차', rate: '+16%', amount: 440000, items: [{ name: 'KODEX 200', amount: 440000 }]},
-          { step: '6차', rate: '+18%', amount: 360000, items: [{ name: 'KODEX 200', amount: 360000 }]},
-          { step: '7차', rate: '+20%', amount: 280000, items: [{ name: 'KODEX 200', amount: 280000 }]},
+          { step: '1차', rate: '+5%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
+          { step: '2차', rate: '+7%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
+          { step: '3차', rate: '+10%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
+          { step: '4차', rate: '+12%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
+          { step: '5차', rate: '+15%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
         ],
-        sellTotal: 4000000,
-        sellNote: '6월까지 미매도 시: 7% 이상이면 전량 매도',
-        // 분할 매수 전략 (3단계) - 총 400만원
+        sellTotal: 2000000,
+        sellNote: '6월까지 미매도 시: 5% 이상이면 전량 매도',
+        // 분할 매수 전략 (3단계) - 총 200만원 (목표 비중대로)
         buyStrategy: [
-          { step: '1차', rate: '-3%', amount: 1000000, items: [
-            { name: '미국채10년', amount: 150000 },
-            { name: '금액티브', amount: 150000 },
-            { name: 'SOFR달러', amount: 150000 },
-            { name: '코스닥150', amount: 200000 },
-            { name: 'S&P500', amount: 200000 },
-            { name: '나스닥100', amount: 150000 },
+          { step: '1차', rate: '-3%', amount: 670000, items: [
+            { name: 'S&P500', amount: 170000 },
+            { name: '배당다우존스', amount: 130000 },
+            { name: '나스닥100', amount: 70000 },
+            { name: '미국채30년', amount: 70000 },
+            { name: '미국채10년', amount: 70000 },
+            { name: '금액티브', amount: 70000 },
+            { name: 'CD금리', amount: 50000 },
+            { name: 'SOFR', amount: 40000 },
           ]},
-          { step: '2차', rate: '-5%', amount: 1300000, items: [
-            { name: '미국채10년', amount: 200000 },
-            { name: '금액티브', amount: 200000 },
-            { name: 'SOFR달러', amount: 200000 },
-            { name: '코스닥150', amount: 300000 },
-            { name: 'S&P500', amount: 300000 },
-            { name: '나스닥100', amount: 100000 },
+          { step: '2차', rate: '-5%', amount: 670000, items: [
+            { name: 'S&P500', amount: 170000 },
+            { name: '배당다우존스', amount: 130000 },
+            { name: '나스닥100', amount: 70000 },
+            { name: '미국채30년', amount: 70000 },
+            { name: '미국채10년', amount: 70000 },
+            { name: '금액티브', amount: 70000 },
+            { name: 'CD금리', amount: 50000 },
+            { name: 'SOFR', amount: 40000 },
           ]},
-          { step: '3차', rate: '-7%', amount: 1700000, items: [
-            { name: '미국채10년', amount: 150000 },
-            { name: '금액티브', amount: 150000 },
-            { name: 'SOFR달러', amount: 150000 },
-            { name: '코스닥150', amount: 500000 },
-            { name: 'S&P500', amount: 500000 },
-            { name: '나스닥100', amount: 250000 },
+          { step: '3차', rate: '-7%', amount: 660000, items: [
+            { name: 'S&P500', amount: 160000 },
+            { name: '배당다우존스', amount: 140000 },
+            { name: '나스닥100', amount: 60000 },
+            { name: '미국채30년', amount: 60000 },
+            { name: '미국채10년', amount: 60000 },
+            { name: '금액티브', amount: 60000 },
+            { name: 'CD금리', amount: 60000 },
+            { name: 'SOFR', amount: 60000 },
           ]},
         ],
-        buyTotal: 4000000,
-        buyNote: '6월까지 미매수 시: 마이너스면 구매',
+        buyTotal: 2000000,
+        buyNote: '6월까지 미매수 시: 마이너스면 목표 비중대로 일괄 매수',
       },
       sellRecommend: [
-        { asset: 'KODEX 200 (ISA)', current: 3000000, sell: 3000000, reason: 'ISA 차익실현' },
-        { asset: 'TIGER S&P500 (ISA)', current: 2000000, sell: 2000000, reason: 'ISA 차익실현' },
-        { asset: 'TIGER 나스닥100 (ISA)', current: 1000000, sell: 1000000, reason: 'ISA 차익실현' },
-        { asset: 'KODEX 200 (연금)', current: 4000000, sell: 4000000, reason: '연금 차익실현' },
+        { asset: 'KODEX 200 (ISA)', current: 3000000, sell: 3000000, reason: '목표 포트폴리오에 없음' },
+        { asset: 'PLUS 신흥국MSCI (ISA)', current: 3000000, sell: 3000000, reason: '목표 포트폴리오에 없음' },
+        { asset: 'KODEX 200 (연금)', current: 2000000, sell: 2000000, reason: '목표 포트폴리오에 없음' },
       ],
       buyRecommend: [
-        { asset: 'PLUS 신흥국MSCI', target: 0, buy: 2000000, reason: '신흥국 저평가 구간' },
-        { asset: 'KODEX 코스닥150', target: 0, buy: 3000000, reason: '코스닥 저평가 구간' },
-        { asset: 'TIGER 미국채10년', target: 2070000, buy: 1500000, reason: '안전자산 확보' },
-        { asset: 'KODEX 금액티브', target: 0, buy: 1000000, reason: '인플레 헤지' },
-        { asset: 'TIGER SOFR달러', target: 0, buy: 1000000, reason: '달러 + 금리 수익' },
-        { asset: 'TIGER 미국S&P500 (연금)', target: 0, buy: 1000000, reason: '해외주식 과세이연' },
-        { asset: 'TIGER 미국나스닥100 (연금)', target: 0, buy: 500000, reason: '성장주 노출' },
+        { asset: 'TIGER S&P500', target: 25, buy: 5000000, reason: '핵심 자산 25%' },
+        { asset: 'TIGER 미국배당다우존스', target: 20, buy: 4000000, reason: '배당 수익 20%' },
+        { asset: 'TIGER 나스닥100', target: 10, buy: 2000000, reason: '성장주 10%' },
+        { asset: 'TIGER 미국채30년선물', target: 10, buy: 2000000, reason: '장기채 10%' },
+        { asset: 'TIGER 미국채10년선물', target: 10, buy: 2000000, reason: '중기채 10%' },
+        { asset: 'KODEX 금액티브', target: 10, buy: 2000000, reason: '인플레 헤지 10%' },
+        { asset: 'TIGER CD금리액티브', target: 8, buy: 1600000, reason: '안전자산 8%' },
+        { asset: 'TIGER SOFR금리액티브', target: 7, buy: 1400000, reason: '달러 안전자산 7%' },
       ],
       // 하늘버핏의 리밸런싱 의견
       haneulOpinion: {
         title: '하늘버핏의 리밸런싱 의견',
-        summary: '가윤님의 포트폴리오는 "핵심-위성" 전략의 교과서적인 구성입니다. VOO와 SCHD가 핵심 자산(37.5%)을 형성하고, ISA 내 6개 자산군 분산이 리스크를 효과적으로 관리하고 있습니다.',
+        summary: '가윤님의 세제혜택 계좌(IRP+ISA+연금저축)를 목표 포트폴리오 비중에 맞춰 리밸런싱하세요. 주식 55%, 채권+CD+SOFR 35%, 금 10%의 균형잡힌 배분으로 안정성과 성장을 동시에 추구합니다.',
         situation: [
           '해외주식: +250만원 수익 중. 양도소득세 고려 시 계속 보유가 유리',
-          'ISA/연금: 국내 대형주(KODEX 200) 비중이 높아 차익 실현 적기',
-          '시장 전망: 코스닥/신흥국 저평가 구간, 안전자산 분산 필요',
+          'ISA/연금: KODEX 200, 신흥국MSCI → 목표 비중으로 전환 필요',
+          '목표: S&P500 25% + 배당다우존스 20% + 나스닥 10% + 채권 20% + 금 10% + CD/SOFR 15%',
         ],
         recommendations: [
           '해외주식(VOO, SCHD, 아마존): Hold - 세금 효율성 우선',
-          'ISA 리밸런싱: KODEX 200 → 신흥국/코스닥 재투자',
-          '연금저축 리밸런싱: 국내주식 → 해외ETF + 안전자산 분산',
+          'ISA: KODEX 200, 신흥국 매도 → 목표 비중대로 재투자',
+          '연금저축: KODEX 200 매도 → 목표 비중대로 재투자',
           '손절 기준: 개별 종목 -20% 도달 시 재검토',
         ],
         tradingStrategy: {
           title: '분할 매수/매도 전략',
           sellRule: '7~20% 수익 구간에서 차익 실현',
           buyRule: '한 번에 몰빵 금지! 4월 동안 일자를 나눠서, 내려갈 때 조금씩 더 사는 방식으로 분할 매수',
+        },
+        // 세제혜택 계좌 목표 포트폴리오 (IRP+ISA+연금저축 통합)
+        targetPortfolio: {
+          title: '세제혜택 계좌 목표 비중',
+          subtitle: 'IRP + ISA + 연금저축 통합',
+          items: [
+            { name: 'TIGER S&P500', ratio: 25 },
+            { name: 'TIGER 미국배당다우존스', ratio: 20 },
+            { name: 'TIGER 나스닥100', ratio: 10 },
+            { name: 'TIGER 미국채30년선물', ratio: 10 },
+            { name: 'TIGER 미국채10년선물', ratio: 10 },
+            { name: '금액티브', ratio: 10 },
+            { name: 'TIGER CD금리액티브', ratio: 8 },
+            { name: 'SOFR', ratio: 7 },
+          ],
+          summary: [
+            { category: '주식', ratio: 55, color: '#3182F6' },
+            { category: '채권+CD+SOFR', ratio: 35, color: '#10B981' },
+            { category: '금', ratio: 10, color: '#F59E0B' },
+          ],
         },
       },
       // 월가 전설들 평가
@@ -1305,52 +1350,52 @@ export default function RebalancePage() {
           style: '가치투자',
           icon: '🎩',
           color: '#F59E0B',
-          rating: 'B+',
-          comment: 'VOO와 SCHD 보유는 합리적이나, 차익 실현 후 재투자 종목의 본질적 가치를 충분히 분석했는지 확인이 필요합니다. 신흥국 투자는 이해 범위 밖일 수 있습니다.',
+          rating: 'A-',
+          comment: 'S&P500 25%와 배당다우존스 20%를 핵심으로 잡은 건 현명합니다. 배당주 비중을 높인 건 제 철학과 일치해요. 나스닥은 10%로 적절히 제한했네요.',
         },
         {
           name: '레이 달리오',
           style: '올웨더',
           icon: '🌊',
           color: '#3182F6',
-          rating: 'A-',
-          comment: '채권, 금, 주식의 분산은 좋습니다. SOFR 달러 추가로 인플레이션 헤지도 고려한 점이 훌륭합니다. 다만 원자재 비중이 금에만 한정된 점은 아쉽습니다.',
+          rating: 'A',
+          comment: '주식 55%, 채권 20%, 금 10%, CD/SOFR 15%의 배분은 올웨더 포트폴리오와 매우 유사합니다! 30년채와 10년채를 나눈 것도 좋고, 금 10%는 인플레 헤지에 적절합니다.',
         },
         {
           name: '피터 린치',
           style: '성장주',
           icon: '📈',
           color: '#10B981',
-          rating: 'B',
-          comment: '나스닥 ETF를 통한 성장주 노출은 좋지만, 개별 종목 발굴 기회가 제한적입니다. \'10루타 종목\'을 직접 찾아볼 여지를 남겨두세요.',
+          rating: 'B+',
+          comment: '나스닥100 10%는 성장주 노출로 적절합니다. 다만 개별 성장주 발굴 기회가 제한적이네요. 해외주식 계좌의 아마존은 좋은 선택입니다!',
         },
         {
           name: '존 보글',
           style: '인덱스',
           icon: '📊',
           color: '#8B5CF6',
-          rating: 'A',
-          comment: '저비용 인덱스 ETF 중심의 리밸런싱은 제가 평생 주장한 원칙과 일치합니다. VOO, TIGER S&P500 같은 저비용 상품 선택은 현명한 결정입니다.',
+          rating: 'A+',
+          comment: '완벽합니다! TIGER S&P500, 나스닥100, 배당다우존스 모두 저비용 인덱스 ETF입니다. 이것이 바로 제가 평생 주장한 인덱스 투자의 정수입니다.',
         },
         {
           name: '하워드 막스',
           style: '리스크',
           icon: '⚖️',
           color: '#EF4444',
-          rating: 'B+',
-          comment: '차익 실현 타이밍이 적절합니다. \'2차 사고\'를 할 수 있는 현금 여력을 확보한 점이 좋습니다. 신흥국 재투자는 \'떨어지는 칼날\'일 수 있으니 분할 매수를 권합니다.',
+          rating: 'A-',
+          comment: '채권+CD+SOFR 35%로 안전자산을 확보한 건 훌륭한 리스크 관리입니다. 시장 하락 시 분할 매수로 대응할 수 있는 여력이 있네요.',
         },
         {
           name: '하늘버핏',
           style: '미래의 전설',
           icon: '🌤️',
           color: '#667EEA',
-          rating: 'A',
-          comment: '가윤이 포트폴리오 구성 아주 좋아요! VOO+SCHD 코어 전략에 ISA/연금 세제혜택까지 완벽하게 활용하고 있어요. 현금 확보하면서 기회 매수 노리는 것도 현명한 판단! 앞으로 떨어지는 우량주 하나씩 줍줍하면서 부자 됩시다~ 움하하하하 🚀',
+          rating: 'A+',
+          comment: '가윤이 새 목표 포트폴리오 완벽해요! S&P500+배당주 45%로 코어 잡고, 채권+금+CD로 안전자산 45% 확보! 이 비중대로 차근차근 리밸런싱하면 부자 됩니다~ 움하하하하 🚀',
         },
       ],
-      overallGrade: 'B+',
-      overallComment: '안정적인 코어-위성 전략에 적절한 리밸런싱. 세금 효율성과 자산배분 모두 고려한 합리적 판단.',
+      overallGrade: 'A',
+      overallComment: '주식 55% + 안전자산 45%의 균형잡힌 목표 포트폴리오. 저비용 인덱스 ETF 중심으로 장기 복리 효과를 극대화할 수 있는 구성.',
       // 기회 매수 전략
       opportunityBuy: {
         title: '기회 매수 전략',
@@ -1773,7 +1818,7 @@ export default function RebalancePage() {
 
             {/* 분할 매수/매도 전략 */}
             {data.haneulOpinion.tradingStrategy && (
-              <div style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12, padding: isMobile ? 16 : 20, border: '2px dashed rgba(255,255,255,0.4)' }}>
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12, padding: isMobile ? 16 : 20, marginBottom: 16, border: '2px dashed rgba(255,255,255,0.4)' }}>
                 <h3 style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, marginBottom: 16, color: '#FF69B4', display: 'flex', alignItems: 'center', gap: 8 }}>
                   ⚡ {data.haneulOpinion.tradingStrategy.title}
                 </h3>
@@ -1790,6 +1835,59 @@ export default function RebalancePage() {
                       {data.haneulOpinion.tradingStrategy.buyRule}
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* 세제혜택 계좌 목표 비중 (IRP+ISA+연금저축) */}
+            {data.haneulOpinion.targetPortfolio && (
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 12, padding: isMobile ? 16 : 20 }}>
+                <h3 style={{ fontSize: isMobile ? 15 : 17, fontWeight: 700, marginBottom: 8, color: '#1E3A5F', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  🎯 {data.haneulOpinion.targetPortfolio.title}
+                </h3>
+                <p style={{ fontSize: 13, color: '#666', marginBottom: 16 }}>
+                  {data.haneulOpinion.targetPortfolio.subtitle} - 최종적으로 이 비중을 목표로 리밸런싱하세요
+                </p>
+
+                {/* 자산군별 요약 카드 */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 16 }}>
+                  {data.haneulOpinion.targetPortfolio.summary.map((item, idx) => (
+                    <div key={idx} style={{
+                      backgroundColor: item.color + '15',
+                      borderRadius: 8,
+                      padding: isMobile ? 10 : 12,
+                      textAlign: 'center',
+                      borderBottom: `3px solid ${item.color}`,
+                    }}>
+                      <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 800, color: item.color }}>
+                        {item.ratio}%
+                      </div>
+                      <div style={{ fontSize: isMobile ? 11 : 12, color: '#666', marginTop: 2 }}>
+                        {item.category}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 종목별 비중 */}
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: 8 }}>
+                  {data.haneulOpinion.targetPortfolio.items.map((item, idx) => (
+                    <div key={idx} style={{
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: 8,
+                      padding: isMobile ? 10 : 12,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                      <span style={{ fontSize: isMobile ? 11 : 12, color: '#333', fontWeight: 500 }}>
+                        {item.name.replace('TIGER ', '')}
+                      </span>
+                      <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 700, color: '#3182F6' }}>
+                        {item.ratio}%
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -1848,13 +1946,14 @@ export default function RebalancePage() {
                   </tbody>
                 </table>
               </div>
-              {/* 매수 */}
+              {/* 매수 - 목표 비중 기반 */}
               <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 매수</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 매수 (목표 비중)</h3>
                 <table style={{ ...styles.table, marginBottom: 0 }}>
                   <thead>
                     <tr>
                       <th style={{ ...styles.th, backgroundColor: '#DCFCE7' }}>종목</th>
+                      <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'center', width: 60 }}>비중</th>
                       <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>금액</th>
                     </tr>
                   </thead>
@@ -1862,6 +1961,9 @@ export default function RebalancePage() {
                     {data.isaRebalance.buy.map((item, idx) => (
                       <tr key={idx}>
                         <td style={styles.td}>{item.asset}</td>
+                        <td style={{ ...styles.td, textAlign: 'center', color: '#3182F6', fontWeight: 700 }}>
+                          {item.ratio}%
+                        </td>
                         <td style={{ ...styles.td, textAlign: 'right', color: COLORS.success, fontWeight: 600 }}>
                           {formatMoney(item.amount)}
                         </td>
@@ -1869,6 +1971,7 @@ export default function RebalancePage() {
                     ))}
                     <tr style={{ backgroundColor: '#DCFCE7' }}>
                       <td style={{ ...styles.td, fontWeight: 700 }}>합계</td>
+                      <td style={{ ...styles.td, textAlign: 'center', fontWeight: 700 }}>100%</td>
                       <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: COLORS.success }}>
                         {formatMoney(data.isaRebalance.buy.reduce((sum, i) => sum + i.amount, 0))}
                       </td>
@@ -1894,14 +1997,13 @@ export default function RebalancePage() {
                     <span style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>총 {formatMoney(data.isaRebalance.sellTotal)}</span>
                   </h4>
                   <div style={{ overflowX: 'auto' }}>
-                    <table style={{ ...styles.table, minWidth: 500 }}>
+                    <table style={{ ...styles.table, minWidth: 400 }}>
                       <thead>
                         <tr style={{ backgroundColor: '#FFF5F5' }}>
                           <th style={{ ...styles.th, textAlign: 'center', width: 50 }}>단계</th>
                           <th style={{ ...styles.th, textAlign: 'center', width: 60 }}>수익률</th>
                           <th style={{ ...styles.th, textAlign: 'right' }}>KODEX 200</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>S&P500</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>나스닥100</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>신흥국MSCI</th>
                           <th style={{ ...styles.th, textAlign: 'right', fontWeight: 700 }}>합계</th>
                         </tr>
                       </thead>
@@ -1911,8 +2013,7 @@ export default function RebalancePage() {
                             <td style={{ ...styles.td, textAlign: 'center', fontWeight: 600 }}>{item.step}</td>
                             <td style={{ ...styles.td, textAlign: 'center', color: '#FF6B6B', fontWeight: 600 }}>{item.rate}</td>
                             <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.items.find(i => i.name === 'KODEX 200')?.amount || 0)}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.items.find(i => i.name === 'S&P500')?.amount || 0)}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.items.find(i => i.name === '나스닥100')?.amount || 0)}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.items.find(i => i.name === '신흥국MSCI')?.amount || 0)}</td>
                             <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: '#FF6B6B' }}>{formatMoney(item.amount)}</td>
                           </tr>
                         ))}
@@ -1922,23 +2023,24 @@ export default function RebalancePage() {
                   <p style={{ fontSize: 12, color: '#888', marginTop: 8 }}>⚠️ {data.isaRebalance.sellNote}</p>
                 </div>
 
-                {/* 분할 매수 */}
+                {/* 분할 매수 - 목표 비중 기반 */}
                 <div>
                   <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    📈 분할 매수
+                    📈 분할 매수 (목표 비중대로)
                     <span style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>총 {formatMoney(data.isaRebalance.buyTotal)}</span>
                   </h4>
                   <div style={{ overflowX: 'auto' }}>
-                    <table style={{ ...styles.table, minWidth: 700 }}>
+                    <table style={{ ...styles.table, minWidth: 600 }}>
                       <thead>
                         <tr style={{ backgroundColor: '#F0FFF4' }}>
                           <th style={{ ...styles.th, textAlign: 'center', width: 50 }}>단계</th>
                           <th style={{ ...styles.th, textAlign: 'center', width: 60 }}>하락률</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>미국채10년</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>금액티브</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>SOFR달러</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>신흥국</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>코스닥150</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>S&P500</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>배당</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>나스닥</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>채권30</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>채권10</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>금</th>
                           <th style={{ ...styles.th, textAlign: 'right', fontWeight: 700 }}>합계</th>
                         </tr>
                       </thead>
@@ -1947,11 +2049,12 @@ export default function RebalancePage() {
                           <tr key={idx}>
                             <td style={{ ...styles.td, textAlign: 'center', fontWeight: 600 }}>{item.step}</td>
                             <td style={{ ...styles.td, textAlign: 'center', color: COLORS.success, fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === 'S&P500')?.amount ? formatMoney(item.items.find(i => i.name === 'S&P500').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '배당다우존스')?.amount ? formatMoney(item.items.find(i => i.name === '배당다우존스').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '나스닥100')?.amount ? formatMoney(item.items.find(i => i.name === '나스닥100').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '미국채30년')?.amount ? formatMoney(item.items.find(i => i.name === '미국채30년').amount) : '-'}</td>
                             <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '미국채10년')?.amount ? formatMoney(item.items.find(i => i.name === '미국채10년').amount) : '-'}</td>
                             <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '금액티브')?.amount ? formatMoney(item.items.find(i => i.name === '금액티브').amount) : '-'}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === 'SOFR달러')?.amount ? formatMoney(item.items.find(i => i.name === 'SOFR달러').amount) : '-'}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '신흥국')?.amount ? formatMoney(item.items.find(i => i.name === '신흥국').amount) : '-'}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '코스닥150')?.amount ? formatMoney(item.items.find(i => i.name === '코스닥150').amount) : '-'}</td>
                             <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: COLORS.success }}>{formatMoney(item.amount)}</td>
                           </tr>
                         ))}
@@ -1998,13 +2101,14 @@ export default function RebalancePage() {
                   </tbody>
                 </table>
               </div>
-              {/* 매수 */}
+              {/* 매수 - 목표 비중 기반 */}
               <div style={{ backgroundColor: '#F0FFF4', borderRadius: 12, padding: 16 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 매수</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: COLORS.success, marginBottom: 12 }}>📈 매수 (목표 비중)</h3>
                 <table style={{ ...styles.table, marginBottom: 0 }}>
                   <thead>
                     <tr>
                       <th style={{ ...styles.th, backgroundColor: '#DCFCE7' }}>종목</th>
+                      <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'center', width: 60 }}>비중</th>
                       <th style={{ ...styles.th, backgroundColor: '#DCFCE7', textAlign: 'right' }}>금액</th>
                     </tr>
                   </thead>
@@ -2012,6 +2116,9 @@ export default function RebalancePage() {
                     {data.pensionRebalance.buy.map((item, idx) => (
                       <tr key={idx}>
                         <td style={styles.td}>{item.asset}</td>
+                        <td style={{ ...styles.td, textAlign: 'center', color: '#3182F6', fontWeight: 700 }}>
+                          {item.ratio}%
+                        </td>
                         <td style={{ ...styles.td, textAlign: 'right', color: COLORS.success, fontWeight: 600 }}>
                           {formatMoney(item.amount)}
                         </td>
@@ -2019,6 +2126,7 @@ export default function RebalancePage() {
                     ))}
                     <tr style={{ backgroundColor: '#DCFCE7' }}>
                       <td style={{ ...styles.td, fontWeight: 700 }}>합계</td>
+                      <td style={{ ...styles.td, textAlign: 'center', fontWeight: 700 }}>100%</td>
                       <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: COLORS.success }}>
                         {formatMoney(data.pensionRebalance.buy.reduce((sum, i) => sum + i.amount, 0))}
                       </td>
@@ -2044,7 +2152,7 @@ export default function RebalancePage() {
                     <span style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>총 {formatMoney(data.pensionRebalance.sellTotal)}</span>
                   </h4>
                   <div style={{ overflowX: 'auto' }}>
-                    <table style={{ ...styles.table, minWidth: 400 }}>
+                    <table style={{ ...styles.table, minWidth: 300 }}>
                       <thead>
                         <tr style={{ backgroundColor: '#FFF5F5' }}>
                           <th style={{ ...styles.th, textAlign: 'center', width: 50 }}>단계</th>
@@ -2068,24 +2176,24 @@ export default function RebalancePage() {
                   <p style={{ fontSize: 12, color: '#888', marginTop: 8 }}>⚠️ {data.pensionRebalance.sellNote}</p>
                 </div>
 
-                {/* 분할 매수 */}
+                {/* 분할 매수 - 목표 비중 기반 */}
                 <div>
                   <h4 style={{ fontSize: 15, fontWeight: 700, color: COLORS.success, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    📈 분할 매수
+                    📈 분할 매수 (목표 비중대로)
                     <span style={{ fontSize: 13, fontWeight: 500, color: '#888' }}>총 {formatMoney(data.pensionRebalance.buyTotal)}</span>
                   </h4>
                   <div style={{ overflowX: 'auto' }}>
-                    <table style={{ ...styles.table, minWidth: 700 }}>
+                    <table style={{ ...styles.table, minWidth: 600 }}>
                       <thead>
                         <tr style={{ backgroundColor: '#F0FFF4' }}>
                           <th style={{ ...styles.th, textAlign: 'center', width: 50 }}>단계</th>
                           <th style={{ ...styles.th, textAlign: 'center', width: 60 }}>하락률</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>미국채10년</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>금액티브</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>SOFR달러</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>코스닥150</th>
                           <th style={{ ...styles.th, textAlign: 'right' }}>S&P500</th>
-                          <th style={{ ...styles.th, textAlign: 'right' }}>나스닥100</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>배당</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>나스닥</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>채권30</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>채권10</th>
+                          <th style={{ ...styles.th, textAlign: 'right' }}>금</th>
                           <th style={{ ...styles.th, textAlign: 'right', fontWeight: 700 }}>합계</th>
                         </tr>
                       </thead>
@@ -2094,12 +2202,12 @@ export default function RebalancePage() {
                           <tr key={idx}>
                             <td style={{ ...styles.td, textAlign: 'center', fontWeight: 600 }}>{item.step}</td>
                             <td style={{ ...styles.td, textAlign: 'center', color: COLORS.success, fontWeight: 600 }}>{item.rate}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === 'S&P500')?.amount ? formatMoney(item.items.find(i => i.name === 'S&P500').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '배당다우존스')?.amount ? formatMoney(item.items.find(i => i.name === '배당다우존스').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '나스닥100')?.amount ? formatMoney(item.items.find(i => i.name === '나스닥100').amount) : '-'}</td>
+                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '미국채30년')?.amount ? formatMoney(item.items.find(i => i.name === '미국채30년').amount) : '-'}</td>
                             <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '미국채10년')?.amount ? formatMoney(item.items.find(i => i.name === '미국채10년').amount) : '-'}</td>
                             <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '금액티브')?.amount ? formatMoney(item.items.find(i => i.name === '금액티브').amount) : '-'}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === 'SOFR달러')?.amount ? formatMoney(item.items.find(i => i.name === 'SOFR달러').amount) : '-'}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '코스닥150')?.amount ? formatMoney(item.items.find(i => i.name === '코스닥150').amount) : '-'}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === 'S&P500')?.amount ? formatMoney(item.items.find(i => i.name === 'S&P500').amount) : '-'}</td>
-                            <td style={{ ...styles.td, textAlign: 'right' }}>{item.items.find(i => i.name === '나스닥100')?.amount ? formatMoney(item.items.find(i => i.name === '나스닥100').amount) : '-'}</td>
                             <td style={{ ...styles.td, textAlign: 'right', fontWeight: 700, color: COLORS.success }}>{formatMoney(item.amount)}</td>
                           </tr>
                         ))}
