@@ -1,150 +1,152 @@
 import { useState, useEffect, useMemo } from 'react'
 
 // 미국 주식 데이터 (S&P 500 기반, 적자 기업 제외)
+// price: 현재가(USD), divYield: 배당수익률(%), growth1Y: 1년 성장률(%)
 const US_STOCKS = [
   // 기술
-  { ticker: 'AAPL', name: '애플', sector: '기술', per: 28.5, roe: 147.2, dividendYears: 12, pbr: 42.1 },
-  { ticker: 'MSFT', name: '마이크로소프트', sector: '기술', per: 35.2, roe: 38.4, dividendYears: 21, pbr: 12.3 },
-  { ticker: 'GOOG', name: '구글', sector: '기술', per: 23.1, roe: 25.2, dividendYears: 0, pbr: 5.8 },
-  { ticker: 'META', name: '메타', sector: '기술', per: 26.8, roe: 28.1, dividendYears: 1, pbr: 7.2 },
-  { ticker: 'CSCO', name: '시스코', sector: '기술', per: 15.2, roe: 28.5, dividendYears: 14, pbr: 4.5 },
-  { ticker: 'IBM', name: 'IBM', sector: '기술', per: 21.3, roe: 32.1, dividendYears: 28, pbr: 6.8 },
-  { ticker: 'INTC', name: '인텔', sector: '기술', per: 35.8, roe: 4.2, dividendYears: 10, pbr: 1.2 },
-  { ticker: 'TXN', name: '텍사스 인스트루먼트', sector: '기술', per: 32.4, roe: 54.2, dividendYears: 20, pbr: 11.2 },
+  { ticker: 'AAPL', name: '애플', sector: '기술', per: 28.5, roe: 147.2, dividendYears: 12, pbr: 42.1, price: 178.5, divYield: 0.5, growth1Y: 12.3 },
+  { ticker: 'MSFT', name: '마이크로소프트', sector: '기술', per: 35.2, roe: 38.4, dividendYears: 21, pbr: 12.3, price: 415.2, divYield: 0.7, growth1Y: 18.5 },
+  { ticker: 'GOOG', name: '구글', sector: '기술', per: 23.1, roe: 25.2, dividendYears: 0, pbr: 5.8, price: 175.8, divYield: 0.0, growth1Y: 25.2 },
+  { ticker: 'META', name: '메타', sector: '기술', per: 26.8, roe: 28.1, dividendYears: 1, pbr: 7.2, price: 505.3, divYield: 0.4, growth1Y: 85.2 },
+  { ticker: 'CSCO', name: '시스코', sector: '기술', per: 15.2, roe: 28.5, dividendYears: 14, pbr: 4.5, price: 48.5, divYield: 3.2, growth1Y: -5.8 },
+  { ticker: 'IBM', name: 'IBM', sector: '기술', per: 21.3, roe: 32.1, dividendYears: 28, pbr: 6.8, price: 185.2, divYield: 3.6, growth1Y: 8.5 },
+  { ticker: 'INTC', name: '인텔', sector: '기술', per: 35.8, roe: 4.2, dividendYears: 10, pbr: 1.2, price: 32.5, divYield: 1.5, growth1Y: -28.5 },
+  { ticker: 'TXN', name: '텍사스 인스트루먼트', sector: '기술', per: 32.4, roe: 54.2, dividendYears: 20, pbr: 11.2, price: 175.8, divYield: 2.8, growth1Y: -2.5 },
   // 금융
-  { ticker: 'JPM', name: 'JP모건', sector: '금융', per: 11.2, roe: 15.8, dividendYears: 14, pbr: 1.7 },
-  { ticker: 'BAC', name: '뱅크오브아메리카', sector: '금융', per: 12.5, roe: 10.2, dividendYears: 11, pbr: 1.1 },
-  { ticker: 'WFC', name: '웰스파고', sector: '금융', per: 11.8, roe: 11.5, dividendYears: 13, pbr: 1.2 },
-  { ticker: 'GS', name: '골드만삭스', sector: '금융', per: 14.2, roe: 12.1, dividendYears: 13, pbr: 1.3 },
-  { ticker: 'MS', name: '모건스탠리', sector: '금융', per: 15.1, roe: 13.2, dividendYears: 12, pbr: 1.6 },
-  { ticker: 'BLK', name: '블랙록', sector: '금융', per: 20.5, roe: 14.8, dividendYears: 15, pbr: 2.8 },
-  { ticker: 'SCHW', name: '찰스슈왑', sector: '금융', per: 24.3, roe: 15.2, dividendYears: 8, pbr: 3.2 },
+  { ticker: 'JPM', name: 'JP모건', sector: '금융', per: 11.2, roe: 15.8, dividendYears: 14, pbr: 1.7, price: 195.5, divYield: 2.3, growth1Y: 22.5 },
+  { ticker: 'BAC', name: '뱅크오브아메리카', sector: '금융', per: 12.5, roe: 10.2, dividendYears: 11, pbr: 1.1, price: 38.2, divYield: 2.5, growth1Y: 15.8 },
+  { ticker: 'WFC', name: '웰스파고', sector: '금융', per: 11.8, roe: 11.5, dividendYears: 13, pbr: 1.2, price: 58.5, divYield: 2.4, growth1Y: 18.2 },
+  { ticker: 'GS', name: '골드만삭스', sector: '금융', per: 14.2, roe: 12.1, dividendYears: 13, pbr: 1.3, price: 485.2, divYield: 2.1, growth1Y: 28.5 },
+  { ticker: 'MS', name: '모건스탠리', sector: '금융', per: 15.1, roe: 13.2, dividendYears: 12, pbr: 1.6, price: 98.5, divYield: 3.5, growth1Y: 12.8 },
+  { ticker: 'BLK', name: '블랙록', sector: '금융', per: 20.5, roe: 14.8, dividendYears: 15, pbr: 2.8, price: 815.2, divYield: 2.4, growth1Y: 8.5 },
+  { ticker: 'SCHW', name: '찰스슈왑', sector: '금융', per: 24.3, roe: 15.2, dividendYears: 8, pbr: 3.2, price: 72.5, divYield: 1.4, growth1Y: -8.2 },
   // 헬스케어
-  { ticker: 'JNJ', name: '존슨앤존슨', sector: '헬스케어', per: 15.8, roe: 21.2, dividendYears: 62, pbr: 5.2 },
-  { ticker: 'UNH', name: '유나이티드헬스', sector: '헬스케어', per: 20.1, roe: 25.8, dividendYears: 15, pbr: 5.8 },
-  { ticker: 'PFE', name: '화이자', sector: '헬스케어', per: 12.3, roe: 18.5, dividendYears: 14, pbr: 1.8 },
-  { ticker: 'ABBV', name: '애브비', sector: '헬스케어', per: 14.5, roe: 62.1, dividendYears: 52, pbr: 18.2 },
-  { ticker: 'MRK', name: '머크', sector: '헬스케어', per: 16.2, roe: 35.2, dividendYears: 13, pbr: 6.1 },
-  { ticker: 'LLY', name: '일라이릴리', sector: '헬스케어', per: 78.5, roe: 58.2, dividendYears: 10, pbr: 45.2 },
-  { ticker: 'BMY', name: '브리스톨마이어스', sector: '헬스케어', per: 8.2, roe: 21.5, dividendYears: 15, pbr: 3.2 },
+  { ticker: 'JNJ', name: '존슨앤존슨', sector: '헬스케어', per: 15.8, roe: 21.2, dividendYears: 62, pbr: 5.2, price: 158.5, divYield: 3.0, growth1Y: -5.2 },
+  { ticker: 'UNH', name: '유나이티드헬스', sector: '헬스케어', per: 20.1, roe: 25.8, dividendYears: 15, pbr: 5.8, price: 525.8, divYield: 1.4, growth1Y: 8.5 },
+  { ticker: 'PFE', name: '화이자', sector: '헬스케어', per: 12.3, roe: 18.5, dividendYears: 14, pbr: 1.8, price: 28.5, divYield: 5.8, growth1Y: -25.8 },
+  { ticker: 'ABBV', name: '애브비', sector: '헬스케어', per: 14.5, roe: 62.1, dividendYears: 52, pbr: 18.2, price: 175.2, divYield: 3.5, growth1Y: 12.5 },
+  { ticker: 'MRK', name: '머크', sector: '헬스케어', per: 16.2, roe: 35.2, dividendYears: 13, pbr: 6.1, price: 125.8, divYield: 2.5, growth1Y: 15.2 },
+  { ticker: 'LLY', name: '일라이릴리', sector: '헬스케어', per: 78.5, roe: 58.2, dividendYears: 10, pbr: 45.2, price: 785.5, divYield: 0.7, growth1Y: 85.5 },
+  { ticker: 'BMY', name: '브리스톨마이어스', sector: '헬스케어', per: 8.2, roe: 21.5, dividendYears: 15, pbr: 3.2, price: 48.5, divYield: 4.8, growth1Y: -18.5 },
   // 소비재
-  { ticker: 'KO', name: '코카콜라', sector: '소비재', per: 24.5, roe: 42.8, dividendYears: 62, pbr: 10.5 },
-  { ticker: 'PEP', name: '펩시코', sector: '소비재', per: 25.8, roe: 52.1, dividendYears: 52, pbr: 12.8 },
-  { ticker: 'PG', name: 'P&G', sector: '소비재', per: 26.2, roe: 32.5, dividendYears: 68, pbr: 7.8 },
-  { ticker: 'WMT', name: '월마트', sector: '소비재', per: 28.5, roe: 18.2, dividendYears: 51, pbr: 5.2 },
-  { ticker: 'COST', name: '코스트코', sector: '소비재', per: 48.2, roe: 28.5, dividendYears: 20, pbr: 13.5 },
-  { ticker: 'MCD', name: '맥도날드', sector: '소비재', per: 22.5, roe: 185.2, dividendYears: 48, pbr: 0 },
-  { ticker: 'NKE', name: '나이키', sector: '소비재', per: 28.1, roe: 32.8, dividendYears: 23, pbr: 8.5 },
+  { ticker: 'KO', name: '코카콜라', sector: '소비재', per: 24.5, roe: 42.8, dividendYears: 62, pbr: 10.5, price: 62.5, divYield: 3.0, growth1Y: 5.8 },
+  { ticker: 'PEP', name: '펩시코', sector: '소비재', per: 25.8, roe: 52.1, dividendYears: 52, pbr: 12.8, price: 175.2, divYield: 2.8, growth1Y: 2.5 },
+  { ticker: 'PG', name: 'P&G', sector: '소비재', per: 26.2, roe: 32.5, dividendYears: 68, pbr: 7.8, price: 165.8, divYield: 2.4, growth1Y: 8.2 },
+  { ticker: 'WMT', name: '월마트', sector: '소비재', per: 28.5, roe: 18.2, dividendYears: 51, pbr: 5.2, price: 165.5, divYield: 1.3, growth1Y: 18.5 },
+  { ticker: 'COST', name: '코스트코', sector: '소비재', per: 48.2, roe: 28.5, dividendYears: 20, pbr: 13.5, price: 725.8, divYield: 0.6, growth1Y: 25.8 },
+  { ticker: 'MCD', name: '맥도날드', sector: '소비재', per: 22.5, roe: 185.2, dividendYears: 48, pbr: 0, price: 285.5, divYield: 2.2, growth1Y: -2.5 },
+  { ticker: 'NKE', name: '나이키', sector: '소비재', per: 28.1, roe: 32.8, dividendYears: 23, pbr: 8.5, price: 98.5, divYield: 1.5, growth1Y: -15.8 },
   // 산업재
-  { ticker: 'CAT', name: '캐터필러', sector: '산업재', per: 16.2, roe: 52.8, dividendYears: 30, pbr: 8.2 },
-  { ticker: 'HON', name: '하니웰', sector: '산업재', per: 22.5, roe: 32.1, dividendYears: 14, pbr: 7.5 },
-  { ticker: 'UPS', name: 'UPS', sector: '산업재', per: 18.2, roe: 42.5, dividendYears: 15, pbr: 8.8 },
-  { ticker: 'RTX', name: '레이시온', sector: '산업재', per: 32.5, roe: 8.2, dividendYears: 30, pbr: 2.1 },
-  { ticker: 'DE', name: '디어앤컴퍼니', sector: '산업재', per: 12.8, roe: 35.2, dividendYears: 8, pbr: 5.2 },
-  { ticker: 'LMT', name: '록히드마틴', sector: '산업재', per: 17.5, roe: 82.5, dividendYears: 21, pbr: 12.8 },
-  { ticker: 'GE', name: 'GE 에어로스페이스', sector: '산업재', per: 38.2, roe: 18.5, dividendYears: 3, pbr: 8.2 },
+  { ticker: 'CAT', name: '캐터필러', sector: '산업재', per: 16.2, roe: 52.8, dividendYears: 30, pbr: 8.2, price: 345.8, divYield: 1.5, growth1Y: 28.5 },
+  { ticker: 'HON', name: '하니웰', sector: '산업재', per: 22.5, roe: 32.1, dividendYears: 14, pbr: 7.5, price: 205.2, divYield: 2.0, growth1Y: 5.8 },
+  { ticker: 'UPS', name: 'UPS', sector: '산업재', per: 18.2, roe: 42.5, dividendYears: 15, pbr: 8.8, price: 145.8, divYield: 4.5, growth1Y: -12.5 },
+  { ticker: 'RTX', name: '레이시온', sector: '산업재', per: 32.5, roe: 8.2, dividendYears: 30, pbr: 2.1, price: 98.5, divYield: 2.3, growth1Y: 15.2 },
+  { ticker: 'DE', name: '디어앤컴퍼니', sector: '산업재', per: 12.8, roe: 35.2, dividendYears: 8, pbr: 5.2, price: 385.5, divYield: 1.4, growth1Y: -8.5 },
+  { ticker: 'LMT', name: '록히드마틴', sector: '산업재', per: 17.5, roe: 82.5, dividendYears: 21, pbr: 12.8, price: 485.2, divYield: 2.5, growth1Y: 12.8 },
+  { ticker: 'GE', name: 'GE 에어로스페이스', sector: '산업재', per: 38.2, roe: 18.5, dividendYears: 3, pbr: 8.2, price: 165.8, divYield: 0.6, growth1Y: 72.5 },
   // 에너지
-  { ticker: 'XOM', name: '엑슨모빌', sector: '에너지', per: 13.2, roe: 18.5, dividendYears: 42, pbr: 2.1 },
-  { ticker: 'CVX', name: '쉐브론', sector: '에너지', per: 14.5, roe: 14.2, dividendYears: 37, pbr: 1.8 },
-  { ticker: 'COP', name: '코노코필립스', sector: '에너지', per: 12.1, roe: 22.5, dividendYears: 8, pbr: 2.5 },
-  { ticker: 'SLB', name: '슐룸버거', sector: '에너지', per: 15.8, roe: 21.8, dividendYears: 5, pbr: 3.2 },
-  { ticker: 'EOG', name: 'EOG 리소시스', sector: '에너지', per: 10.5, roe: 28.2, dividendYears: 6, pbr: 2.8 },
-  { ticker: 'PSX', name: '필립스66', sector: '에너지', per: 8.5, roe: 25.2, dividendYears: 12, pbr: 1.5 },
+  { ticker: 'XOM', name: '엑슨모빌', sector: '에너지', per: 13.2, roe: 18.5, dividendYears: 42, pbr: 2.1, price: 115.8, divYield: 3.2, growth1Y: 8.5 },
+  { ticker: 'CVX', name: '쉐브론', sector: '에너지', per: 14.5, roe: 14.2, dividendYears: 37, pbr: 1.8, price: 155.2, divYield: 4.0, growth1Y: -2.8 },
+  { ticker: 'COP', name: '코노코필립스', sector: '에너지', per: 12.1, roe: 22.5, dividendYears: 8, pbr: 2.5, price: 115.5, divYield: 1.8, growth1Y: 5.2 },
+  { ticker: 'SLB', name: '슐룸버거', sector: '에너지', per: 15.8, roe: 21.8, dividendYears: 5, pbr: 3.2, price: 48.5, divYield: 2.3, growth1Y: -12.5 },
+  { ticker: 'EOG', name: 'EOG 리소시스', sector: '에너지', per: 10.5, roe: 28.2, dividendYears: 6, pbr: 2.8, price: 125.8, divYield: 2.5, growth1Y: -5.8 },
+  { ticker: 'PSX', name: '필립스66', sector: '에너지', per: 8.5, roe: 25.2, dividendYears: 12, pbr: 1.5, price: 145.5, divYield: 3.0, growth1Y: 12.5 },
   // 통신
-  { ticker: 'VZ', name: '버라이즌', sector: '통신', per: 9.2, roe: 18.5, dividendYears: 20, pbr: 1.8 },
-  { ticker: 'T', name: 'AT&T', sector: '통신', per: 10.5, roe: 12.8, dividendYears: 40, pbr: 1.2 },
-  { ticker: 'TMUS', name: 'T-모바일', sector: '통신', per: 22.8, roe: 12.5, dividendYears: 2, pbr: 2.8 },
-  { ticker: 'CMCSA', name: '컴캐스트', sector: '통신', per: 10.8, roe: 15.2, dividendYears: 16, pbr: 1.8 },
+  { ticker: 'VZ', name: '버라이즌', sector: '통신', per: 9.2, roe: 18.5, dividendYears: 20, pbr: 1.8, price: 42.5, divYield: 6.2, growth1Y: 2.5 },
+  { ticker: 'T', name: 'AT&T', sector: '통신', per: 10.5, roe: 12.8, dividendYears: 40, pbr: 1.2, price: 18.5, divYield: 6.0, growth1Y: 15.8 },
+  { ticker: 'TMUS', name: 'T-모바일', sector: '통신', per: 22.8, roe: 12.5, dividendYears: 2, pbr: 2.8, price: 175.8, divYield: 1.5, growth1Y: 32.5 },
+  { ticker: 'CMCSA', name: '컴캐스트', sector: '통신', per: 10.8, roe: 15.2, dividendYears: 16, pbr: 1.8, price: 42.5, divYield: 2.8, growth1Y: -8.5 },
   // 유틸리티
-  { ticker: 'NEE', name: '넥스트에라에너지', sector: '유틸리티', per: 22.5, roe: 12.8, dividendYears: 29, pbr: 2.8 },
-  { ticker: 'DUK', name: '듀크에너지', sector: '유틸리티', per: 18.2, roe: 8.5, dividendYears: 18, pbr: 1.5 },
-  { ticker: 'SO', name: '서던컴퍼니', sector: '유틸리티', per: 20.5, roe: 12.1, dividendYears: 22, pbr: 2.2 },
-  { ticker: 'D', name: '도미니언에너지', sector: '유틸리티', per: 16.8, roe: 10.2, dividendYears: 20, pbr: 1.8 },
+  { ticker: 'NEE', name: '넥스트에라에너지', sector: '유틸리티', per: 22.5, roe: 12.8, dividendYears: 29, pbr: 2.8, price: 72.5, divYield: 2.8, growth1Y: -12.5 },
+  { ticker: 'DUK', name: '듀크에너지', sector: '유틸리티', per: 18.2, roe: 8.5, dividendYears: 18, pbr: 1.5, price: 98.5, divYield: 4.2, growth1Y: -5.8 },
+  { ticker: 'SO', name: '서던컴퍼니', sector: '유틸리티', per: 20.5, roe: 12.1, dividendYears: 22, pbr: 2.2, price: 78.5, divYield: 3.5, growth1Y: 2.5 },
+  { ticker: 'D', name: '도미니언에너지', sector: '유틸리티', per: 16.8, roe: 10.2, dividendYears: 20, pbr: 1.8, price: 52.5, divYield: 5.0, growth1Y: -8.2 },
   // 부동산
-  { ticker: 'AMT', name: '아메리칸타워', sector: '부동산', per: 42.5, roe: 28.5, dividendYears: 14, pbr: 18.5 },
-  { ticker: 'PLD', name: '프롤로지스', sector: '부동산', per: 38.2, roe: 5.8, dividendYears: 10, pbr: 2.1 },
-  { ticker: 'EQIX', name: '에퀴닉스', sector: '부동산', per: 78.5, roe: 8.2, dividendYears: 8, pbr: 5.2 },
-  { ticker: 'SPG', name: '사이먼프로퍼티', sector: '부동산', per: 18.5, roe: 52.8, dividendYears: 12, pbr: 12.5 },
-  { ticker: 'O', name: '리얼티인컴', sector: '부동산', per: 45.2, roe: 3.2, dividendYears: 30, pbr: 1.2 },
+  { ticker: 'AMT', name: '아메리칸타워', sector: '부동산', per: 42.5, roe: 28.5, dividendYears: 14, pbr: 18.5, price: 205.8, divYield: 3.2, growth1Y: -5.8 },
+  { ticker: 'PLD', name: '프롤로지스', sector: '부동산', per: 38.2, roe: 5.8, dividendYears: 10, pbr: 2.1, price: 125.5, divYield: 2.8, growth1Y: -2.5 },
+  { ticker: 'EQIX', name: '에퀴닉스', sector: '부동산', per: 78.5, roe: 8.2, dividendYears: 8, pbr: 5.2, price: 785.8, divYield: 2.0, growth1Y: 5.8 },
+  { ticker: 'SPG', name: '사이먼프로퍼티', sector: '부동산', per: 18.5, roe: 52.8, dividendYears: 12, pbr: 12.5, price: 155.8, divYield: 5.2, growth1Y: 15.8 },
+  { ticker: 'O', name: '리얼티인컴', sector: '부동산', per: 45.2, roe: 3.2, dividendYears: 30, pbr: 1.2, price: 55.8, divYield: 5.5, growth1Y: -8.5 },
   // 소재
-  { ticker: 'LIN', name: '린데', sector: '소재', per: 32.5, roe: 15.8, dividendYears: 30, pbr: 4.8 },
-  { ticker: 'APD', name: '에어프로덕츠', sector: '소재', per: 25.8, roe: 18.2, dividendYears: 42, pbr: 4.2 },
-  { ticker: 'SHW', name: '셔윈윌리엄스', sector: '소재', per: 28.5, roe: 62.5, dividendYears: 45, pbr: 22.5 },
-  { ticker: 'FCX', name: '프리포트맥모란', sector: '소재', per: 28.2, roe: 18.5, dividendYears: 3, pbr: 3.8 },
-  { ticker: 'NEM', name: '뉴몬트', sector: '소재', per: 15.8, roe: 8.5, dividendYears: 8, pbr: 1.5 },
-  { ticker: 'DD', name: '듀폰', sector: '소재', per: 22.5, roe: 5.2, dividendYears: 5, pbr: 1.8 },
+  { ticker: 'LIN', name: '린데', sector: '소재', per: 32.5, roe: 15.8, dividendYears: 30, pbr: 4.8, price: 455.8, divYield: 1.2, growth1Y: 12.5 },
+  { ticker: 'APD', name: '에어프로덕츠', sector: '소재', per: 25.8, roe: 18.2, dividendYears: 42, pbr: 4.2, price: 285.5, divYield: 2.5, growth1Y: -5.8 },
+  { ticker: 'SHW', name: '셔윈윌리엄스', sector: '소재', per: 28.5, roe: 62.5, dividendYears: 45, pbr: 22.5, price: 325.8, divYield: 0.9, growth1Y: 18.5 },
+  { ticker: 'FCX', name: '프리포트맥모란', sector: '소재', per: 28.2, roe: 18.5, dividendYears: 3, pbr: 3.8, price: 45.8, divYield: 1.5, growth1Y: 8.5 },
+  { ticker: 'NEM', name: '뉴몬트', sector: '소재', per: 15.8, roe: 8.5, dividendYears: 8, pbr: 1.5, price: 42.5, divYield: 2.8, growth1Y: 25.8 },
+  { ticker: 'DD', name: '듀폰', sector: '소재', per: 22.5, roe: 5.2, dividendYears: 5, pbr: 1.8, price: 78.5, divYield: 1.8, growth1Y: -2.5 },
 ]
 
 // 한국 주식 데이터 (KOSPI/KOSDAQ 기반, 적자 기업 제외)
+// price: 현재가(KRW), divYield: 배당수익률(%), growth1Y: 1년 성장률(%)
 const KR_STOCKS = [
   // 기술/반도체
-  { ticker: '005930', name: '삼성전자', sector: '기술', per: 32.5, roe: 8.2, dividendYears: 25, pbr: 1.3 },
-  { ticker: '000660', name: 'SK하이닉스', sector: '기술', per: 8.5, roe: 18.5, dividendYears: 10, pbr: 1.8 },
-  { ticker: '035420', name: '네이버', sector: '기술', per: 35.2, roe: 8.5, dividendYears: 5, pbr: 1.5 },
-  { ticker: '035720', name: '카카오', sector: '기술', per: 42.5, roe: 4.2, dividendYears: 3, pbr: 1.2 },
-  { ticker: '373220', name: 'LG에너지솔루션', sector: '기술', per: 125.8, roe: 5.8, dividendYears: 1, pbr: 4.5 },
-  { ticker: '006400', name: '삼성SDI', sector: '기술', per: 28.5, roe: 12.5, dividendYears: 20, pbr: 2.1 },
-  { ticker: '066570', name: 'LG전자', sector: '기술', per: 18.2, roe: 8.5, dividendYears: 15, pbr: 0.8 },
-  { ticker: '051910', name: 'LG화학', sector: '기술', per: 45.2, roe: 5.2, dividendYears: 18, pbr: 1.2 },
+  { ticker: '005930', name: '삼성전자', sector: '기술', per: 32.5, roe: 8.2, dividendYears: 25, pbr: 1.3, price: 72500, divYield: 2.5, growth1Y: -15.8 },
+  { ticker: '000660', name: 'SK하이닉스', sector: '기술', per: 8.5, roe: 18.5, dividendYears: 10, pbr: 1.8, price: 185000, divYield: 0.8, growth1Y: 45.2 },
+  { ticker: '035420', name: '네이버', sector: '기술', per: 35.2, roe: 8.5, dividendYears: 5, pbr: 1.5, price: 185000, divYield: 0.5, growth1Y: -22.5 },
+  { ticker: '035720', name: '카카오', sector: '기술', per: 42.5, roe: 4.2, dividendYears: 3, pbr: 1.2, price: 42500, divYield: 0.3, growth1Y: -35.8 },
+  { ticker: '373220', name: 'LG에너지솔루션', sector: '기술', per: 125.8, roe: 5.8, dividendYears: 1, pbr: 4.5, price: 385000, divYield: 0.2, growth1Y: -28.5 },
+  { ticker: '006400', name: '삼성SDI', sector: '기술', per: 28.5, roe: 12.5, dividendYears: 20, pbr: 2.1, price: 385000, divYield: 0.5, growth1Y: -18.2 },
+  { ticker: '066570', name: 'LG전자', sector: '기술', per: 18.2, roe: 8.5, dividendYears: 15, pbr: 0.8, price: 98500, divYield: 2.0, growth1Y: 8.5 },
+  { ticker: '051910', name: 'LG화학', sector: '기술', per: 45.2, roe: 5.2, dividendYears: 18, pbr: 1.2, price: 325000, divYield: 1.5, growth1Y: -25.8 },
   // 금융
-  { ticker: '055550', name: '신한지주', sector: '금융', per: 5.8, roe: 9.2, dividendYears: 20, pbr: 0.5 },
-  { ticker: '105560', name: 'KB금융', sector: '금융', per: 5.2, roe: 10.5, dividendYears: 15, pbr: 0.5 },
-  { ticker: '086790', name: '하나금융지주', sector: '금융', per: 4.8, roe: 11.2, dividendYears: 12, pbr: 0.4 },
-  { ticker: '316140', name: '우리금융지주', sector: '금융', per: 4.5, roe: 8.8, dividendYears: 5, pbr: 0.4 },
-  { ticker: '138930', name: 'BNK금융지주', sector: '금융', per: 4.2, roe: 8.5, dividendYears: 10, pbr: 0.3 },
-  { ticker: '024110', name: '기업은행', sector: '금융', per: 5.5, roe: 8.2, dividendYears: 18, pbr: 0.4 },
-  { ticker: '000810', name: '삼성화재', sector: '금융', per: 8.5, roe: 12.8, dividendYears: 25, pbr: 0.8 },
+  { ticker: '055550', name: '신한지주', sector: '금융', per: 5.8, roe: 9.2, dividendYears: 20, pbr: 0.5, price: 52500, divYield: 5.5, growth1Y: 28.5 },
+  { ticker: '105560', name: 'KB금융', sector: '금융', per: 5.2, roe: 10.5, dividendYears: 15, pbr: 0.5, price: 78500, divYield: 5.2, growth1Y: 32.5 },
+  { ticker: '086790', name: '하나금융지주', sector: '금융', per: 4.8, roe: 11.2, dividendYears: 12, pbr: 0.4, price: 62500, divYield: 6.5, growth1Y: 35.8 },
+  { ticker: '316140', name: '우리금융지주', sector: '금융', per: 4.5, roe: 8.8, dividendYears: 5, pbr: 0.4, price: 15500, divYield: 7.2, growth1Y: 25.8 },
+  { ticker: '138930', name: 'BNK금융지주', sector: '금융', per: 4.2, roe: 8.5, dividendYears: 10, pbr: 0.3, price: 8850, divYield: 7.8, growth1Y: 18.5 },
+  { ticker: '024110', name: '기업은행', sector: '금융', per: 5.5, roe: 8.2, dividendYears: 18, pbr: 0.4, price: 14500, divYield: 6.8, growth1Y: 22.5 },
+  { ticker: '000810', name: '삼성화재', sector: '금융', per: 8.5, roe: 12.8, dividendYears: 25, pbr: 0.8, price: 385000, divYield: 3.2, growth1Y: 45.2 },
   // 자동차
-  { ticker: '005380', name: '현대차', sector: '자동차', per: 5.8, roe: 12.5, dividendYears: 20, pbr: 0.6 },
-  { ticker: '000270', name: '기아', sector: '자동차', per: 5.2, roe: 18.2, dividendYears: 15, pbr: 0.8 },
-  { ticker: '012330', name: '현대모비스', sector: '자동차', per: 6.8, roe: 8.5, dividendYears: 18, pbr: 0.5 },
-  { ticker: '161390', name: '한국타이어앤테크놀로지', sector: '자동차', per: 8.2, roe: 10.2, dividendYears: 12, pbr: 0.7 },
-  { ticker: '011210', name: '현대위아', sector: '자동차', per: 12.5, roe: 5.8, dividendYears: 8, pbr: 0.5 },
+  { ticker: '005380', name: '현대차', sector: '자동차', per: 5.8, roe: 12.5, dividendYears: 20, pbr: 0.6, price: 245000, divYield: 3.5, growth1Y: 18.5 },
+  { ticker: '000270', name: '기아', sector: '자동차', per: 5.2, roe: 18.2, dividendYears: 15, pbr: 0.8, price: 125000, divYield: 4.5, growth1Y: 25.8 },
+  { ticker: '012330', name: '현대모비스', sector: '자동차', per: 6.8, roe: 8.5, dividendYears: 18, pbr: 0.5, price: 245000, divYield: 2.8, growth1Y: 12.5 },
+  { ticker: '161390', name: '한국타이어앤테크놀로지', sector: '자동차', per: 8.2, roe: 10.2, dividendYears: 12, pbr: 0.7, price: 48500, divYield: 3.2, growth1Y: 15.8 },
+  { ticker: '011210', name: '현대위아', sector: '자동차', per: 12.5, roe: 5.8, dividendYears: 8, pbr: 0.5, price: 68500, divYield: 2.5, growth1Y: 8.5 },
   // 철강/화학
-  { ticker: '005490', name: 'POSCO홀딩스', sector: '철강', per: 8.5, roe: 5.2, dividendYears: 22, pbr: 0.4 },
-  { ticker: '010130', name: '고려아연', sector: '철강', per: 12.5, roe: 8.8, dividendYears: 15, pbr: 1.2 },
-  { ticker: '004020', name: '현대제철', sector: '철강', per: 6.2, roe: 4.5, dividendYears: 10, pbr: 0.3 },
-  { ticker: '042670', name: '두산퓨얼셀', sector: '화학', per: 85.2, roe: 2.5, dividendYears: 0, pbr: 3.5 },
-  { ticker: '011170', name: '롯데케미칼', sector: '화학', per: 18.5, roe: 3.2, dividendYears: 12, pbr: 0.5 },
+  { ticker: '005490', name: 'POSCO홀딩스', sector: '철강', per: 8.5, roe: 5.2, dividendYears: 22, pbr: 0.4, price: 385000, divYield: 3.5, growth1Y: -8.5 },
+  { ticker: '010130', name: '고려아연', sector: '철강', per: 12.5, roe: 8.8, dividendYears: 15, pbr: 1.2, price: 585000, divYield: 1.8, growth1Y: 5.8 },
+  { ticker: '004020', name: '현대제철', sector: '철강', per: 6.2, roe: 4.5, dividendYears: 10, pbr: 0.3, price: 32500, divYield: 4.5, growth1Y: -12.5 },
+  { ticker: '042670', name: '두산퓨얼셀', sector: '화학', per: 85.2, roe: 2.5, dividendYears: 0, pbr: 3.5, price: 18500, divYield: 0.0, growth1Y: -45.8 },
+  { ticker: '011170', name: '롯데케미칼', sector: '화학', per: 18.5, roe: 3.2, dividendYears: 12, pbr: 0.5, price: 98500, divYield: 2.8, growth1Y: -18.5 },
   // 바이오/헬스케어
-  { ticker: '207940', name: '삼성바이오로직스', sector: '바이오', per: 62.5, roe: 12.8, dividendYears: 2, pbr: 5.8 },
-  { ticker: '068270', name: '셀트리온', sector: '바이오', per: 28.5, roe: 15.2, dividendYears: 5, pbr: 2.8 },
-  { ticker: '128940', name: '한미약품', sector: '바이오', per: 35.2, roe: 8.5, dividendYears: 18, pbr: 2.5 },
-  { ticker: '000100', name: '유한양행', sector: '바이오', per: 45.8, roe: 5.2, dividendYears: 25, pbr: 2.2 },
-  { ticker: '006280', name: '녹십자', sector: '바이오', per: 22.5, roe: 6.8, dividendYears: 15, pbr: 1.2 },
+  { ticker: '207940', name: '삼성바이오로직스', sector: '바이오', per: 62.5, roe: 12.8, dividendYears: 2, pbr: 5.8, price: 885000, divYield: 0.2, growth1Y: 15.8 },
+  { ticker: '068270', name: '셀트리온', sector: '바이오', per: 28.5, roe: 15.2, dividendYears: 5, pbr: 2.8, price: 185000, divYield: 0.5, growth1Y: -5.8 },
+  { ticker: '128940', name: '한미약품', sector: '바이오', per: 35.2, roe: 8.5, dividendYears: 18, pbr: 2.5, price: 285000, divYield: 0.8, growth1Y: 12.5 },
+  { ticker: '000100', name: '유한양행', sector: '바이오', per: 45.8, roe: 5.2, dividendYears: 25, pbr: 2.2, price: 78500, divYield: 1.2, growth1Y: 8.5 },
+  { ticker: '006280', name: '녹십자', sector: '바이오', per: 22.5, roe: 6.8, dividendYears: 15, pbr: 1.2, price: 125000, divYield: 1.5, growth1Y: -8.5 },
   // 유통/소비재
-  { ticker: '051900', name: 'LG생활건강', sector: '소비재', per: 28.5, roe: 12.5, dividendYears: 20, pbr: 2.8 },
-  { ticker: '090430', name: '아모레퍼시픽', sector: '소비재', per: 45.2, roe: 5.8, dividendYears: 15, pbr: 1.5 },
-  { ticker: '004170', name: '신세계', sector: '유통', per: 8.5, roe: 6.2, dividendYears: 18, pbr: 0.5 },
-  { ticker: '139480', name: '이마트', sector: '유통', per: 12.8, roe: 3.5, dividendYears: 10, pbr: 0.3 },
-  { ticker: '069960', name: '현대백화점', sector: '유통', per: 10.5, roe: 5.8, dividendYears: 15, pbr: 0.4 },
-  { ticker: '027740', name: '마녀공장', sector: '소비재', per: 18.5, roe: 22.5, dividendYears: 3, pbr: 3.8 },
+  { ticker: '051900', name: 'LG생활건강', sector: '소비재', per: 28.5, roe: 12.5, dividendYears: 20, pbr: 2.8, price: 385000, divYield: 1.5, growth1Y: -25.8 },
+  { ticker: '090430', name: '아모레퍼시픽', sector: '소비재', per: 45.2, roe: 5.8, dividendYears: 15, pbr: 1.5, price: 125000, divYield: 1.2, growth1Y: -32.5 },
+  { ticker: '004170', name: '신세계', sector: '유통', per: 8.5, roe: 6.2, dividendYears: 18, pbr: 0.5, price: 185000, divYield: 2.8, growth1Y: 5.8 },
+  { ticker: '139480', name: '이마트', sector: '유통', per: 12.8, roe: 3.5, dividendYears: 10, pbr: 0.3, price: 68500, divYield: 3.5, growth1Y: -15.8 },
+  { ticker: '069960', name: '현대백화점', sector: '유통', per: 10.5, roe: 5.8, dividendYears: 15, pbr: 0.4, price: 58500, divYield: 3.2, growth1Y: -8.5 },
+  { ticker: '027740', name: '마녀공장', sector: '소비재', per: 18.5, roe: 22.5, dividendYears: 3, pbr: 3.8, price: 28500, divYield: 1.5, growth1Y: 85.2 },
   // 건설
-  { ticker: '000720', name: '현대건설', sector: '건설', per: 8.2, roe: 8.5, dividendYears: 12, pbr: 0.5 },
-  { ticker: '028260', name: '삼성물산', sector: '건설', per: 15.8, roe: 6.2, dividendYears: 20, pbr: 0.8 },
-  { ticker: '047040', name: '대우건설', sector: '건설', per: 5.5, roe: 12.5, dividendYears: 5, pbr: 0.5 },
-  { ticker: '006360', name: 'GS건설', sector: '건설', per: 4.8, roe: 10.8, dividendYears: 8, pbr: 0.4 },
-  { ticker: '000210', name: 'DL', sector: '건설', per: 6.2, roe: 8.2, dividendYears: 15, pbr: 0.3 },
+  { ticker: '000720', name: '현대건설', sector: '건설', per: 8.2, roe: 8.5, dividendYears: 12, pbr: 0.5, price: 38500, divYield: 3.8, growth1Y: 12.5 },
+  { ticker: '028260', name: '삼성물산', sector: '건설', per: 15.8, roe: 6.2, dividendYears: 20, pbr: 0.8, price: 125000, divYield: 2.5, growth1Y: 8.5 },
+  { ticker: '047040', name: '대우건설', sector: '건설', per: 5.5, roe: 12.5, dividendYears: 5, pbr: 0.5, price: 4850, divYield: 5.5, growth1Y: 18.5 },
+  { ticker: '006360', name: 'GS건설', sector: '건설', per: 4.8, roe: 10.8, dividendYears: 8, pbr: 0.4, price: 18500, divYield: 6.2, growth1Y: 15.8 },
+  { ticker: '000210', name: 'DL', sector: '건설', per: 6.2, roe: 8.2, dividendYears: 15, pbr: 0.3, price: 48500, divYield: 4.5, growth1Y: 5.8 },
   // 통신
-  { ticker: '017670', name: 'SK텔레콤', sector: '통신', per: 10.5, roe: 12.8, dividendYears: 20, pbr: 0.9 },
-  { ticker: '030200', name: 'KT', sector: '통신', per: 8.2, roe: 8.5, dividendYears: 18, pbr: 0.5 },
-  { ticker: '032640', name: 'LG유플러스', sector: '통신', per: 8.8, roe: 9.2, dividendYears: 15, pbr: 0.5 },
+  { ticker: '017670', name: 'SK텔레콤', sector: '통신', per: 10.5, roe: 12.8, dividendYears: 20, pbr: 0.9, price: 58500, divYield: 5.8, growth1Y: 12.5 },
+  { ticker: '030200', name: 'KT', sector: '통신', per: 8.2, roe: 8.5, dividendYears: 18, pbr: 0.5, price: 42500, divYield: 4.8, growth1Y: 25.8 },
+  { ticker: '032640', name: 'LG유플러스', sector: '통신', per: 8.8, roe: 9.2, dividendYears: 15, pbr: 0.5, price: 12500, divYield: 5.2, growth1Y: 8.5 },
   // 전력/가스
-  { ticker: '015760', name: '한국전력', sector: '유틸리티', per: 5.2, roe: 4.5, dividendYears: 8, pbr: 0.2 },
-  { ticker: '036460', name: '한국가스공사', sector: '유틸리티', per: 4.8, roe: 5.8, dividendYears: 15, pbr: 0.3 },
+  { ticker: '015760', name: '한국전력', sector: '유틸리티', per: 5.2, roe: 4.5, dividendYears: 8, pbr: 0.2, price: 22500, divYield: 2.5, growth1Y: 35.8 },
+  { ticker: '036460', name: '한국가스공사', sector: '유틸리티', per: 4.8, roe: 5.8, dividendYears: 15, pbr: 0.3, price: 42500, divYield: 4.5, growth1Y: 18.5 },
   // 기타
-  { ticker: '034730', name: 'SK', sector: '지주', per: 12.5, roe: 5.2, dividendYears: 18, pbr: 0.5 },
-  { ticker: '003550', name: 'LG', sector: '지주', per: 10.8, roe: 8.5, dividendYears: 20, pbr: 0.8 },
-  { ticker: '018260', name: '삼성SDS', sector: '기술', per: 15.2, roe: 12.8, dividendYears: 10, pbr: 1.5 },
-  { ticker: '032830', name: '삼성생명', sector: '금융', per: 8.5, roe: 6.8, dividendYears: 15, pbr: 0.4 },
-  { ticker: '009150', name: '삼성전기', sector: '기술', per: 18.5, roe: 8.2, dividendYears: 12, pbr: 1.2 },
-  { ticker: '096770', name: 'SK이노베이션', sector: '에너지', per: 15.8, roe: 5.5, dividendYears: 8, pbr: 0.6 },
-  { ticker: '010950', name: 'S-Oil', sector: '에너지', per: 8.2, roe: 12.5, dividendYears: 20, pbr: 1.2 },
-  { ticker: '078930', name: 'GS', sector: '에너지', per: 6.5, roe: 8.8, dividendYears: 15, pbr: 0.5 },
-  { ticker: '267250', name: '현대일렉트릭', sector: '산업재', per: 22.5, roe: 18.5, dividendYears: 3, pbr: 3.2 },
-  { ticker: '034020', name: '두산에너빌리티', sector: '산업재', per: 35.8, roe: 5.2, dividendYears: 2, pbr: 1.5 },
-  { ticker: '042700', name: '한미반도체', sector: '기술', per: 28.5, roe: 25.8, dividendYears: 5, pbr: 8.5 },
-  { ticker: '247540', name: '에코프로비엠', sector: '기술', per: 85.2, roe: 15.2, dividendYears: 1, pbr: 12.5 },
+  { ticker: '034730', name: 'SK', sector: '지주', per: 12.5, roe: 5.2, dividendYears: 18, pbr: 0.5, price: 185000, divYield: 3.8, growth1Y: -8.5 },
+  { ticker: '003550', name: 'LG', sector: '지주', per: 10.8, roe: 8.5, dividendYears: 20, pbr: 0.8, price: 78500, divYield: 3.5, growth1Y: 5.8 },
+  { ticker: '018260', name: '삼성SDS', sector: '기술', per: 15.2, roe: 12.8, dividendYears: 10, pbr: 1.5, price: 155000, divYield: 2.2, growth1Y: 12.5 },
+  { ticker: '032830', name: '삼성생명', sector: '금융', per: 8.5, roe: 6.8, dividendYears: 15, pbr: 0.4, price: 85500, divYield: 4.5, growth1Y: 28.5 },
+  { ticker: '009150', name: '삼성전기', sector: '기술', per: 18.5, roe: 8.2, dividendYears: 12, pbr: 1.2, price: 145000, divYield: 1.5, growth1Y: -5.8 },
+  { ticker: '096770', name: 'SK이노베이션', sector: '에너지', per: 15.8, roe: 5.5, dividendYears: 8, pbr: 0.6, price: 125000, divYield: 2.8, growth1Y: -18.5 },
+  { ticker: '010950', name: 'S-Oil', sector: '에너지', per: 8.2, roe: 12.5, dividendYears: 20, pbr: 1.2, price: 68500, divYield: 5.5, growth1Y: -8.5 },
+  { ticker: '078930', name: 'GS', sector: '에너지', per: 6.5, roe: 8.8, dividendYears: 15, pbr: 0.5, price: 48500, divYield: 4.8, growth1Y: 5.8 },
+  { ticker: '267250', name: '현대일렉트릭', sector: '산업재', per: 22.5, roe: 18.5, dividendYears: 3, pbr: 3.2, price: 285000, divYield: 0.5, growth1Y: 125.8 },
+  { ticker: '034020', name: '두산에너빌리티', sector: '산업재', per: 35.8, roe: 5.2, dividendYears: 2, pbr: 1.5, price: 18500, divYield: 0.8, growth1Y: 45.8 },
+  { ticker: '042700', name: '한미반도체', sector: '기술', per: 28.5, roe: 25.8, dividendYears: 5, pbr: 8.5, price: 125000, divYield: 0.5, growth1Y: 185.2 },
+  { ticker: '247540', name: '에코프로비엠', sector: '기술', per: 85.2, roe: 15.2, dividendYears: 1, pbr: 12.5, price: 185000, divYield: 0.2, growth1Y: -55.8 },
 ]
 
 // 가산점 계산 함수
@@ -289,7 +291,7 @@ export default function ValueStocksPage() {
     table: {
       width: '100%',
       borderCollapse: 'collapse',
-      minWidth: isMobile ? '600px' : '100%',
+      minWidth: isMobile ? '800px' : '100%',
     },
     th: {
       padding: isMobile ? '10px 8px' : '14px 16px',
@@ -414,49 +416,75 @@ export default function ValueStocksPage() {
                 <th style={styles.th}>섹터</th>
                 <th style={styles.thRight}>PER</th>
                 <th style={styles.thRight}>ROE</th>
-                <th style={styles.thRight}>배당</th>
+                <th style={styles.thRight}>배당연속</th>
                 <th style={styles.thRight}>PBR</th>
+                <th style={styles.thRight}>배당예상</th>
+                <th style={styles.thRight}>1Y성장</th>
                 <th style={styles.thRight}>총점</th>
               </tr>
             </thead>
             <tbody>
-              {stocks.map((stock, index) => (
-                <tr key={stock.ticker}>
-                  <td style={styles.td}>
-                    <span style={styles.rank(index + 1)}>{index + 1}</span>
-                  </td>
-                  <td style={styles.td}>
-                    <div style={{ fontWeight: 600 }}>{stock.name}</div>
-                    <div style={styles.ticker}>{stock.ticker}</div>
-                  </td>
-                  <td style={styles.td}>
-                    <span style={styles.sector}>{stock.sector}</span>
-                  </td>
-                  <td style={styles.tdRight}>
-                    <span style={styles.metric(stock.per, stock.per < 15)}>
-                      {stock.per.toFixed(1)}
-                    </span>
-                  </td>
-                  <td style={styles.tdRight}>
-                    <span style={styles.metric(stock.roe, stock.roe > 15)}>
-                      {stock.roe.toFixed(1)}%
-                    </span>
-                  </td>
-                  <td style={styles.tdRight}>
-                    <span style={styles.metric(stock.dividendYears, stock.dividendYears >= 10)}>
-                      {stock.dividendYears}년
-                    </span>
-                  </td>
-                  <td style={styles.tdRight}>
-                    <span style={styles.metric(stock.pbr, stock.pbr < 2)}>
-                      {stock.pbr.toFixed(1)}
-                    </span>
-                  </td>
-                  <td style={styles.tdRight}>
-                    <span style={styles.totalScore}>{stock.totalScore}</span>
-                  </td>
-                </tr>
-              ))}
+              {stocks.map((stock, index) => {
+                // 배당 예상액 계산 (1주 기준)
+                const divAmount = activeTab === 'us'
+                  ? (stock.price * stock.divYield / 100).toFixed(2)
+                  : Math.round(stock.price * stock.divYield / 100).toLocaleString()
+                const divAmountDisplay = activeTab === 'us' ? `$${divAmount}` : `₩${divAmount}`
+
+                return (
+                  <tr key={stock.ticker}>
+                    <td style={styles.td}>
+                      <span style={styles.rank(index + 1)}>{index + 1}</span>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={{ fontWeight: 600 }}>{stock.name}</div>
+                      <div style={styles.ticker}>{stock.ticker}</div>
+                    </td>
+                    <td style={styles.td}>
+                      <span style={styles.sector}>{stock.sector}</span>
+                    </td>
+                    <td style={styles.tdRight}>
+                      <span style={styles.metric(stock.per, stock.per < 15)}>
+                        {stock.per.toFixed(1)}
+                      </span>
+                    </td>
+                    <td style={styles.tdRight}>
+                      <span style={styles.metric(stock.roe, stock.roe > 15)}>
+                        {stock.roe.toFixed(1)}%
+                      </span>
+                    </td>
+                    <td style={styles.tdRight}>
+                      <span style={styles.metric(stock.dividendYears, stock.dividendYears >= 10)}>
+                        {stock.dividendYears}년
+                      </span>
+                    </td>
+                    <td style={styles.tdRight}>
+                      <span style={styles.metric(stock.pbr, stock.pbr < 2)}>
+                        {stock.pbr.toFixed(1)}
+                      </span>
+                    </td>
+                    <td style={styles.tdRight}>
+                      <div style={{ color: stock.divYield >= 3 ? '#10B981' : '#4E5968', fontWeight: stock.divYield >= 3 ? 600 : 400 }}>
+                        {divAmountDisplay}
+                      </div>
+                      <div style={{ fontSize: isMobile ? 9 : 10, color: '#8B95A1' }}>
+                        ({stock.divYield.toFixed(1)}%)
+                      </div>
+                    </td>
+                    <td style={styles.tdRight}>
+                      <span style={{
+                        color: stock.growth1Y > 0 ? '#10B981' : '#EF4444',
+                        fontWeight: 600
+                      }}>
+                        {stock.growth1Y > 0 ? '+' : ''}{stock.growth1Y.toFixed(1)}%
+                      </span>
+                    </td>
+                    <td style={styles.tdRight}>
+                      <span style={styles.totalScore}>{stock.totalScore}</span>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
