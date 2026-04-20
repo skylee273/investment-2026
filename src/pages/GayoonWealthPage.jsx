@@ -28,42 +28,46 @@ const QUARTERLY_PORTFOLIOS = {
 
 // 세제혜택 계좌 현황
 const TAX_ACCOUNTS = [
-  { id: 'pension', name: '연금저축', icon: '🧓', targetKRW: 6000000, currentKRW: 6000000, depositDay: null, note: '세액공제 79.2만원', status: '완료' },
+  { id: 'pension', name: '연금저축', icon: '🧓', targetKRW: 15000000, currentKRW: 6000000, depositDay: 25, note: '세액공제 79.2만원 · 월 60만원', status: '진행중' },
   { id: 'irp', name: 'IRP', icon: '🏦', targetKRW: 3000000, currentKRW: 250000, depositDay: 25, note: '세액공제 39.6만원 · 월 25만원', status: '진행중' },
   { id: 'isa', name: 'ISA', icon: '📈', targetKRW: 20000000, currentKRW: 20000000, depositDay: null, note: '비과세 200만원', status: '완료' },
-  { id: 'pension-extra', name: '추가 연금저축', icon: '💰', targetKRW: 9000000, currentKRW: 0, depositDay: 25, note: '과세이연 · 월 60만원', status: '진행중' },
 ]
 
-// ISA 포트폴리오 (2,000만원) - 코스피 30% / S&P 20% / 나스닥 15% / 신흥국 15% / 금 10% / 채권 10%
+// ISA 포트폴리오 (2,000만원) - 하늘 버핏 추천
 const ISA_PORTFOLIO = [
-  { ticker: '069500', name: 'KODEX 코스피200', category: '국내주식', targetWeight: 30, risk: 2 },
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 20, risk: 3 },
-  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '해외주식', targetWeight: 15, risk: 4 },
-  { ticker: '195980', name: 'TIGER MSCI신흥국', category: '해외주식', targetWeight: 15, risk: 5 },
-  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 20, risk: 2 },
+  { ticker: '360750', name: 'TIGER S&P500', category: '해외주식', targetWeight: 15, risk: 3 },
+  { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 10, risk: 2 },
   { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
+  { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '357870', name: 'TIGER CD금리액티브', category: '현금성', targetWeight: 10, risk: 1 },
+  { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 8, risk: 1 },
+  { ticker: '456600', name: 'TIGER SOFR금리액티브', category: '달러', targetWeight: 7, risk: 1 },
+  { ticker: '133690', name: 'TIGER 나스닥100', category: '해외주식', targetWeight: 5, risk: 4 },
+  { ticker: '069500', name: 'KODEX 200', category: '국내주식', targetWeight: 5, risk: 2 },
 ]
 
-// 연금저축 포트폴리오 (600만원) - 국내주식 100% (7:3)
+// 연금저축 포트폴리오 (1,500만원) - 하늘 버핏 추천
 const PENSION_PORTFOLIO = [
-  { ticker: '069500', name: 'KODEX 코스피200', category: '국내주식', targetWeight: 70, risk: 2 },
-  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내주식', targetWeight: 30, risk: 3 },
+  { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 20, risk: 2 },
+  { ticker: '360750', name: 'TIGER S&P500', category: '해외주식', targetWeight: 15, risk: 3 },
+  { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 10, risk: 2 },
+  { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
+  { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '357870', name: 'TIGER CD금리액티브', category: '현금성', targetWeight: 10, risk: 1 },
+  { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 8, risk: 1 },
+  { ticker: '456600', name: 'TIGER SOFR금리액티브', category: '달러', targetWeight: 7, risk: 1 },
+  { ticker: '133690', name: 'TIGER 나스닥100', category: '해외주식', targetWeight: 5, risk: 4 },
+  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내주식', targetWeight: 5, risk: 3 },
 ]
 
-// IRP 포트폴리오 (300만원) - 위험자산 70% + 안전자산 30%
+// IRP 포트폴리오 (300만원) - 하늘 버핏 추천 (안전자산 30% 규정 준수)
 const IRP_PORTFOLIO = [
-  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '해외주식', targetWeight: 35, risk: 4 },
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 21, risk: 3 },
-  { ticker: '195980', name: 'TIGER MSCI신흥국', category: '해외주식', targetWeight: 14, risk: 5 },
-  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 30, risk: 1 },
-]
-
-// 추가 연금저축 포트폴리오 (900만원)
-const PENSION_EXTRA_PORTFOLIO = [
-  { ticker: '456600', name: 'TIGER 미국달러SOFR금리액티브(합성)', category: '달러', targetWeight: 30, risk: 1 },
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 40, risk: 3 },
-  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '나스닥', targetWeight: 20, risk: 4 },
-  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 35, risk: 2 },
+  { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 35, risk: 2 },
+  { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
+  { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 10, risk: 1 },
 ]
 
 // 배당주 매월 1주 포트폴리오 (1년 1000만원)
@@ -119,12 +123,11 @@ const STABLE_ASSETS = [
   { id: 'deposit', name: '전세 보증금', icon: '🏢', currentKRW: 45000000, note: '7월 수령 예정', type: 'receivable' },
 ]
 
-// 3. 변동성 자산 (언제든 쓸 수 있는 자산) - CMA, 자율적금, IRP, 추가 연금저축
+// 3. 변동성 자산 (언제든 쓸 수 있는 자산) - CMA, 자율적금, IRP
 const LIQUID_ASSETS = [
   { id: 'cma', name: 'CMA', icon: '💵', currentKRW: 14030691, investedKRW: 14015160, gainKRW: 15531, gainPercent: 0.11, note: '미래에셋 · +0.11%' },
   { id: 'free-savings', name: '자율적금', icon: '💰', currentKRW: 4500000, note: '1년 만기 · 2026-09 · 3.3%' },
   { id: 'irp', name: 'IRP (퇴직연금)', icon: '🏦', currentKRW: 266026, investedKRW: 267479, gainKRW: -1453, gainPercent: -0.54, note: '미래에셋 · -0.54%' },
-  { id: 'pension-extra', name: '추가 연금저축', icon: '💸', currentKRW: 0, investedKRW: 0, gainKRW: 0, gainPercent: 0, note: '월 60만원 예정' },
 ]
 
 // 전체 보유 종목 통합 (실제 데이터 기반 - 2026.03.29)
@@ -1263,9 +1266,9 @@ export default function GayoonWealthPage() {
         <PortfolioChart
           icon="🧓"
           title="연금저축"
-          amount={6000000}
-          status="완료"
-          statusColor={{ bg: '#E8F5E9', text: '#2E7D32' }}
+          amount={15000000}
+          status="진행중"
+          statusColor={{ bg: '#E8F3FF', text: '#3182F6' }}
           items={PENSION_PORTFOLIO}
           isMobile={isMobile}
         />
@@ -1278,17 +1281,6 @@ export default function GayoonWealthPage() {
           status="진행중"
           statusColor={{ bg: '#E8F3FF', text: '#3182F6' }}
           items={IRP_PORTFOLIO}
-          isMobile={isMobile}
-        />
-
-        {/* 추가 연금저축 포트폴리오 */}
-        <PortfolioChart
-          icon="💰"
-          title="추가 연금저축"
-          amount={9000000}
-          status="예정"
-          statusColor={{ bg: '#FFF3E0', text: '#E65100' }}
-          items={PENSION_EXTRA_PORTFOLIO}
           isMobile={isMobile}
         />
 
@@ -1359,7 +1351,7 @@ export default function GayoonWealthPage() {
           </div>
         </div>
 
-        {/* 추가 연금저축 월 60만원 */}
+        {/* 연금저축 월 60만원 */}
         <div style={{
           padding: isMobile ? '14px' : '20px',
           backgroundColor: 'white',
@@ -1367,14 +1359,14 @@ export default function GayoonWealthPage() {
           border: '1px solid #E5E8EB',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isMobile ? '12px' : '16px' }}>
-            <span style={{ fontSize: isMobile ? '18px' : '20px' }}>💰</span>
+            <span style={{ fontSize: isMobile ? '18px' : '20px' }}>🧓</span>
             <div>
-              <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28' }}>추가 연금저축 월 매수</div>
-              <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#E65100', fontWeight: '600' }}>매월 60만원 (예정)</div>
+              <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28' }}>연금저축 월 매수</div>
+              <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#3182F6', fontWeight: '600' }}>매월 60만원</div>
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '6px' : '8px' }}>
-            {PENSION_EXTRA_PORTFOLIO.map(item => {
+            {PENSION_PORTFOLIO.map(item => {
               const amount = Math.round(600000 * item.targetWeight / 100)
               return (
                 <div key={item.ticker} style={{
@@ -1387,14 +1379,14 @@ export default function GayoonWealthPage() {
                 }}>
                   <div>
                     <div style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '600', color: '#191F28' }}>
-                      {item.name.replace('TIGER ', '').replace('KODEX ', '')}
+                      {item.name.replace('TIGER ', '').replace('KODEX ', '').replace('PLUS ', '')}
                     </div>
                     <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#8B95A1' }}>
-                      <span style={{ backgroundColor: '#FFF3E0', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', color: '#E65100', fontWeight: '600', fontSize: isMobile ? '9px' : '11px' }}>{item.ticker}</span>
+                      <span style={{ backgroundColor: '#E8F3FF', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', color: '#3182F6', fontWeight: '600', fontSize: isMobile ? '9px' : '11px' }}>{item.ticker}</span>
                       {item.targetWeight}%
                     </div>
                   </div>
-                  <div style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: '#E65100' }}>
+                  <div style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: '#3182F6' }}>
                     ₩{amount.toLocaleString()}
                   </div>
                 </div>

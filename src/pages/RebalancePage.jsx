@@ -1120,22 +1120,24 @@ export default function RebalancePage() {
       },
       // ISA 리밸런싱 (삼성증권) - 목표 비중 기반
       isaRebalance: {
-        targetTotal: 12000000, // ISA 목표 1,200만원 (전체 2,000만원 중 60%)
+        targetTotal: 20000000, // ISA 목표 2,000만원
         sell: [
           { asset: 'KODEX 200 전량', amount: 3000000 },
           { asset: 'PLUS 신흥국MSCI 전량', amount: 3000000 },
         ],
         buy: [
-          { asset: 'TIGER S&P500', amount: 3000000, ratio: 25 },
-          { asset: 'TIGER 미국배당다우존스', amount: 2400000, ratio: 20 },
-          { asset: 'TIGER 나스닥100', amount: 1200000, ratio: 10 },
-          { asset: 'TIGER 미국채30년선물', amount: 1200000, ratio: 10 },
-          { asset: 'TIGER 미국채10년선물', amount: 1200000, ratio: 10 },
-          { asset: 'KODEX 금액티브', amount: 1200000, ratio: 10 },
-          { asset: 'TIGER CD금리액티브', amount: 960000, ratio: 8 },
-          { asset: 'TIGER SOFR금리액티브', amount: 840000, ratio: 7 },
+          { asset: 'TIGER 미국배당다우존스', amount: 4000000, ratio: 20 },
+          { asset: 'TIGER S&P500', amount: 3000000, ratio: 15 },
+          { asset: 'PLUS 고배당주', amount: 2000000, ratio: 10 },
+          { asset: 'TIGER 미국채10년선물', amount: 2000000, ratio: 10 },
+          { asset: 'KODEX 금액티브', amount: 2000000, ratio: 10 },
+          { asset: 'TIGER CD금리액티브', amount: 2000000, ratio: 10 },
+          { asset: 'TIGER 미국채30년선물', amount: 1600000, ratio: 8 },
+          { asset: 'TIGER SOFR금리액티브', amount: 1400000, ratio: 7 },
+          { asset: 'TIGER 나스닥100', amount: 1000000, ratio: 5 },
+          { asset: 'KODEX 200', amount: 1000000, ratio: 5 },
         ],
-        reason: '목표 포트폴리오 비중에 맞춰 리밸런싱 (국내주식/신흥국 → 미국배당+채권 분산)',
+        reason: '목표 포트폴리오 비중에 맞춰 리밸런싱 (배당주 30% + 안전자산 45% + 성장주 25%)',
         // 분할 매도 전략 (6단계) - 총 600만원
         sellStrategy: [
           { step: '1차', rate: '+5%', amount: 1000000, items: [
@@ -1226,21 +1228,23 @@ export default function RebalancePage() {
       },
       // 연금저축 리밸런싱 (미래에셋) - 목표 비중 기반
       pensionRebalance: {
-        targetTotal: 8000000, // 연금저축+IRP 목표 800만원 (전체 2,000만원 중 40%)
+        targetTotal: 15000000, // 연금저축 목표 1,500만원
         sell: [
           { asset: 'KODEX 200 전량', amount: 2000000 },
         ],
         buy: [
-          { asset: 'TIGER S&P500', amount: 2000000, ratio: 25 },
-          { asset: 'TIGER 미국배당다우존스', amount: 1600000, ratio: 20 },
-          { asset: 'TIGER 나스닥100', amount: 800000, ratio: 10 },
-          { asset: 'TIGER 미국채30년선물', amount: 800000, ratio: 10 },
-          { asset: 'TIGER 미국채10년선물', amount: 800000, ratio: 10 },
-          { asset: 'KODEX 금액티브', amount: 800000, ratio: 10 },
-          { asset: 'TIGER CD금리액티브', amount: 640000, ratio: 8 },
-          { asset: 'TIGER SOFR금리액티브', amount: 560000, ratio: 7 },
+          { asset: 'TIGER 미국배당다우존스', amount: 3000000, ratio: 20 },
+          { asset: 'TIGER S&P500', amount: 2250000, ratio: 15 },
+          { asset: 'PLUS 고배당주', amount: 1500000, ratio: 10 },
+          { asset: 'TIGER 미국채10년선물', amount: 1500000, ratio: 10 },
+          { asset: 'KODEX 금액티브', amount: 1500000, ratio: 10 },
+          { asset: 'TIGER CD금리액티브', amount: 1500000, ratio: 10 },
+          { asset: 'TIGER 미국채30년선물', amount: 1200000, ratio: 8 },
+          { asset: 'TIGER SOFR금리액티브', amount: 1050000, ratio: 7 },
+          { asset: 'TIGER 나스닥100', amount: 750000, ratio: 5 },
+          { asset: 'KODEX 코스닥150', amount: 750000, ratio: 5 },
         ],
-        reason: '목표 포트폴리오 비중에 맞춰 리밸런싱 (국내주식 → 해외ETF+채권 분산)',
+        reason: '목표 포트폴리오 비중에 맞춰 리밸런싱 (배당주 30% + 안전자산 45% + 성장주 25%)',
         // 분할 매도 전략 (5단계) - 총 200만원
         sellStrategy: [
           { step: '1차', rate: '+5%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
@@ -1288,33 +1292,35 @@ export default function RebalancePage() {
         buyNote: '6월까지 미매수 시: 마이너스면 목표 비중대로 일괄 매수',
       },
       sellRecommend: [
-        { asset: 'KODEX 200 (ISA)', current: 3000000, sell: 3000000, reason: '목표 포트폴리오에 없음' },
+        { asset: 'KODEX 200 (ISA)', current: 3000000, sell: 3000000, reason: '신흥국MSCI와 함께 매도 후 재편입' },
         { asset: 'PLUS 신흥국MSCI (ISA)', current: 3000000, sell: 3000000, reason: '목표 포트폴리오에 없음' },
-        { asset: 'KODEX 200 (연금)', current: 2000000, sell: 2000000, reason: '목표 포트폴리오에 없음' },
+        { asset: 'KODEX 200 (연금)', current: 2000000, sell: 2000000, reason: '코스닥150으로 전환' },
       ],
       buyRecommend: [
-        { asset: 'TIGER S&P500', target: 25, buy: 5000000, reason: '핵심 자산 25%' },
         { asset: 'TIGER 미국배당다우존스', target: 20, buy: 4000000, reason: '배당 수익 20%' },
-        { asset: 'TIGER 나스닥100', target: 10, buy: 2000000, reason: '성장주 10%' },
-        { asset: 'TIGER 미국채30년선물', target: 10, buy: 2000000, reason: '장기채 10%' },
+        { asset: 'TIGER S&P500', target: 15, buy: 3000000, reason: '핵심 자산 15%' },
+        { asset: 'PLUS 고배당주', target: 10, buy: 2000000, reason: '국내 배당 10%' },
         { asset: 'TIGER 미국채10년선물', target: 10, buy: 2000000, reason: '중기채 10%' },
         { asset: 'KODEX 금액티브', target: 10, buy: 2000000, reason: '인플레 헤지 10%' },
-        { asset: 'TIGER CD금리액티브', target: 8, buy: 1600000, reason: '안전자산 8%' },
+        { asset: 'TIGER CD금리액티브', target: 10, buy: 2000000, reason: '안전자산 10%' },
+        { asset: 'TIGER 미국채30년선물', target: 8, buy: 1600000, reason: '장기채 8%' },
         { asset: 'TIGER SOFR금리액티브', target: 7, buy: 1400000, reason: '달러 안전자산 7%' },
+        { asset: 'TIGER 나스닥100', target: 5, buy: 1000000, reason: '성장주 5%' },
+        { asset: 'KODEX 200', target: 5, buy: 1000000, reason: '국내주식 5%' },
       ],
       // 하늘버핏의 리밸런싱 의견
       haneulOpinion: {
         title: '하늘버핏의 리밸런싱 의견',
-        summary: '가윤님의 세제혜택 계좌(IRP+ISA+연금저축)를 목표 포트폴리오 비중에 맞춰 리밸런싱하세요. 주식 55%, 채권+CD+SOFR 35%, 금 10%의 균형잡힌 배분으로 안정성과 성장을 동시에 추구합니다.',
+        summary: '가윤님의 세제혜택 계좌(IRP+ISA+연금저축)를 목표 포트폴리오 비중에 맞춰 리밸런싱하세요. 배당주 30%, 해외성장주 20%, 안전자산 45%, 국내주식 5%의 균형잡힌 배분으로 안정성과 성장을 동시에 추구합니다.',
         situation: [
           '해외주식: +250만원 수익 중. 양도소득세 고려 시 계속 보유가 유리',
           'ISA/연금: KODEX 200, 신흥국MSCI → 목표 비중으로 전환 필요',
-          '목표: S&P500 25% + 배당다우존스 20% + 나스닥 10% + 채권 20% + 금 10% + CD/SOFR 15%',
+          '목표: 배당주 30% + S&P500 15% + 나스닥 5% + 채권 18% + 금 10% + CD/SOFR 17% + 국내 5%',
         ],
         recommendations: [
           '해외주식(VOO, SCHD, 아마존): Hold - 세금 효율성 우선',
           'ISA: KODEX 200, 신흥국 매도 → 목표 비중대로 재투자',
-          '연금저축: KODEX 200 매도 → 목표 비중대로 재투자',
+          '연금저축: KODEX 200 → KODEX 코스닥150으로 전환',
           '손절 기준: 개별 종목 -20% 도달 시 재검토',
         ],
         tradingStrategy: {
@@ -1327,19 +1333,22 @@ export default function RebalancePage() {
           title: '세제혜택 계좌 목표 비중',
           subtitle: 'IRP + ISA + 연금저축 통합',
           items: [
-            { name: 'TIGER S&P500', ratio: 25 },
             { name: 'TIGER 미국배당다우존스', ratio: 20 },
-            { name: 'TIGER 나스닥100', ratio: 10 },
-            { name: 'TIGER 미국채30년선물', ratio: 10 },
+            { name: 'TIGER S&P500', ratio: 15 },
+            { name: 'PLUS 고배당주', ratio: 10 },
             { name: 'TIGER 미국채10년선물', ratio: 10 },
-            { name: '금액티브', ratio: 10 },
-            { name: 'TIGER CD금리액티브', ratio: 8 },
-            { name: 'SOFR', ratio: 7 },
+            { name: 'KODEX 금액티브', ratio: 10 },
+            { name: 'TIGER CD금리액티브', ratio: 10 },
+            { name: 'TIGER 미국채30년선물', ratio: 8 },
+            { name: 'TIGER SOFR금리액티브', ratio: 7 },
+            { name: 'TIGER 나스닥100', ratio: 5 },
+            { name: 'KODEX 200/코스닥150', ratio: 5 },
           ],
           summary: [
-            { category: '주식', ratio: 55, color: '#3182F6' },
-            { category: '채권+CD+SOFR', ratio: 35, color: '#10B981' },
-            { category: '금', ratio: 10, color: '#F59E0B' },
+            { category: '배당주', ratio: 30, color: '#F59E0B' },
+            { category: '해외성장주', ratio: 20, color: '#3182F6' },
+            { category: '안전자산', ratio: 45, color: '#10B981' },
+            { category: '국내주식', ratio: 5, color: '#8B5CF6' },
           ],
         },
       },
@@ -1350,16 +1359,16 @@ export default function RebalancePage() {
           style: '가치투자',
           icon: '🎩',
           color: '#F59E0B',
-          rating: 'A-',
-          comment: 'S&P500 25%와 배당다우존스 20%를 핵심으로 잡은 건 현명합니다. 배당주 비중을 높인 건 제 철학과 일치해요. 나스닥은 10%로 적절히 제한했네요.',
+          rating: 'A',
+          comment: '배당다우존스 20%와 PLUS 고배당주 10%로 배당주 30%를 핵심으로 잡은 건 현명합니다. 배당 재투자를 통한 복리 효과는 장기적으로 엄청난 차이를 만들어요.',
         },
         {
           name: '레이 달리오',
           style: '올웨더',
           icon: '🌊',
           color: '#3182F6',
-          rating: 'A',
-          comment: '주식 55%, 채권 20%, 금 10%, CD/SOFR 15%의 배분은 올웨더 포트폴리오와 매우 유사합니다! 30년채와 10년채를 나눈 것도 좋고, 금 10%는 인플레 헤지에 적절합니다.',
+          rating: 'A+',
+          comment: '채권 18% + 금 10% + CD/SOFR 17%로 안전자산 45%를 확보한 건 올웨더 철학과 정확히 일치합니다! 어떤 경제 환경에서도 버틸 수 있는 포트폴리오입니다.',
         },
         {
           name: '피터 린치',
@@ -1367,7 +1376,7 @@ export default function RebalancePage() {
           icon: '📈',
           color: '#10B981',
           rating: 'B+',
-          comment: '나스닥100 10%는 성장주 노출로 적절합니다. 다만 개별 성장주 발굴 기회가 제한적이네요. 해외주식 계좌의 아마존은 좋은 선택입니다!',
+          comment: 'S&P500+나스닥100 20% 비중은 성장주 노출로 적절합니다. 다만 개별 성장주 발굴 기회가 제한적이네요. 안정성을 택한 거라면 이해됩니다!',
         },
         {
           name: '존 보글',
@@ -1382,8 +1391,8 @@ export default function RebalancePage() {
           style: '리스크',
           icon: '⚖️',
           color: '#EF4444',
-          rating: 'A-',
-          comment: '채권+CD+SOFR 35%로 안전자산을 확보한 건 훌륭한 리스크 관리입니다. 시장 하락 시 분할 매수로 대응할 수 있는 여력이 있네요.',
+          rating: 'A',
+          comment: '채권+CD+SOFR+금 45%로 안전자산을 확보한 건 훌륭한 리스크 관리입니다. 시장 하락 시 분할 매수로 대응할 수 있는 여력이 있네요.',
         },
         {
           name: '하늘버핏',
@@ -1391,11 +1400,11 @@ export default function RebalancePage() {
           icon: '🌤️',
           color: '#667EEA',
           rating: 'A+',
-          comment: '가윤이 새 목표 포트폴리오 완벽해요! S&P500+배당주 45%로 코어 잡고, 채권+금+CD로 안전자산 45% 확보! 이 비중대로 차근차근 리밸런싱하면 부자 됩니다~ 움하하하하 🚀',
+          comment: '가윤이 세제혜택 포트폴리오 완벽해요! 배당주 30%로 현금흐름 확보하고, 채권+금+CD로 안전자산 45% 갖추고, 나스닥으로 성장까지! 이대로 꾸준히 하면 부자 됩니다~ 움하하 🚀',
         },
       ],
       overallGrade: 'A',
-      overallComment: '주식 55% + 안전자산 45%의 균형잡힌 목표 포트폴리오. 저비용 인덱스 ETF 중심으로 장기 복리 효과를 극대화할 수 있는 구성.',
+      overallComment: '배당주 30% + 해외성장주 20% + 안전자산 45% + 국내주식 5%의 균형잡힌 목표 포트폴리오. 저비용 인덱스 ETF 중심으로 장기 복리 효과를 극대화할 수 있는 구성.',
       // 기회 매수 전략
       opportunityBuy: {
         title: '기회 매수 전략',
