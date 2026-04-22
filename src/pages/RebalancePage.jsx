@@ -1071,6 +1071,57 @@ export default function RebalancePage() {
         { account: 'IRP', asset: '나스닥100, 국채', amount: 263861, ratio: 5.3 },
         { account: 'CMA', asset: '발행어음', amount: 863681, ratio: 17.3 },
       ],
+      // 연금저축 상세 (미래에셋)
+      pensionHoldings: {
+        total: 1757300,
+        invested: 1662595,
+        gain: 94705,
+        gainPercent: 5.69,
+        items: [
+          { name: 'KODEX 200', currentKRW: 778400, investedKRW: 696430, gainPercent: 11.77 },
+          { name: 'KODEX 코스닥150', currentKRW: 874280, investedKRW: 874005, gainPercent: 0.03 },
+          { name: 'KODEX 미국나스닥100', currentKRW: 104620, investedKRW: 92160, gainPercent: 13.52 },
+        ],
+      },
+      // ISA 상세 (미래에셋)
+      isaHoldings: {
+        total: 508635,
+        invested: 496290,
+        gain: 12345,
+        gainPercent: 2.49,
+        items: [
+          { name: 'KODEX 코스닥150', currentKRW: 99350, investedKRW: 101075, gainPercent: -1.71 },
+          { name: 'TIGER 미국채10년선물', currentKRW: 200925, investedKRW: 198375, gainPercent: 1.29 },
+          { name: 'TIGER 미국S&P500', currentKRW: 208360, investedKRW: 196840, gainPercent: 5.85 },
+        ],
+      },
+      // IRP 상세 (미래에셋)
+      irpHoldings: {
+        total: 263861,
+        invested: 250366,
+        gain: 13495,
+        gainPercent: 5.40,
+        items: [
+          { name: 'TIGER 미국나스닥100', currentKRW: 173860, investedKRW: 160815, gainPercent: 8.11 },
+          { name: 'KODEX 미국10년국채액티브(H)', currentKRW: 89325, investedKRW: 88875, gainPercent: 0.51 },
+          { name: '현금성자산', currentKRW: 676, investedKRW: 0, gainPercent: 0 },
+        ],
+      },
+      // 해외주식 상세 (미래에셋 종합)
+      overseasHoldings: {
+        total: 1587887,
+        invested: 1542884,
+        gain: 45003,
+        gainPercent: 2.92,
+        items: [
+          { name: '셰브론 (CVX)', currentKRW: 555958, investedKRW: 555345, gainPercent: 0.11, type: '해외' },
+          { name: '알파벳 C (GOOG)', currentKRW: 490644, investedKRW: 457022, gainPercent: 7.36, type: '해외' },
+          { name: '크래프트 하인즈 (KHC)', currentKRW: 226967, investedKRW: 227224, gainPercent: -0.11, type: '해외' },
+          { name: 'TIGER 미국S&P500', currentKRW: 182315, investedKRW: 174090, gainPercent: 4.72, type: 'ETF' },
+          { name: '1Q 미국S&P500미국채혼합', currentKRW: 119050, investedKRW: 116250, gainPercent: 2.41, type: 'ETF' },
+          { name: '미국달러', currentKRW: 12953, investedKRW: 12953, gainPercent: 0, type: '현금' },
+        ],
+      },
       allocation: [
         { category: '해외주식(S&P/나스닥)', current: 32, target: 50, gap: -18 },
         { category: '국내주식', current: 35, target: 20, gap: 15 },
@@ -1080,14 +1131,105 @@ export default function RebalancePage() {
         { category: '개별종목', current: 8, target: 5, gap: 3 },
       ],
       sellRecommend: [
-        { asset: 'KODEX 200', current: 800000, sell: 400000, reason: '국내주식 비중 축소' },
-        { asset: 'CMA', current: 863681, sell: 350000, reason: '현금 과다 조정' },
+        { asset: 'KODEX 200', current: 778400, sell: 400000, reason: '국내주식 비중 축소' },
+        { asset: 'KODEX 코스닥150', current: 973630, sell: 500000, reason: '국내주식 비중 축소' },
+        { asset: 'CMA', current: 863681, sell: 300000, reason: '현금 과다 조정' },
       ],
       buyRecommend: [
-        { asset: 'TIGER 미국S&P500', target: 0, buy: 450000, reason: '해외주식 비중 확대' },
-        { asset: 'TIGER 미국채10년', target: 0, buy: 150000, reason: '안전자산 확보' },
-        { asset: '비트코인', target: 0, buy: 150000, reason: '대체투자 분산' },
+        { asset: 'TIGER 미국S&P500', target: 390675, buy: 600000, reason: '해외주식 비중 50%까지 확대' },
+        { asset: 'TIGER 미국채10년', target: 200925, buy: 200000, reason: '안전자산 확보' },
+        { asset: '비트코인', target: 0, buy: 200000, reason: '대체투자 5% 분산' },
+        { asset: 'KODEX 금액티브', target: 0, buy: 200000, reason: '인플레 헤지' },
       ],
+      // 리밸런싱 전략
+      rebalanceStrategy: {
+        pension: {
+          action: 'KODEX 200/코스닥150 → S&P500 전환',
+          sell: [
+            { asset: 'KODEX 200', amount: 400000, reason: '국내 비중 축소' },
+            { asset: 'KODEX 코스닥150', amount: 400000, reason: '변동성 축소' },
+          ],
+          buy: [
+            { asset: 'TIGER 미국S&P500', amount: 600000, reason: '해외주식 확대' },
+            { asset: 'TIGER 미국채10년', amount: 200000, reason: '안정성 확보' },
+          ],
+        },
+        isa: {
+          action: '현재 배분 양호, 소폭 조정',
+          note: '코스닥150을 S&P500으로 교체 권장',
+          sell: [
+            { asset: 'KODEX 코스닥150', amount: 99350, reason: '변동성 축소' },
+          ],
+          buy: [
+            { asset: 'TIGER 미국S&P500', amount: 100000, reason: '해외주식 확대' },
+          ],
+        },
+        irp: {
+          action: '현재 배분 우수, 유지',
+          note: '나스닥100 + 국채 조합 적절',
+          additionalBuy: [
+            { asset: 'KODEX 금액티브', amount: 50000, reason: '금 비중 추가' },
+          ],
+        },
+        overseas: {
+          action: 'Hold (계속 보유)',
+          note: '개별주 CVX, GOOG, KHC는 배당/성장 목적 장기 보유',
+          stopLoss: '-20% 이상 하락 시 재검토',
+        },
+      },
+      // 월가 전설들 평가
+      legends: [
+        {
+          name: '워렌 버핏',
+          style: '가치투자',
+          icon: '🎩',
+          color: '#F59E0B',
+          rating: 'B+',
+          comment: '셰브론(CVX)은 좋은 선택이에요! 배당 귀족주답게 꾸준히 배당금을 받을 수 있죠. 알파벳(GOOG)도 견조하고요. 다만 국내주식 비중(35%)이 높고, 개별종목 대신 S&P500 ETF에 더 집중하면 좋겠어요.',
+        },
+        {
+          name: '레이 달리오',
+          style: '올웨더',
+          icon: '🌊',
+          color: '#3182F6',
+          rating: 'B',
+          comment: '채권(8%)과 금(0%) 비중이 너무 낮아요. 올웨더 포트폴리오는 채권 55%, 금 7.5%를 권장하거든요. IRP에 국채 ETF가 있는 건 좋지만, 전체적으로 안전자산을 더 늘리세요.',
+        },
+        {
+          name: '피터 린치',
+          style: '성장주',
+          icon: '📈',
+          color: '#10B981',
+          rating: 'A',
+          comment: '오! 알파벳(+7.36%)과 셰브론으로 직접 투자하는 건 마음에 드네요! 하지만 크래프트 하인즈는 성장성이 낮아 보여요. 그 자금으로 테슬라나 아마존 같은 성장주를 고려해보세요.',
+        },
+        {
+          name: '존 보글',
+          style: '인덱스',
+          icon: '📊',
+          color: '#8B5CF6',
+          rating: 'B+',
+          comment: 'S&P500 ETF 보유는 좋습니다! 하지만 개별주식(CVX, GOOG, KHC)에 25%나 투자하고 있네요. 장기적으로는 인덱스 펀드에 집중하는 게 더 나을 수 있어요. 수수료도 낮고요.',
+        },
+        {
+          name: '하워드 막스',
+          style: '리스크',
+          icon: '⚖️',
+          color: '#EF4444',
+          rating: 'B+',
+          comment: '현금(17%)을 많이 들고 있어서 하락장에서 기회를 잡을 수 있겠네요! 다만 암호화폐가 없어서 리스크 분산이 조금 아쉬워요. 비트코인 5% 정도 추가하면 어떨까요?',
+        },
+        {
+          name: '가윤달리오',
+          style: '든든한 언니',
+          icon: '👩‍💼',
+          color: '#EC4899',
+          rating: 'A',
+          comment: '하늘아 포트폴리오 잘 구성했어! 셰브론이랑 알파벳 직접 산 거 대견하다~ 다만 국내주식이 좀 많으니까 S&P500으로 조금씩 바꿔가자! 그리고 비트코인도 조금 사보자 ㅋㅋ 나도 들고 있어~ 💪',
+        },
+      ],
+      overallGrade: 'B+',
+      overallComment: '세제혜택 계좌(연금저축, ISA, IRP) 활용 우수. 개별주식(CVX, GOOG, KHC) 직접 투자로 배당+성장 추구. 다만 국내주식 비중이 높고 암호화폐 없음. 해외주식 비중을 50%까지 확대 권장.',
     }
 
     // 가윤달리오 데이터 (2026.04.22 기준)
@@ -1101,6 +1243,70 @@ export default function RebalancePage() {
         { account: 'IRP(미래)', asset: '금, 신흥국, 나스닥, TDF', amount: 3312857, ratio: 3.8 },
         { account: '암호화폐', asset: 'BTC', amount: 1344337, ratio: 1.5 },
       ],
+      // ISA 상세 (삼성증권)
+      isaHoldings: {
+        total: 21231426,
+        invested: 20520572,
+        gain: 710854,
+        gainPercent: 3.46,
+        items: [
+          { name: 'TIGER 미국S&P500', currentKRW: 5156910, investedKRW: 4888810, gainPercent: 5.48 },
+          { name: 'PLUS 신흥국MSCI(합성H)', currentKRW: 3101760, investedKRW: 3096180, gainPercent: 0.18 },
+          { name: 'TIGER 미국나스닥100', currentKRW: 2966840, investedKRW: 2730767, gainPercent: 8.64 },
+          { name: 'TIGER 미국채10년선물', currentKRW: 2451285, investedKRW: 2405385, gainPercent: 1.91 },
+          { name: 'KODEX 금액티브', currentKRW: 2036880, investedKRW: 2133740, gainPercent: -4.54 },
+          { name: 'KODEX 200', currentKRW: 1459500, investedKRW: 1243665, gainPercent: 17.35 },
+          { name: 'TIGER 미국배당다우존스', currentKRW: 1416200, investedKRW: 1408020, gainPercent: 0.58 },
+          { name: 'ACE 미국30년국채액티브(H)', currentKRW: 1079650, investedKRW: 1078935, gainPercent: 0.07 },
+          { name: 'TIGER CD금리투자KIS', currentKRW: 1032930, investedKRW: 1032750, gainPercent: 0.02 },
+          { name: 'KODEX 코스닥150', currentKRW: 516620, investedKRW: 502320, gainPercent: 2.85 },
+          { name: 'ISA 예수금', currentKRW: 12851, investedKRW: 0, gainPercent: 0 },
+        ],
+      },
+      // IRP 상세 (미래에셋)
+      irpHoldings: {
+        total: 3312857,
+        invested: 3268547,
+        gain: 44310,
+        gainPercent: 1.36,
+        items: [
+          { name: 'KODEX 미국나스닥100', currentKRW: 1307750, investedKRW: 1268800, gainPercent: 3.07 },
+          { name: 'IRP 현금성자산', currentKRW: 722371, investedKRW: 722371, gainPercent: 0 },
+          { name: 'KODEX 금액티브', currentKRW: 590400, investedKRW: 595200, gainPercent: -0.81 },
+          { name: 'PLUS 신흥국MSCI(합성H)', currentKRW: 416440, investedKRW: 414697, gainPercent: 0.42 },
+          { name: '미래에셋TDF2025', currentKRW: 275896, investedKRW: 267479, gainPercent: 3.15 },
+        ],
+      },
+      // 연금저축 상세 (미래에셋)
+      pensionHoldings: {
+        total: 15485830,
+        invested: 15102380,
+        gain: 383450,
+        gainPercent: 2.54,
+        items: [
+          { name: 'TIGER 미국S&P500', currentKRW: 3542120, investedKRW: 3502680, gainPercent: 1.13 },
+          { name: 'KODEX 200', currentKRW: 3210900, investedKRW: 2947335, gainPercent: 8.94 },
+          { name: 'KODEX 코스닥150', currentKRW: 3099720, investedKRW: 3080430, gainPercent: 0.63 },
+          { name: 'TIGER 미국나스닥100', currentKRW: 2268760, investedKRW: 2198010, gainPercent: 3.22 },
+          { name: 'PLUS 고배당주', currentKRW: 1508650, investedKRW: 1514975, gainPercent: -0.42 },
+          { name: 'KODEX 금액티브', currentKRW: 885600, investedKRW: 892800, gainPercent: -0.81 },
+          { name: 'TIGER 미국배당다우존스', currentKRW: 511000, investedKRW: 507150, gainPercent: 0.76 },
+          { name: 'TIGER CD금리투자KIS', currentKRW: 459080, investedKRW: 459000, gainPercent: 0.02 },
+        ],
+      },
+      // 해외주식 상세 (삼성증권 + 미래에셋 종합)
+      overseasHoldings: {
+        total: 26399608,
+        invested: 22841816,
+        gain: 3557792,
+        gainPercent: 15.58,
+        etfItems: [
+          { name: 'VOO (S&P500)', currentKRW: 21062208, investedKRW: 18034965, gainPercent: 16.79 },
+          { name: 'VOO 소수점', currentKRW: 706131, investedKRW: 676691, gainPercent: 4.35 },
+          { name: 'SCHD (배당)', currentKRW: 4567569, investedKRW: 4047160, gainPercent: 12.86 },
+          { name: '케이뱅크', currentKRW: 63700, investedKRW: 83000, gainPercent: -23.25 },
+        ],
+      },
       // 개별주식 (미래에셋 종합)
       individualStocks: [
         { ticker: 'AMZN', name: '아마존', amount: 1854752, gainPercent: 16.22, type: '해외' },
@@ -1838,6 +2044,427 @@ export default function RebalancePage() {
                 국내 배당주(삼성화재, 하나금융, SKT, 기아)는 배당 수익 중심으로 관리.
               </p>
             </div>
+          </div>
+        )}
+
+        {/* ISA 현황 */}
+        {data.isaHoldings && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>📊 ISA 현황 {personalTab === 'haneul' ? '(미래에셋)' : '(삼성증권)'}</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <p style={{ fontSize: 13, color: '#666', margin: 0 }}>
+                총 평가금액: <strong style={{ color: '#3182F6' }}>{formatMoney(data.isaHoldings.total)}</strong>
+              </p>
+              <span style={{
+                padding: '4px 12px',
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: data.isaHoldings.gainPercent >= 0 ? '#E6F7F1' : '#FFEBEE',
+                color: data.isaHoldings.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+              }}>
+                {data.isaHoldings.gainPercent >= 0 ? '+' : ''}{data.isaHoldings.gainPercent.toFixed(2)}%
+              </span>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ ...styles.table, minWidth: 400 }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.th, backgroundColor: '#E8F3FF' }}>종목</th>
+                    <th style={{ ...styles.th, backgroundColor: '#E8F3FF', textAlign: 'right' }}>평가금액</th>
+                    <th style={{ ...styles.th, backgroundColor: '#E8F3FF', textAlign: 'right' }}>수익률</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.isaHoldings.items.map((item, idx) => (
+                    <tr key={idx}>
+                      <td style={styles.td}><strong>{item.name}</strong></td>
+                      <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.currentKRW)}</td>
+                      <td style={{
+                        ...styles.td,
+                        textAlign: 'right',
+                        fontWeight: 600,
+                        color: item.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+                      }}>
+                        {item.gainPercent >= 0 ? '+' : ''}{item.gainPercent.toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* IRP 현황 */}
+        {data.irpHoldings && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>🏦 IRP 현황 (미래에셋)</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <p style={{ fontSize: 13, color: '#666', margin: 0 }}>
+                총 평가금액: <strong style={{ color: '#3182F6' }}>{formatMoney(data.irpHoldings.total)}</strong>
+              </p>
+              <span style={{
+                padding: '4px 12px',
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: data.irpHoldings.gainPercent >= 0 ? '#E6F7F1' : '#FFEBEE',
+                color: data.irpHoldings.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+              }}>
+                {data.irpHoldings.gainPercent >= 0 ? '+' : ''}{data.irpHoldings.gainPercent.toFixed(2)}%
+              </span>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ ...styles.table, minWidth: 400 }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.th, backgroundColor: '#FFF4E6' }}>종목</th>
+                    <th style={{ ...styles.th, backgroundColor: '#FFF4E6', textAlign: 'right' }}>평가금액</th>
+                    <th style={{ ...styles.th, backgroundColor: '#FFF4E6', textAlign: 'right' }}>수익률</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.irpHoldings.items.map((item, idx) => (
+                    <tr key={idx}>
+                      <td style={styles.td}><strong>{item.name}</strong></td>
+                      <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.currentKRW)}</td>
+                      <td style={{
+                        ...styles.td,
+                        textAlign: 'right',
+                        fontWeight: 600,
+                        color: item.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+                      }}>
+                        {item.gainPercent >= 0 ? '+' : ''}{item.gainPercent.toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 연금저축 현황 */}
+        {data.pensionHoldings && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>🧓 연금저축 현황 (미래에셋)</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <p style={{ fontSize: 13, color: '#666', margin: 0 }}>
+                총 평가금액: <strong style={{ color: '#3182F6' }}>{formatMoney(data.pensionHoldings.total)}</strong>
+              </p>
+              <span style={{
+                padding: '4px 12px',
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: data.pensionHoldings.gainPercent >= 0 ? '#E6F7F1' : '#FFEBEE',
+                color: data.pensionHoldings.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+              }}>
+                {data.pensionHoldings.gainPercent >= 0 ? '+' : ''}{data.pensionHoldings.gainPercent.toFixed(2)}%
+              </span>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ ...styles.table, minWidth: 400 }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.th, backgroundColor: '#F3E8FF' }}>종목</th>
+                    <th style={{ ...styles.th, backgroundColor: '#F3E8FF', textAlign: 'right' }}>평가금액</th>
+                    <th style={{ ...styles.th, backgroundColor: '#F3E8FF', textAlign: 'right' }}>수익률</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.pensionHoldings.items.map((item, idx) => (
+                    <tr key={idx}>
+                      <td style={styles.td}><strong>{item.name}</strong></td>
+                      <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.currentKRW)}</td>
+                      <td style={{
+                        ...styles.td,
+                        textAlign: 'right',
+                        fontWeight: 600,
+                        color: item.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+                      }}>
+                        {item.gainPercent >= 0 ? '+' : ''}{item.gainPercent.toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 해외주식 현황 (하늘버핏 전용) */}
+        {personalTab === 'haneul' && data.overseasHoldings && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>🌍 해외주식 현황 (미래에셋 종합)</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <p style={{ fontSize: 13, color: '#666', margin: 0 }}>
+                총 평가금액: <strong style={{ color: '#3182F6' }}>{formatMoney(data.overseasHoldings.total)}</strong>
+              </p>
+              <span style={{
+                padding: '4px 12px',
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: data.overseasHoldings.gainPercent >= 0 ? '#E6F7F1' : '#FFEBEE',
+                color: data.overseasHoldings.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+              }}>
+                {data.overseasHoldings.gainPercent >= 0 ? '+' : ''}{data.overseasHoldings.gainPercent.toFixed(2)}%
+              </span>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ ...styles.table, minWidth: 400 }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.th, backgroundColor: '#E6F7F1' }}>종목</th>
+                    <th style={{ ...styles.th, backgroundColor: '#E6F7F1', textAlign: 'center' }}>구분</th>
+                    <th style={{ ...styles.th, backgroundColor: '#E6F7F1', textAlign: 'right' }}>평가금액</th>
+                    <th style={{ ...styles.th, backgroundColor: '#E6F7F1', textAlign: 'right' }}>수익률</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.overseasHoldings.items.map((item, idx) => (
+                    <tr key={idx}>
+                      <td style={styles.td}><strong>{item.name}</strong></td>
+                      <td style={{ ...styles.td, textAlign: 'center' }}>
+                        <span style={{
+                          padding: '2px 8px',
+                          borderRadius: 4,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          backgroundColor: item.type === '해외' ? '#E8F3FF' : item.type === 'ETF' ? '#F3E8FF' : '#F7F8FA',
+                          color: item.type === '해외' ? '#3182F6' : item.type === 'ETF' ? '#8B5CF6' : '#666',
+                        }}>
+                          {item.type}
+                        </span>
+                      </td>
+                      <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.currentKRW)}</td>
+                      <td style={{
+                        ...styles.td,
+                        textAlign: 'right',
+                        fontWeight: 600,
+                        color: item.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+                      }}>
+                        {item.gainPercent >= 0 ? '+' : ''}{item.gainPercent.toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {data.rebalanceStrategy?.overseas && (
+              <div style={{ ...styles.tipBox('info'), marginTop: 16, marginBottom: 0 }}>
+                <div style={styles.tipTitle('info')}>💡 해외주식 전략</div>
+                <p style={styles.tipText}>
+                  <strong>{data.rebalanceStrategy.overseas.action}</strong><br/>
+                  {data.rebalanceStrategy.overseas.note}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 가윤달리오 전용: 해외주식(ETF) 현황 */}
+        {personalTab === 'gayoon' && data.overseasHoldings && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>🌍 해외주식(ETF) 현황 (삼성증권)</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <p style={{ fontSize: 13, color: '#666', margin: 0 }}>
+                총 평가금액: <strong style={{ color: '#3182F6' }}>{formatMoney(data.overseasHoldings.total)}</strong>
+              </p>
+              <span style={{
+                padding: '4px 12px',
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: data.overseasHoldings.gainPercent >= 0 ? '#E6F7F1' : '#FFEBEE',
+                color: data.overseasHoldings.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+              }}>
+                {data.overseasHoldings.gainPercent >= 0 ? '+' : ''}{data.overseasHoldings.gainPercent.toFixed(2)}%
+              </span>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ ...styles.table, minWidth: 400 }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.th, backgroundColor: '#E6F7F1' }}>종목</th>
+                    <th style={{ ...styles.th, backgroundColor: '#E6F7F1', textAlign: 'right' }}>평가금액</th>
+                    <th style={{ ...styles.th, backgroundColor: '#E6F7F1', textAlign: 'right' }}>수익률</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.overseasHoldings.etfItems.map((item, idx) => (
+                    <tr key={idx}>
+                      <td style={styles.td}><strong>{item.name}</strong></td>
+                      <td style={{ ...styles.td, textAlign: 'right' }}>{formatMoney(item.currentKRW)}</td>
+                      <td style={{
+                        ...styles.td,
+                        textAlign: 'right',
+                        fontWeight: 600,
+                        color: item.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+                      }}>
+                        {item.gainPercent >= 0 ? '+' : ''}{item.gainPercent.toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 하늘버핏 전용: 월가 전설들 평가 */}
+        {personalTab === 'haneul' && data.legends && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>🏛️ 월가 전설들의 평가</h2>
+
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 24 }}>
+              {data.legends.map((legend, idx) => (
+                <div key={idx} style={{
+                  backgroundColor: COLORS.background,
+                  borderRadius: 12,
+                  padding: 16,
+                  borderLeft: `4px solid ${legend.color}`,
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 24 }}>{legend.icon}</span>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: COLORS.textPrimary }}>{legend.name}</div>
+                        <div style={{ fontSize: 12, color: COLORS.textSecondary }}>{legend.style}</div>
+                      </div>
+                    </div>
+                    <div style={{
+                      backgroundColor: legend.color,
+                      color: COLORS.white,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                    }}>
+                      {legend.rating}
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 13, lineHeight: 1.6, color: COLORS.textPrimary, margin: 0 }}>
+                    "{legend.comment}"
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* 종합 평점 */}
+            <div style={{
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+              borderRadius: 16,
+              padding: isMobile ? 20 : 28,
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>종합 평점</div>
+              <div style={{
+                fontSize: isMobile ? 48 : 64,
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginBottom: 12,
+              }}>
+                {data.overallGrade}
+              </div>
+              <p style={{ fontSize: isMobile ? 14 : 16, color: 'rgba(255,255,255,0.9)', margin: 0, lineHeight: 1.6 }}>
+                "{data.overallComment}"
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 하늘버핏 전용: 리밸런싱 전략 */}
+        {personalTab === 'haneul' && data.rebalanceStrategy && (
+          <div style={{
+            ...styles.card,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: COLORS.white,
+          }}>
+            <h2 style={{ ...styles.cardTitle, color: COLORS.white }}>🎯 계좌별 리밸런싱 전략</h2>
+
+            {/* 연금저축 전략 */}
+            {data.rebalanceStrategy.pension && (
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, color: '#FFD700' }}>
+                  🧓 연금저축: {data.rebalanceStrategy.pension.action}
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 12, color: '#FFB3B3', marginBottom: 8, fontWeight: 600 }}>📉 매도</div>
+                    {data.rebalanceStrategy.pension.sell.map((item, idx) => (
+                      <p key={idx} style={{ fontSize: 13, marginBottom: 4, color: 'rgba(255,255,255,0.9)' }}>
+                        • {item.asset}: -{formatMoney(item.amount)}
+                      </p>
+                    ))}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, color: '#90EE90', marginBottom: 8, fontWeight: 600 }}>📈 매수</div>
+                    {data.rebalanceStrategy.pension.buy.map((item, idx) => (
+                      <p key={idx} style={{ fontSize: 13, marginBottom: 4, color: 'rgba(255,255,255,0.9)' }}>
+                        • {item.asset}: +{formatMoney(item.amount)}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ISA 전략 */}
+            {data.rebalanceStrategy.isa && (
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, color: '#90EE90' }}>
+                  📊 ISA: {data.rebalanceStrategy.isa.action}
+                </h3>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 12 }}>
+                  {data.rebalanceStrategy.isa.note}
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 12, color: '#FFB3B3', marginBottom: 8, fontWeight: 600 }}>📉 매도</div>
+                    {data.rebalanceStrategy.isa.sell.map((item, idx) => (
+                      <p key={idx} style={{ fontSize: 13, marginBottom: 4, color: 'rgba(255,255,255,0.9)' }}>
+                        • {item.asset}: -{formatMoney(item.amount)}
+                      </p>
+                    ))}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, color: '#90EE90', marginBottom: 8, fontWeight: 600 }}>📈 매수</div>
+                    {data.rebalanceStrategy.isa.buy.map((item, idx) => (
+                      <p key={idx} style={{ fontSize: 13, marginBottom: 4, color: 'rgba(255,255,255,0.9)' }}>
+                        • {item.asset}: +{formatMoney(item.amount)}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* IRP 전략 */}
+            {data.rebalanceStrategy.irp && (
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: 16 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 12, color: '#87CEEB' }}>
+                  🏦 IRP: {data.rebalanceStrategy.irp.action}
+                </h3>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 12 }}>
+                  {data.rebalanceStrategy.irp.note}
+                </p>
+                {data.rebalanceStrategy.irp.additionalBuy && (
+                  <div>
+                    <div style={{ fontSize: 12, color: '#90EE90', marginBottom: 8, fontWeight: 600 }}>📈 추가 매수 권장</div>
+                    {data.rebalanceStrategy.irp.additionalBuy.map((item, idx) => (
+                      <p key={idx} style={{ fontSize: 13, marginBottom: 4, color: 'rgba(255,255,255,0.9)' }}>
+                        • {item.asset}: +{formatMoney(item.amount)} ({item.reason})
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
