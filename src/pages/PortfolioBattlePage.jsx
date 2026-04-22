@@ -2,65 +2,55 @@ import { useState, useEffect } from 'react'
 
 // 포트폴리오 대결 2026
 const BATTLE_INFO = {
-  startDate: '2026-02-22',
+  startDate: '2026-01-01',
   endDate: '2026-12-24',
   prize: '치킨',
-  lastUpdate: '2026.04.11 (하늘 업데이트)',
+  lastUpdate: '2026.04.22',
 }
 
-// ========== 공정한 수익률 계산을 위한 기준 데이터 ==========
-// 대결 시작일(2026.02.22) 기준 "진짜 투입 원금"
-// 증권사 이동으로 인한 왜곡을 방지하기 위해 최초 투입금만 기록
-//
-// [중요] 이 값은 "처음 투자한 원금"입니다.
-// 증권사를 이동해도 이 값은 변하지 않습니다.
-// 예: 한투에서 1000만원→1100만원 되고 미래에셋으로 이동해도,
-//     원금은 여전히 1000만원으로 계산합니다.
-const BATTLE_START_DATA = {
+// ========== 2026년 투자수익 대결 ==========
+// 규칙: 2026년 1월 1일부터의 "투자수익"으로 비교 (미실현 포함)
+// - 투자수익 = 현재 평가금액 - 투자원금
+// - 원금 크기와 무관하게 순수하게 "얼마를 벌었냐"로 비교
+// - 매월 업데이트
+const INVESTMENT_GAINS_2026 = {
   haneul: {
-    // 토스(62만) + 미래에셋 연금(147.6만) + ISA(49.6만) + 종합(137.7만) + IRP(25만) + CMA(61만) + 비트(16.7만)
-    initialCapital: 4997665,
-    description: '토스 + 미래에셋 (연금/ISA/종합/IRP/CMA) + 업비트',
+    // 2026.04.22 기준
+    totalGain: 305739,
+    totalInvested: 2218765 + 150000,  // 미래에셋 + 업비트
+    returnPercent: 12.91,  // 종합 수익률
+    breakdown: [
+      { account: '미래에셋 (IRP/연금/ISA)', gain: 276902, invested: 2218765, returnPercent: 12.48 },
+      { account: '업비트 (비트코인)', gain: 28837, invested: 150000, returnPercent: 19.22 },
+    ],
+    description: '미래에셋/업비트',
   },
   gayoon: {
-    // 삼성(해외+ISA) + 미래에셋(연금/CMA/IRP) + 한투(아마존) + 업비트
-    // 모든 계좌의 "처음 투자한 금액" 합계
-    initialCapital: 67150260,
-    // 실현수익: 증권사 이동 시 이미 실현된 수익 (현재 0으로 설정)
-    // 한투→삼성 이동 시 실현된 수익이 있다면 여기에 기록
-    realizedGains: 0,
-    description: '삼성(해외주식/ISA) + 미래에셋(연금/CMA/IRP) + 한투 + 업비트',
+    // 2026.04.22 기준
+    totalGain: 5694523,
+    totalInvested: 67161241,  // 총 투자원금
+    returnPercent: 8.48,  // 종합 수익률
+    breakdown: [
+      { account: '미래에셋', gain: 910713, invested: 7194764, returnPercent: 12.66 },
+      { account: '삼성증권', gain: 4266429, invested: 49922697, returnPercent: 8.55 },
+      { account: '한국투자', gain: 271395, invested: 2941594, returnPercent: 9.23 },
+      { account: '업비트 (비트코인)', gain: 245986, invested: 1098351, returnPercent: 22.40 },
+    ],
+    description: '삼성/미래에셋/한투/업비트',
   },
 }
 
-// ========== 하우가 패밀리 (하늘) 실제 데이터 (2026.04.11) ==========
+// ========== 하우가 패밀리 (하늘) 실제 데이터 (2026.04.22) ==========
+// 토스증권 제외, 미래에셋 + 업비트만 포함
 const HAUGA_HOLDINGS = [
-  // 토스증권 해외주식
-  { ticker: 'MSFT', name: '마이크로소프트', currentKRW: 42130, investedKRW: 47590, gainPercent: -11.4 },
-  { ticker: 'META', name: '메타', currentKRW: 23167, investedKRW: 23670, gainPercent: -2.1 },
-  { ticker: 'VST', name: '비스트라 에너지', currentKRW: 906, investedKRW: 986, gainPercent: -8.0 },
-  { ticker: 'AMZN', name: '아마존 (토스)', currentKRW: 428785, investedKRW: 405610, gainPercent: 5.7 },
-  { ticker: 'GOOGL', name: '알파벳 A', currentKRW: 19238, investedKRW: 19727, gainPercent: -2.4 },
-  { ticker: 'ISRG', name: '인튜이티브 서지컬', currentKRW: 7195, investedKRW: 7882, gainPercent: -8.7 },
-  { ticker: 'QCOM', name: '퀄컴', currentKRW: 6784, investedKRW: 7883, gainPercent: -13.9 },
-  { ticker: 'TSLA', name: '테슬라', currentKRW: 2566, investedKRW: 2969, gainPercent: -13.5 },
-  // 미래에셋 해외주식
-  { ticker: 'CVX', name: '셰브론', currentKRW: 558523, investedKRW: 559234, gainPercent: -0.13 },
-  { ticker: 'GOOG_M', name: '알파벳 C (미래)', currentKRW: 467613, investedKRW: 460222, gainPercent: 1.61 },
-  { ticker: 'ORCL', name: '오라클', currentKRW: 204525, investedKRW: 202481, gainPercent: 1.01 },
-  // 미래에셋 국내주식/ETF
-  { ticker: '1Q_HYB', name: '1Q 미국S&P500미국채혼합', currentKRW: 116800, investedKRW: 116250, gainPercent: 0.47 },
-  { ticker: 'TIGER_SP', name: 'TIGER 미국S&P500', currentKRW: 175735, investedKRW: 174090, gainPercent: 0.94 },
-  { ticker: 'KODEX200', name: 'KODEX 200', currentKRW: 1152515, investedKRW: 1131700, gainPercent: 1.84 },
-  { ticker: 'KODEX150_P', name: 'KODEX 코스닥150 (연금)', currentKRW: 315775, investedKRW: 344775, gainPercent: -8.41 },
-  { ticker: 'KODEX_NAS', name: 'KODEX 미국나스닥100', currentKRW: 98720, investedKRW: 92160, gainPercent: 7.12 },
-  { ticker: 'KODEX150_I', name: 'KODEX 코스닥150 (ISA)', currentKRW: 92875, investedKRW: 101075, gainPercent: -8.11 },
-  { ticker: 'TIGER_BOND', name: 'TIGER 미국채10년선물', currentKRW: 201450, investedKRW: 198375, gainPercent: 1.55 },
-  { ticker: 'TIGER_SP_I', name: 'TIGER 미국S&P500 (ISA)', currentKRW: 200840, investedKRW: 196840, gainPercent: 2.03 },
-  // 미래에셋 예수금
-  { ticker: 'CASH', name: '예수금 (원화)', currentKRW: 263921, investedKRW: 263921, gainPercent: 0.00 },
+  // 미래에셋 상품별 자산
+  { ticker: 'STOCK', name: '주식 (미래에셋)', currentKRW: 3835525, investedKRW: 3688816, gainPercent: 3.98 },
+  { ticker: 'CMA', name: '발행어음 (CMA)', currentKRW: 863681, investedKRW: 863445, gainPercent: 0.03 },
+  { ticker: 'IRP', name: '퇴직연금 (IRP)', currentKRW: 263861, investedKRW: 250000, gainPercent: 5.54 },
+  { ticker: 'FX', name: '외화 예수금', currentKRW: 12953, investedKRW: 12953, gainPercent: 0.00 },
+  { ticker: 'CASH', name: 'D+2 원화예수금', currentKRW: 5209, investedKRW: 0, gainPercent: 0.00 },
   // 업비트
-  { ticker: 'BTC', name: '비트코인', currentKRW: 176419, investedKRW: 167063, gainPercent: 5.56 },
+  { ticker: 'BTC', name: '비트코인', currentKRW: 178837, investedKRW: 150000, gainPercent: 19.22 },
 ]
 
 // ========== 가윤 달리오 실제 데이터 ==========
@@ -85,24 +75,21 @@ const GAYOON_HOLDINGS = [
   { ticker: 'BTC', name: '비트코인', currentKRW: 1091846, investedKRW: 1098351, gainPercent: -0.59 },
 ]
 
-// 월별 누적 데이터 기록
-// totalValue: 해당 월말 총 평가금액
-// deposits: 해당 월 추가 입금액
-// withdrawals: 해당 월 출금액
-const MONTHLY_RECORDS = {
-  '2026-02': {
-    haneul: { totalValue: 4997665, deposits: 0, withdrawals: 0 },
-    gayoon: { totalValue: 67150260, deposits: 0, withdrawals: 0 },
-  },
-  '2026-03': {
-    haneul: { totalValue: 4808828, deposits: 0, withdrawals: 0 },
-    gayoon: { totalValue: 67622384, deposits: 0, withdrawals: 0 },
-  },
-  '2026-04': {
-    haneul: { totalValue: 4854776, deposits: 0, withdrawals: 0 },
-    // 가윤 데이터는 캡처 받으면 추가
-    gayoon: { totalValue: 67622384, deposits: 0, withdrawals: 0 }, // 임시: 3월 데이터 유지
-  },
+// 월별 투자수익 기록 (2026년 기준)
+// 해당 월까지 누적 투자수익 (미실현 포함)
+const MONTHLY_GAINS = {
+  '2026-01': { haneul: null, gayoon: null },
+  '2026-02': { haneul: null, gayoon: null },
+  '2026-03': { haneul: null, gayoon: null },
+  '2026-04': { haneul: 305739, gayoon: 5694523 },  // 4월 업데이트
+  '2026-05': { haneul: null, gayoon: null },
+  '2026-06': { haneul: null, gayoon: null },
+  '2026-07': { haneul: null, gayoon: null },
+  '2026-08': { haneul: null, gayoon: null },
+  '2026-09': { haneul: null, gayoon: null },
+  '2026-10': { haneul: null, gayoon: null },
+  '2026-11': { haneul: null, gayoon: null },
+  '2026-12': { haneul: null, gayoon: null },
 }
 
 const calculatePortfolioStats = (holdings) => {
@@ -111,24 +98,6 @@ const calculatePortfolioStats = (holdings) => {
   const totalGain = totalCurrent - totalInvested
   const returnPercent = totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0
   return { totalCurrent, totalInvested, totalGain, returnPercent }
-}
-
-// 공정한 수익률 계산 (대결 시작 시점 원금 기준)
-const calculateFairReturn = (holdings, startData) => {
-  const totalCurrent = holdings.reduce((sum, h) => sum + h.currentKRW, 0)
-  const realizedGains = startData.realizedGains || 0
-
-  // 공식: (현재 총 자산 + 실현수익 - 최초 원금) / 최초 원금 × 100
-  const totalGain = totalCurrent - startData.initialCapital + realizedGains
-  const fairReturnPercent = (totalGain / startData.initialCapital) * 100
-
-  return {
-    totalCurrent,
-    initialCapital: startData.initialCapital,
-    realizedGains,
-    totalGain,
-    fairReturnPercent,
-  }
 }
 
 export default function PortfolioBattlePage() {
@@ -146,16 +115,12 @@ export default function PortfolioBattlePage() {
   const haugaStats = calculatePortfolioStats(HAUGA_HOLDINGS)
   const gayoonStats = calculatePortfolioStats(GAYOON_HOLDINGS)
 
-  // 공정한 수익률 계산 (대결 시작 원금 기준)
-  const haneulFair = calculateFairReturn(HAUGA_HOLDINGS, BATTLE_START_DATA.haneul)
-  const gayoonFair = calculateFairReturn(GAYOON_HOLDINGS, BATTLE_START_DATA.gayoon)
+  // 2026년 투자수익으로 비교 (미실현 포함)
+  const haneulGain = INVESTMENT_GAINS_2026.haneul.totalGain
+  const gayoonGain = INVESTMENT_GAINS_2026.gayoon.totalGain
 
-  // 대결은 공정한 수익률로 비교
-  const haneulReturn = haneulFair.fairReturnPercent
-  const gayoonReturn = gayoonFair.fairReturnPercent
-
-  const winner = haneulReturn > gayoonReturn ? 'haneul' : gayoonReturn > haneulReturn ? 'gayoon' : 'tie'
-  const gap = Math.abs(haneulReturn - gayoonReturn)
+  const winner = haneulGain > gayoonGain ? 'haneul' : gayoonGain > haneulGain ? 'gayoon' : 'tie'
+  const gap = Math.abs(haneulGain - gayoonGain)
 
   // D-day
   const today = new Date()
@@ -163,69 +128,6 @@ export default function PortfolioBattlePage() {
   const dDay = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24))
   const startDate = new Date(BATTLE_INFO.startDate)
   const progressPercent = Math.min(Math.max(((today - startDate) / (endDate - startDate)) * 100, 0), 100)
-
-  // 통계
-  const calculateStats = (holdings) => {
-    const gains = holdings.map(h => h.gainPercent)
-    return {
-      avg: gains.reduce((a, b) => a + b, 0) / gains.length,
-      max: Math.max(...gains),
-      min: Math.min(...gains),
-      count: holdings.length
-    }
-  }
-  const haugaAnalytics = calculateStats(HAUGA_HOLDINGS)
-  const gayoonAnalytics = calculateStats(GAYOON_HOLDINGS)
-
-  // 월별 승리 (누적 수익률 기준)
-  const getMonthlyReturn = (person, monthKey) => {
-    const data = MONTHLY_RECORDS[monthKey]
-    if (!data || !data[person]) return null
-    const startData = BATTLE_START_DATA[person]
-    const cumDeposits = Object.entries(MONTHLY_RECORDS)
-      .filter(([k]) => k <= monthKey)
-      .reduce((sum, [, d]) => sum + (d[person]?.deposits || 0) - (d[person]?.withdrawals || 0), 0)
-    const adjustedBase = startData.initialCapital + cumDeposits
-    return ((data[person].totalValue - adjustedBase) / adjustedBase) * 100
-  }
-
-  const monthKeys = Object.keys(MONTHLY_RECORDS).filter(k => k !== '2026-02') // 시작월 제외
-  const haneulWins = monthKeys.filter(k => {
-    const h = getMonthlyReturn('haneul', k)
-    const g = getMonthlyReturn('gayoon', k)
-    return h !== null && g !== null && h > g
-  }).length
-  const gayoonWins = monthKeys.filter(k => {
-    const h = getMonthlyReturn('haneul', k)
-    const g = getMonthlyReturn('gayoon', k)
-    return h !== null && g !== null && g > h
-  }).length
-
-  // 공통 종목
-  const compareHoldings = () => {
-    const normalize = (ticker) => ticker.replace(/_[A-Z]+$/, '').replace('_M', '')
-    const hMap = {}, gMap = {}
-    HAUGA_HOLDINGS.forEach(h => {
-      const k = normalize(h.ticker)
-      hMap[k] = hMap[k] ? { ...hMap[k], totalKRW: hMap[k].totalKRW + h.currentKRW } : { ...h, totalKRW: h.currentKRW }
-    })
-    GAYOON_HOLDINGS.forEach(h => {
-      const k = normalize(h.ticker)
-      gMap[k] = gMap[k] ? { ...gMap[k], totalKRW: gMap[k].totalKRW + h.currentKRW } : { ...h, totalKRW: h.currentKRW }
-    })
-    const result = []
-    Object.keys(hMap).forEach(k => {
-      if (gMap[k] && !['CMA', 'USD', 'IRP', 'ISA_CASH', 'IRP_CASH'].includes(k)) {
-        result.push({
-          name: hMap[k].name.replace(/\s*\([^)]*\)/g, ''),
-          haneul: { amount: hMap[k].totalKRW, gain: hMap[k].gainPercent },
-          gayoon: { amount: gMap[k].totalKRW, gain: gMap[k].gainPercent },
-        })
-      }
-    })
-    return result.sort((a, b) => (b.haneul.amount + b.gayoon.amount) - (a.haneul.amount + a.gayoon.amount))
-  }
-  const holdingsComparison = compareHoldings()
 
   return (
     <div style={{ maxWidth: '100%' }}>
@@ -260,12 +162,12 @@ export default function PortfolioBattlePage() {
           </div>
           {winner !== 'tie' && (
             <div style={{ fontSize: '16px', opacity: 0.9, marginTop: '4px' }}>
-              +{gap.toFixed(2)}%p 리드
+              +{gap.toLocaleString()}원 리드
             </div>
           )}
         </div>
 
-        {/* 수익률 비교 */}
+        {/* 투자수익 비교 */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-around',
@@ -273,11 +175,11 @@ export default function PortfolioBattlePage() {
         }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '13px', opacity: 0.8, marginBottom: '8px' }}>☁️ 하늘</div>
-            <div style={{ fontSize: isMobile ? '28px' : '36px', fontWeight: '800' }}>
-              {haneulReturn >= 0 ? '+' : ''}{haneulReturn.toFixed(2)}%
+            <div style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '800' }}>
+              {haneulGain === 0 ? '대기중' : (haneulGain >= 0 ? '+' : '') + haneulGain.toLocaleString() + '원'}
             </div>
-            <div style={{ fontSize: '12px', opacity: 0.7, marginTop: '4px' }}>
-              {(haugaStats.totalCurrent / 10000).toFixed(0)}만원
+            <div style={{ fontSize: '11px', opacity: 0.7, marginTop: '4px' }}>
+              {INVESTMENT_GAINS_2026.haneul.description}
             </div>
           </div>
 
@@ -289,11 +191,11 @@ export default function PortfolioBattlePage() {
 
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '13px', opacity: 0.8, marginBottom: '8px' }}>🐰 가윤</div>
-            <div style={{ fontSize: isMobile ? '28px' : '36px', fontWeight: '800' }}>
-              {gayoonReturn >= 0 ? '+' : ''}{gayoonReturn.toFixed(2)}%
+            <div style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '800' }}>
+              {gayoonGain >= 0 ? '+' : ''}{gayoonGain.toLocaleString()}원
             </div>
-            <div style={{ fontSize: '12px', opacity: 0.7, marginTop: '4px' }}>
-              {(gayoonStats.totalCurrent / 10000).toFixed(0)}만원
+            <div style={{ fontSize: '11px', opacity: 0.7, marginTop: '4px' }}>
+              {INVESTMENT_GAINS_2026.gayoon.description}
             </div>
           </div>
         </div>
@@ -329,7 +231,534 @@ export default function PortfolioBattlePage() {
         </div>
       </div>
 
-      {/* 공정성 설명 섹션 */}
+      {/* 🔥 수익률 % 대결 - 불꽃 VS 그래프 🔥 */}
+      <div style={{
+        background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)',
+        borderRadius: '24px',
+        padding: isMobile ? '24px' : '32px',
+        marginBottom: '24px',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* 배경 불꽃 효과 */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 30% 50%, rgba(255,107,0,0.15) 0%, transparent 50%), radial-gradient(circle at 70% 50%, rgba(255,0,107,0.15) 0%, transparent 50%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* 타이틀 */}
+        <div style={{
+          textAlign: 'center',
+          marginBottom: '24px',
+          position: 'relative',
+        }}>
+          <div style={{
+            fontSize: '12px',
+            color: '#888',
+            letterSpacing: '2px',
+            marginBottom: '4px',
+          }}>
+            RETURN RATE BATTLE
+          </div>
+          <div style={{
+            fontSize: isMobile ? '20px' : '24px',
+            fontWeight: '800',
+            background: 'linear-gradient(90deg, #ff6b00, #ff0080, #ff6b00)',
+            backgroundSize: '200% auto',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            animation: 'shine 3s linear infinite',
+          }}>
+            수익률 % 대결
+          </div>
+          <style>{`
+            @keyframes shine {
+              to { background-position: 200% center; }
+            }
+            @keyframes pulse {
+              0%, 100% { transform: scale(1); }
+              50% { transform: scale(1.05); }
+            }
+            @keyframes fireGlow {
+              0%, 100% { box-shadow: 0 0 20px rgba(255,107,0,0.5), 0 0 40px rgba(255,107,0,0.3); }
+              50% { box-shadow: 0 0 30px rgba(255,107,0,0.7), 0 0 60px rgba(255,107,0,0.5); }
+            }
+            @keyframes fireGlowPink {
+              0%, 100% { box-shadow: 0 0 20px rgba(255,0,107,0.5), 0 0 40px rgba(255,0,107,0.3); }
+              50% { box-shadow: 0 0 30px rgba(255,0,107,0.7), 0 0 60px rgba(255,0,107,0.5); }
+            }
+          `}</style>
+        </div>
+
+        {/* VS 배틀 영역 */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          position: 'relative',
+        }}>
+          {/* 하늘 */}
+          <div style={{
+            flex: 1,
+            textAlign: 'center',
+          }}>
+            <div style={{
+              fontSize: '32px',
+              marginBottom: '8px',
+            }}>☁️</div>
+            <div style={{
+              fontSize: '14px',
+              color: '#aaa',
+              marginBottom: '12px',
+            }}>하늘</div>
+            <div style={{
+              fontSize: isMobile ? '36px' : '48px',
+              fontWeight: '900',
+              color: '#ff6b00',
+              textShadow: '0 0 20px rgba(255,107,0,0.5)',
+              animation: 'pulse 2s ease-in-out infinite',
+            }}>
+              {INVESTMENT_GAINS_2026.haneul.returnPercent.toFixed(2)}%
+            </div>
+            <div style={{
+              marginTop: '16px',
+              height: '8px',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}>
+              <div style={{
+                width: `${Math.min(INVESTMENT_GAINS_2026.haneul.returnPercent * 4, 100)}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #ff6b00, #ff9500)',
+                borderRadius: '4px',
+                animation: 'fireGlow 1.5s ease-in-out infinite',
+              }} />
+            </div>
+          </div>
+
+          {/* VS 뱃지 */}
+          <div style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #ff6b00 0%, #ff0080 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: '900',
+            fontSize: '18px',
+            color: 'white',
+            boxShadow: '0 0 30px rgba(255,107,0,0.5), 0 0 60px rgba(255,0,107,0.3)',
+            animation: 'pulse 1s ease-in-out infinite',
+            flexShrink: 0,
+          }}>
+            VS
+          </div>
+
+          {/* 가윤 */}
+          <div style={{
+            flex: 1,
+            textAlign: 'center',
+          }}>
+            <div style={{
+              fontSize: '32px',
+              marginBottom: '8px',
+            }}>🐰</div>
+            <div style={{
+              fontSize: '14px',
+              color: '#aaa',
+              marginBottom: '12px',
+            }}>가윤</div>
+            <div style={{
+              fontSize: isMobile ? '36px' : '48px',
+              fontWeight: '900',
+              color: '#ff0080',
+              textShadow: '0 0 20px rgba(255,0,107,0.5)',
+              animation: 'pulse 2s ease-in-out infinite',
+            }}>
+              {INVESTMENT_GAINS_2026.gayoon.returnPercent.toFixed(2)}%
+            </div>
+            <div style={{
+              marginTop: '16px',
+              height: '8px',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}>
+              <div style={{
+                width: `${Math.min(INVESTMENT_GAINS_2026.gayoon.returnPercent * 4, 100)}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #ff0080, #ff69b4)',
+                borderRadius: '4px',
+                animation: 'fireGlowPink 1.5s ease-in-out infinite',
+              }} />
+            </div>
+          </div>
+        </div>
+
+        {/* 승자 표시 */}
+        <div style={{
+          marginTop: '24px',
+          textAlign: 'center',
+          padding: '16px',
+          background: 'rgba(255,255,255,0.05)',
+          borderRadius: '12px',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          {INVESTMENT_GAINS_2026.haneul.returnPercent > INVESTMENT_GAINS_2026.gayoon.returnPercent ? (
+            <>
+              <div style={{ fontSize: '14px', color: '#888', marginBottom: '4px' }}>수익률 승자</div>
+              <div style={{ fontSize: '24px', fontWeight: '800', color: '#ff6b00' }}>
+                🏆 ☁️ 하늘 WIN! 🔥
+              </div>
+              <div style={{ fontSize: '13px', color: '#aaa', marginTop: '8px' }}>
+                +{(INVESTMENT_GAINS_2026.haneul.returnPercent - INVESTMENT_GAINS_2026.gayoon.returnPercent).toFixed(2)}%p 차이
+              </div>
+            </>
+          ) : INVESTMENT_GAINS_2026.gayoon.returnPercent > INVESTMENT_GAINS_2026.haneul.returnPercent ? (
+            <>
+              <div style={{ fontSize: '14px', color: '#888', marginBottom: '4px' }}>수익률 승자</div>
+              <div style={{ fontSize: '24px', fontWeight: '800', color: '#ff0080' }}>
+                🏆 🐰 가윤 WIN! 🔥
+              </div>
+              <div style={{ fontSize: '13px', color: '#aaa', marginTop: '8px' }}>
+                +{(INVESTMENT_GAINS_2026.gayoon.returnPercent - INVESTMENT_GAINS_2026.haneul.returnPercent).toFixed(2)}%p 차이
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: '24px', fontWeight: '800', color: '#fff' }}>
+              🤝 무승부!
+            </div>
+          )}
+        </div>
+
+        {/* 📊 상세 비교 테이블 */}
+        <div style={{
+          marginTop: '24px',
+          background: 'rgba(255,255,255,0.03)',
+          borderRadius: '16px',
+          padding: '20px',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          <div style={{
+            fontSize: '14px',
+            fontWeight: '700',
+            color: '#fff',
+            marginBottom: '16px',
+            textAlign: 'center',
+          }}>
+            📊 수익률 계산 상세 내역
+          </div>
+
+          {/* 계산 공식 */}
+          <div style={{
+            background: 'rgba(255,255,255,0.05)',
+            borderRadius: '8px',
+            padding: '12px',
+            marginBottom: '16px',
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>수익률 공식</div>
+            <div style={{ fontSize: '14px', color: '#fff', fontFamily: 'monospace' }}>
+              수익률(%) = (투자수익 ÷ 투자원금) × 100
+            </div>
+          </div>
+
+          {/* 하늘 상세 */}
+          <div style={{
+            marginBottom: '20px',
+            padding: '16px',
+            background: 'rgba(255,107,0,0.1)',
+            borderRadius: '12px',
+            border: '1px solid rgba(255,107,0,0.3)',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '12px',
+            }}>
+              <div style={{ fontSize: '16px', fontWeight: '700', color: '#ff6b00' }}>
+                ☁️ 하늘
+              </div>
+              <div style={{
+                fontSize: '20px',
+                fontWeight: '800',
+                color: '#ff6b00',
+              }}>
+                {INVESTMENT_GAINS_2026.haneul.returnPercent.toFixed(2)}%
+              </div>
+            </div>
+
+            {/* 계좌별 breakdown */}
+            {INVESTMENT_GAINS_2026.haneul.breakdown.map((item, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '10px 0',
+                borderTop: idx > 0 ? '1px solid rgba(255,107,0,0.2)' : 'none',
+              }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '13px', color: '#fff', marginBottom: '4px' }}>{item.account}</div>
+                  <div style={{ fontSize: '11px', color: '#888' }}>
+                    투자 {item.invested.toLocaleString()}원 → 수익 +{item.gain.toLocaleString()}원
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  color: '#ff6b00',
+                  minWidth: '70px',
+                  textAlign: 'right',
+                }}>
+                  {item.returnPercent.toFixed(2)}%
+                </div>
+              </div>
+            ))}
+
+            {/* 합계 */}
+            <div style={{
+              marginTop: '12px',
+              paddingTop: '12px',
+              borderTop: '2px solid rgba(255,107,0,0.5)',
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}>
+              <div>
+                <div style={{ fontSize: '12px', color: '#888' }}>총 투자원금</div>
+                <div style={{ fontSize: '15px', color: '#fff', fontWeight: '600' }}>
+                  {INVESTMENT_GAINS_2026.haneul.totalInvested.toLocaleString()}원
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#888' }}>총 투자수익</div>
+                <div style={{ fontSize: '15px', color: '#00ff88', fontWeight: '600' }}>
+                  +{INVESTMENT_GAINS_2026.haneul.totalGain.toLocaleString()}원
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#888' }}>종합 수익률</div>
+                <div style={{ fontSize: '15px', color: '#ff6b00', fontWeight: '700' }}>
+                  {INVESTMENT_GAINS_2026.haneul.returnPercent.toFixed(2)}%
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 가윤 상세 */}
+          <div style={{
+            padding: '16px',
+            background: 'rgba(255,0,107,0.1)',
+            borderRadius: '12px',
+            border: '1px solid rgba(255,0,107,0.3)',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '12px',
+            }}>
+              <div style={{ fontSize: '16px', fontWeight: '700', color: '#ff0080' }}>
+                🐰 가윤
+              </div>
+              <div style={{
+                fontSize: '20px',
+                fontWeight: '800',
+                color: '#ff0080',
+              }}>
+                {INVESTMENT_GAINS_2026.gayoon.returnPercent.toFixed(2)}%
+              </div>
+            </div>
+
+            {/* 계좌별 breakdown */}
+            {INVESTMENT_GAINS_2026.gayoon.breakdown.map((item, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '10px 0',
+                borderTop: idx > 0 ? '1px solid rgba(255,0,107,0.2)' : 'none',
+              }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '13px', color: '#fff', marginBottom: '4px' }}>{item.account}</div>
+                  <div style={{ fontSize: '11px', color: '#888' }}>
+                    투자 {item.invested.toLocaleString()}원 → 수익 +{item.gain.toLocaleString()}원
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  color: '#ff0080',
+                  minWidth: '70px',
+                  textAlign: 'right',
+                }}>
+                  {item.returnPercent.toFixed(2)}%
+                </div>
+              </div>
+            ))}
+
+            {/* 합계 */}
+            <div style={{
+              marginTop: '12px',
+              paddingTop: '12px',
+              borderTop: '2px solid rgba(255,0,107,0.5)',
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}>
+              <div>
+                <div style={{ fontSize: '12px', color: '#888' }}>총 투자원금</div>
+                <div style={{ fontSize: '15px', color: '#fff', fontWeight: '600' }}>
+                  {INVESTMENT_GAINS_2026.gayoon.totalInvested.toLocaleString()}원
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#888' }}>총 투자수익</div>
+                <div style={{ fontSize: '15px', color: '#00ff88', fontWeight: '600' }}>
+                  +{INVESTMENT_GAINS_2026.gayoon.totalGain.toLocaleString()}원
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#888' }}>종합 수익률</div>
+                <div style={{ fontSize: '15px', color: '#ff0080', fontWeight: '700' }}>
+                  {INVESTMENT_GAINS_2026.gayoon.returnPercent.toFixed(2)}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 📈 계좌별 수익률 비교 차트 */}
+        <div style={{
+          marginTop: '20px',
+          background: 'rgba(255,255,255,0.03)',
+          borderRadius: '16px',
+          padding: '20px',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          <div style={{
+            fontSize: '14px',
+            fontWeight: '700',
+            color: '#fff',
+            marginBottom: '16px',
+            textAlign: 'center',
+          }}>
+            📈 계좌별 수익률 비교
+          </div>
+
+          {/* 하늘 계좌별 바 */}
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{ fontSize: '12px', color: '#ff6b00', marginBottom: '8px', fontWeight: '600' }}>☁️ 하늘</div>
+            {INVESTMENT_GAINS_2026.haneul.breakdown.map((item, idx) => (
+              <div key={idx} style={{ marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#aaa', marginBottom: '4px' }}>
+                  <span>{item.account}</span>
+                  <span style={{ color: '#ff6b00', fontWeight: '600' }}>{item.returnPercent.toFixed(2)}%</span>
+                </div>
+                <div style={{ height: '12px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '6px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${Math.min(item.returnPercent * 3, 100)}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #ff6b00, #ff9500)',
+                    borderRadius: '6px',
+                    transition: 'width 1s ease-out',
+                  }} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 가윤 계좌별 바 */}
+          <div>
+            <div style={{ fontSize: '12px', color: '#ff0080', marginBottom: '8px', fontWeight: '600' }}>🐰 가윤</div>
+            {INVESTMENT_GAINS_2026.gayoon.breakdown.map((item, idx) => (
+              <div key={idx} style={{ marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#aaa', marginBottom: '4px' }}>
+                  <span>{item.account}</span>
+                  <span style={{ color: '#ff0080', fontWeight: '600' }}>{item.returnPercent.toFixed(2)}%</span>
+                </div>
+                <div style={{ height: '12px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '6px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${Math.min(item.returnPercent * 3, 100)}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #ff0080, #ff69b4)',
+                    borderRadius: '6px',
+                    transition: 'width 1s ease-out',
+                  }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 🎯 결론 */}
+        <div style={{
+          marginTop: '20px',
+          background: 'linear-gradient(135deg, rgba(255,107,0,0.2) 0%, rgba(255,0,107,0.2) 100%)',
+          borderRadius: '16px',
+          padding: '20px',
+          border: '1px solid rgba(255,255,255,0.2)',
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: '14px', color: '#888', marginBottom: '8px' }}>🎯 최종 판정</div>
+          <div style={{ fontSize: '18px', color: '#fff', fontWeight: '700', marginBottom: '12px' }}>
+            {INVESTMENT_GAINS_2026.haneul.returnPercent > INVESTMENT_GAINS_2026.gayoon.returnPercent ? (
+              <>같은 돈을 투자했다면 <span style={{ color: '#ff6b00' }}>하늘</span>이 더 많이 벌었다!</>
+            ) : (
+              <>같은 돈을 투자했다면 <span style={{ color: '#ff0080' }}>가윤</span>이 더 많이 벌었다!</>
+            )}
+          </div>
+          <div style={{ fontSize: '13px', color: '#aaa', lineHeight: '1.6' }}>
+            {INVESTMENT_GAINS_2026.haneul.returnPercent > INVESTMENT_GAINS_2026.gayoon.returnPercent ? (
+              <>
+                하늘: {INVESTMENT_GAINS_2026.haneul.totalInvested.toLocaleString()}원 투자 → {INVESTMENT_GAINS_2026.haneul.returnPercent.toFixed(2)}% 수익<br />
+                가윤: {INVESTMENT_GAINS_2026.gayoon.totalInvested.toLocaleString()}원 투자 → {INVESTMENT_GAINS_2026.gayoon.returnPercent.toFixed(2)}% 수익<br /><br />
+                <span style={{ color: '#ff6b00' }}>
+                  💡 만약 가윤이 하늘처럼 {INVESTMENT_GAINS_2026.haneul.totalInvested.toLocaleString()}원만 투자했다면?<br />
+                  → 수익: {Math.round(INVESTMENT_GAINS_2026.haneul.totalInvested * INVESTMENT_GAINS_2026.gayoon.returnPercent / 100).toLocaleString()}원 (하늘보다 {Math.round(INVESTMENT_GAINS_2026.haneul.totalGain - INVESTMENT_GAINS_2026.haneul.totalInvested * INVESTMENT_GAINS_2026.gayoon.returnPercent / 100).toLocaleString()}원 적음)
+                </span>
+              </>
+            ) : (
+              <>
+                가윤: {INVESTMENT_GAINS_2026.gayoon.totalInvested.toLocaleString()}원 투자 → {INVESTMENT_GAINS_2026.gayoon.returnPercent.toFixed(2)}% 수익<br />
+                하늘: {INVESTMENT_GAINS_2026.haneul.totalInvested.toLocaleString()}원 투자 → {INVESTMENT_GAINS_2026.haneul.returnPercent.toFixed(2)}% 수익<br /><br />
+                <span style={{ color: '#ff0080' }}>
+                  💡 만약 하늘이 가윤처럼 {INVESTMENT_GAINS_2026.gayoon.totalInvested.toLocaleString()}원 투자했다면?<br />
+                  → 수익: {Math.round(INVESTMENT_GAINS_2026.gayoon.totalInvested * INVESTMENT_GAINS_2026.haneul.returnPercent / 100).toLocaleString()}원
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ⚖️ 공정성 설명 */}
+        <div style={{
+          marginTop: '20px',
+          background: 'rgba(255,255,255,0.05)',
+          borderRadius: '12px',
+          padding: '16px',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          <div style={{ fontSize: '13px', color: '#888', marginBottom: '8px' }}>⚖️ 왜 수익률(%)로 비교하나요?</div>
+          <div style={{ fontSize: '12px', color: '#aaa', lineHeight: '1.6' }}>
+            • <strong style={{ color: '#fff' }}>공정한 비교</strong>: 투자금 크기가 달라도 "투자 실력"을 비교 가능<br />
+            • <strong style={{ color: '#fff' }}>같은 조건</strong>: 100만원 투자로 환산하면 누가 더 벌었는지 명확<br />
+            • <strong style={{ color: '#fff' }}>실제 예시</strong>:
+            {INVESTMENT_GAINS_2026.haneul.returnPercent > INVESTMENT_GAINS_2026.gayoon.returnPercent ? (
+              <> 하늘 100만원 → +{(INVESTMENT_GAINS_2026.haneul.returnPercent * 10000).toLocaleString()}원 vs 가윤 100만원 → +{(INVESTMENT_GAINS_2026.gayoon.returnPercent * 10000).toLocaleString()}원</>
+            ) : (
+              <> 가윤 100만원 → +{(INVESTMENT_GAINS_2026.gayoon.returnPercent * 10000).toLocaleString()}원 vs 하늘 100만원 → +{(INVESTMENT_GAINS_2026.haneul.returnPercent * 10000).toLocaleString()}원</>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 대결 규칙 설명 섹션 */}
       <div style={{
         backgroundColor: 'white',
         borderRadius: '20px',
@@ -347,7 +776,7 @@ export default function PortfolioBattlePage() {
           onClick={() => setShowFairness(!showFairness)}
         >
           <div style={{ fontSize: '15px', fontWeight: '600', color: '#191F28' }}>
-            수익률 계산 방식
+            대결 규칙
           </div>
           <div style={{
             fontSize: '20px',
@@ -361,7 +790,7 @@ export default function PortfolioBattlePage() {
 
         {showFairness && (
           <div style={{ marginTop: '16px' }}>
-            {/* 왜 공정한가? 설명 */}
+            {/* 왜 투자수익으로 비교하나요? */}
             <div style={{
               backgroundColor: '#E8F3FF',
               borderRadius: '12px',
@@ -369,16 +798,14 @@ export default function PortfolioBattlePage() {
               marginBottom: '16px',
             }}>
               <div style={{ fontSize: '14px', fontWeight: '600', color: '#3182F6', marginBottom: '8px' }}>
-                왜 이 방식이 공정한가요?
+                왜 투자수익으로 비교하나요?
               </div>
               <div style={{ fontSize: '13px', color: '#4E5968', lineHeight: '1.6' }}>
-                증권사를 옮기면 이전 수익이 "새 원금"으로 바뀌어 수익률이 0%로 리셋됩니다.
-                예를 들어 한투에서 +150만원 수익을 내고 미래에셋으로 옮기면,
-                미래에셋에서는 그 150만원이 "원금"으로 잡혀서 수익이 사라진 것처럼 보이죠.
+                • <strong>원금 크기와 무관</strong>: 순수하게 "얼마를 벌었냐"로 비교<br />
+                • <strong>실제 투자 성과 반영</strong>: 미실현 수익도 실력<br />
+                • <strong>명확한 기준</strong>: 현재 평가금액 - 투자원금 = 투자수익
                 <br /><br />
-                <strong>그래서 우리는 "대결 시작일 기준 진짜 원금"으로 계산합니다.</strong>
-                <br />
-                이렇게 하면 증권사를 몇 번 옮기든, 실현 수익이든 미실현 수익이든 모두 공평하게 반영됩니다.
+                2026년 1월 1일부터 12월 24일까지의 <strong>투자수익</strong>으로 승부!
               </div>
             </div>
 
@@ -390,22 +817,24 @@ export default function PortfolioBattlePage() {
               marginBottom: '16px',
             }}>
               <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28', marginBottom: '12px' }}>
-                계산 공식
+                투자수익 = 현재 평가금액 - 투자원금
               </div>
               <div style={{
-                fontFamily: 'monospace',
                 fontSize: '13px',
                 color: '#4E5968',
                 backgroundColor: 'white',
                 padding: '12px',
                 borderRadius: '8px',
                 border: '1px solid #E5E8EB',
+                lineHeight: '1.6',
               }}>
-                수익률 = (현재 총 자산 - 대결 시작 원금) ÷ 대결 시작 원금 × 100
+                • <strong>현재 평가금액</strong>: 보유 중인 모든 자산의 현재 가치<br />
+                • <strong>투자원금</strong>: 실제로 투자한 금액 (입금액 - 출금액)<br />
+                • <strong>투자수익</strong>: 실현 + 미실현 수익 모두 포함
               </div>
             </div>
 
-            {/* 하늘 계산 상세 */}
+            {/* 하늘 상세 */}
             <div style={{
               border: '1px solid #E5E8EB',
               borderRadius: '12px',
@@ -413,99 +842,68 @@ export default function PortfolioBattlePage() {
               marginBottom: '12px',
             }}>
               <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28', marginBottom: '12px' }}>
-                ☁️ 하늘 수익률 계산
+                ☁️ 하늘 투자수익 내역
               </div>
-              <table style={{ width: '100%', fontSize: '13px', color: '#4E5968' }}>
-                <tbody>
-                  <tr>
-                    <td style={{ padding: '6px 0' }}>대결 시작 원금 (02.22)</td>
-                    <td style={{ textAlign: 'right', fontWeight: '600' }}>
-                      {(BATTLE_START_DATA.haneul.initialCapital / 10000).toLocaleString()}만원
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0' }}>현재 총 자산</td>
-                    <td style={{ textAlign: 'right', fontWeight: '600' }}>
-                      {(haneulFair.totalCurrent / 10000).toFixed(1)}만원
-                    </td>
-                  </tr>
-                  <tr style={{ borderTop: '1px solid #E5E8EB' }}>
-                    <td style={{ padding: '10px 0 6px', fontWeight: '600', color: '#191F28' }}>총 손익</td>
-                    <td style={{
-                      textAlign: 'right',
-                      fontWeight: '700',
-                      color: haneulFair.totalGain >= 0 ? '#00C853' : '#F04438'
-                    }}>
-                      {haneulFair.totalGain >= 0 ? '+' : ''}{(haneulFair.totalGain / 10000).toFixed(1)}만원
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0', fontWeight: '600', color: '#191F28' }}>수익률</td>
-                    <td style={{
-                      textAlign: 'right',
-                      fontWeight: '700',
-                      fontSize: '16px',
-                      color: haneulReturn >= 0 ? '#00C853' : '#F04438'
-                    }}>
-                      {haneulReturn >= 0 ? '+' : ''}{haneulReturn.toFixed(2)}%
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              {INVESTMENT_GAINS_2026.haneul.totalGain === 0 ? (
+                <div style={{ fontSize: '13px', color: '#8B95A1', textAlign: 'center', padding: '16px' }}>
+                  데이터 업데이트 대기 중<br />
+                  (증권사 앱에서 투자수익 스크린샷 필요)
+                </div>
+              ) : (
+                <table style={{ width: '100%', fontSize: '13px', color: '#4E5968' }}>
+                  <tbody>
+                    {INVESTMENT_GAINS_2026.haneul.breakdown.map((item, idx) => (
+                      <tr key={idx}>
+                        <td style={{ padding: '6px 0' }}>{item.account}</td>
+                        <td style={{ textAlign: 'right', fontWeight: '600', color: item.gain >= 0 ? '#00C853' : '#F04438' }}>
+                          {item.gain >= 0 ? '+' : ''}{item.gain.toLocaleString()}원
+                        </td>
+                      </tr>
+                    ))}
+                    <tr style={{ borderTop: '1px solid #E5E8EB' }}>
+                      <td style={{ padding: '10px 0 6px', fontWeight: '600', color: '#191F28' }}>총 투자수익</td>
+                      <td style={{
+                        textAlign: 'right',
+                        fontWeight: '700',
+                        fontSize: '16px',
+                        color: INVESTMENT_GAINS_2026.haneul.totalGain >= 0 ? '#00C853' : '#F04438'
+                      }}>
+                        {INVESTMENT_GAINS_2026.haneul.totalGain >= 0 ? '+' : ''}{INVESTMENT_GAINS_2026.haneul.totalGain.toLocaleString()}원
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
             </div>
 
-            {/* 가윤 계산 상세 */}
+            {/* 가윤 상세 */}
             <div style={{
               border: '1px solid #E5E8EB',
               borderRadius: '12px',
               padding: '16px',
             }}>
               <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28', marginBottom: '12px' }}>
-                🐰 가윤 수익률 계산
+                🐰 가윤 투자수익 내역
               </div>
               <table style={{ width: '100%', fontSize: '13px', color: '#4E5968' }}>
                 <tbody>
-                  <tr>
-                    <td style={{ padding: '6px 0' }}>대결 시작 원금 (02.22)</td>
-                    <td style={{ textAlign: 'right', fontWeight: '600' }}>
-                      {(BATTLE_START_DATA.gayoon.initialCapital / 10000).toLocaleString()}만원
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0' }}>현재 총 자산</td>
-                    <td style={{ textAlign: 'right', fontWeight: '600' }}>
-                      {(gayoonFair.totalCurrent / 10000).toFixed(1)}만원
-                    </td>
-                  </tr>
-                  {gayoonFair.realizedGains > 0 && (
-                    <tr>
-                      <td style={{ padding: '6px 0', color: '#8B95A1' }}>
-                        (포함: 실현수익)
-                      </td>
-                      <td style={{ textAlign: 'right', color: '#00C853', fontWeight: '500' }}>
-                        +{(gayoonFair.realizedGains / 10000).toFixed(1)}만원
+                  {INVESTMENT_GAINS_2026.gayoon.breakdown.map((item, idx) => (
+                    <tr key={idx}>
+                      <td style={{ padding: '6px 0' }}>{item.account}</td>
+                      <td style={{ textAlign: 'right', fontWeight: '600', color: item.gain >= 0 ? '#00C853' : '#F04438' }}>
+                        {item.gain >= 0 ? '+' : ''}{item.gain.toLocaleString()}원
                       </td>
                     </tr>
-                  )}
+                  ))}
                   <tr style={{ borderTop: '1px solid #E5E8EB' }}>
-                    <td style={{ padding: '10px 0 6px', fontWeight: '600', color: '#191F28' }}>총 손익</td>
-                    <td style={{
-                      textAlign: 'right',
-                      fontWeight: '700',
-                      color: gayoonFair.totalGain >= 0 ? '#00C853' : '#F04438'
-                    }}>
-                      {gayoonFair.totalGain >= 0 ? '+' : ''}{(gayoonFair.totalGain / 10000).toFixed(1)}만원
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '6px 0', fontWeight: '600', color: '#191F28' }}>수익률</td>
+                    <td style={{ padding: '10px 0 6px', fontWeight: '600', color: '#191F28' }}>총 투자수익</td>
                     <td style={{
                       textAlign: 'right',
                       fontWeight: '700',
                       fontSize: '16px',
-                      color: gayoonReturn >= 0 ? '#00C853' : '#F04438'
+                      color: '#00C853'
                     }}>
-                      {gayoonReturn >= 0 ? '+' : ''}{gayoonReturn.toFixed(2)}%
+                      +{INVESTMENT_GAINS_2026.gayoon.totalGain.toLocaleString()}원
                     </td>
                   </tr>
                 </tbody>
@@ -516,7 +914,7 @@ export default function PortfolioBattlePage() {
         )}
       </div>
 
-      {/* 데이터 입력 가이드 */}
+      {/* 매월 업데이트 가이드 */}
       <div style={{
         backgroundColor: 'white',
         borderRadius: '20px',
@@ -544,125 +942,61 @@ export default function PortfolioBattlePage() {
           marginBottom: '16px',
         }}>
           <div style={{ fontSize: '14px', fontWeight: '600', color: '#0369A1', marginBottom: '12px' }}>
-            1. 필요한 스크린샷
+            필요한 스크린샷
           </div>
           <div style={{ fontSize: '13px', color: '#4E5968', lineHeight: '1.8' }}>
-            <div style={{ marginBottom: '12px' }}>
-              <strong>☁️ 하늘</strong>
-              <ul style={{ margin: '4px 0 0 0', paddingLeft: '20px' }}>
-                <li>토스증권 → 해외주식 탭 (총 평가금액)</li>
-                <li>미래에셋 → 연금저축/ISA/종합/IRP/CMA 각각</li>
-                <li>업비트 → 보유자산 (비트코인)</li>
-              </ul>
-            </div>
-            <div>
-              <strong>🐰 가윤</strong>
-              <ul style={{ margin: '4px 0 0 0', paddingLeft: '20px' }}>
-                <li>삼성증권 → 해외주식/ISA 탭 (총 평가금액)</li>
-                <li>미래에셋 → 연금저축/CMA/IRP 각각</li>
-                <li>한투 → 해외주식 (아마존)</li>
-                <li>업비트 → 보유자산 (비트코인)</li>
-              </ul>
+            각 증권사 앱에서 <strong>"투자수익"</strong> 화면 캡처
+            <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px' }}>
+              <li>미래에셋: 자산 → 투자손익 탭</li>
+              <li>삼성증권: 자산 → 투자손익 탭</li>
+              <li>한투: 자산 → 투자손익 탭</li>
+              <li>업비트: 포트폴리오 → 총 손익</li>
+            </ul>
+            <div style={{ marginTop: '8px', padding: '8px', backgroundColor: '#E0F2FE', borderRadius: '6px' }}>
+              💡 현재 평가금액 - 투자원금 = 투자수익
             </div>
           </div>
         </div>
 
-        {/* 필요한 숫자 */}
+        {/* 확인할 항목 */}
         <div style={{
           backgroundColor: '#F0FDF4',
           borderRadius: '12px',
           padding: '16px',
-          marginBottom: '16px',
         }}>
           <div style={{ fontSize: '14px', fontWeight: '600', color: '#15803D', marginBottom: '12px' }}>
-            2. 캡처에서 확인할 숫자
-          </div>
-          <div style={{ fontSize: '13px', color: '#4E5968', lineHeight: '1.8' }}>
-            각 증권사/계좌별로 다음 정보가 필요합니다:
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '8px',
-              marginTop: '8px',
-            }}>
-              <div style={{
-                backgroundColor: 'white',
-                padding: '10px',
-                borderRadius: '8px',
-                border: '1px solid #E5E8EB',
-              }}>
-                <div style={{ fontSize: '12px', color: '#8B95A1' }}>필수</div>
-                <div style={{ fontWeight: '600' }}>총 평가금액</div>
-              </div>
-              <div style={{
-                backgroundColor: 'white',
-                padding: '10px',
-                borderRadius: '8px',
-                border: '1px solid #E5E8EB',
-              }}>
-                <div style={{ fontSize: '12px', color: '#8B95A1' }}>추가입금 있을 때만</div>
-                <div style={{ fontWeight: '600' }}>이번 달 입금액</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 수익률 계산 공식 */}
-        <div style={{
-          backgroundColor: '#FEF3C7',
-          borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '16px',
-        }}>
-          <div style={{ fontSize: '14px', fontWeight: '600', color: '#92400E', marginBottom: '12px' }}>
-            3. 수익률 계산 방법
+            확인할 항목
           </div>
           <div style={{
-            fontFamily: 'monospace',
-            fontSize: '13px',
-            color: '#4E5968',
-            backgroundColor: 'white',
-            padding: '12px',
-            borderRadius: '8px',
-            lineHeight: '1.6',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '8px',
           }}>
-            조정원금 = 시작평가 + 누적입금 - 누적출금<br/>
-            <strong>수익률 = (현재평가 - 조정원금) ÷ 조정원금 × 100</strong>
-          </div>
-          <div style={{ fontSize: '12px', color: '#92400E', marginTop: '8px' }}>
-            ※ 추가 입금을 빼서 계산하므로, 돈을 많이 넣는다고 유리하지 않습니다
-          </div>
-        </div>
-
-        {/* 예시 */}
-        <div style={{
-          backgroundColor: '#F5F3FF',
-          borderRadius: '12px',
-          padding: '16px',
-        }}>
-          <div style={{ fontSize: '14px', fontWeight: '600', color: '#6D28D9', marginBottom: '12px' }}>
-            4. 예시
-          </div>
-          <div style={{ fontSize: '13px', color: '#4E5968', lineHeight: '1.6' }}>
-            <div style={{ marginBottom: '8px' }}>
-              • 2월 시작: 6,000만원<br/>
-              • 3월 추가입금: 200만원<br/>
-              • 4월 현재 평가: 6,500만원
+            <div style={{
+              backgroundColor: 'white',
+              padding: '10px',
+              borderRadius: '8px',
+              border: '1px solid #E5E8EB',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '12px', color: '#8B95A1' }}>1</div>
+              <div style={{ fontWeight: '600', fontSize: '13px' }}>평가금액</div>
             </div>
             <div style={{
               backgroundColor: 'white',
               padding: '10px',
               borderRadius: '8px',
               border: '1px solid #E5E8EB',
+              textAlign: 'center',
             }}>
-              조정원금 = 6,000 + 200 = 6,200만원<br/>
-              수익률 = (6,500 - 6,200) ÷ 6,200 × 100 = <strong style={{ color: '#00C853' }}>+4.84%</strong>
+              <div style={{ fontSize: '12px', color: '#8B95A1' }}>2</div>
+              <div style={{ fontWeight: '600', fontSize: '13px' }}>투자원금</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 현재 기록된 데이터 */}
+      {/* 현재 투자수익 현황 */}
       <div style={{
         backgroundColor: 'white',
         borderRadius: '20px',
@@ -676,202 +1010,93 @@ export default function PortfolioBattlePage() {
           color: '#191F28',
           marginBottom: '16px',
         }}>
-          📊 현재 기록된 데이터
+          📊 2026년 투자수익 현황
         </div>
 
-        <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ borderBottom: '2px solid #E5E8EB' }}>
-              <th style={{ padding: '10px 8px', textAlign: 'left', color: '#8B95A1', fontWeight: '500' }}>항목</th>
-              <th style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>☁️ 하늘</th>
-              <th style={{ padding: '10px 8px', textAlign: 'right', color: '#8B95A1', fontWeight: '500' }}>🐰 가윤</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style={{ borderBottom: '1px solid #F2F4F6' }}>
-              <td style={{ padding: '12px 8px', color: '#4E5968' }}>시작 평가 (02.22)</td>
-              <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '600' }}>
-                {(BATTLE_START_DATA.haneul.initialCapital / 10000).toFixed(1)}만원
-              </td>
-              <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '600' }}>
-                {(BATTLE_START_DATA.gayoon.initialCapital / 10000).toFixed(1)}만원
-              </td>
-            </tr>
-            <tr style={{ borderBottom: '1px solid #F2F4F6' }}>
-              <td style={{ padding: '12px 8px', color: '#4E5968' }}>누적 추가입금</td>
-              <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '600' }}>0만원</td>
-              <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '600' }}>0만원</td>
-            </tr>
-            <tr style={{ borderBottom: '1px solid #F2F4F6' }}>
-              <td style={{ padding: '12px 8px', color: '#4E5968' }}>현재 총 평가</td>
-              <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '600' }}>
-                {(haneulFair.totalCurrent / 10000).toFixed(1)}만원
-              </td>
-              <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: '600' }}>
-                {(gayoonFair.totalCurrent / 10000).toFixed(1)}만원
-              </td>
-            </tr>
-            <tr style={{ backgroundColor: '#F7F8FA' }}>
-              <td style={{ padding: '12px 8px', fontWeight: '600', color: '#191F28' }}>수익률</td>
-              <td style={{
-                padding: '12px 8px',
-                textAlign: 'right',
-                fontWeight: '700',
-                color: haneulReturn >= 0 ? '#00C853' : '#F04438'
-              }}>
-                {haneulReturn >= 0 ? '+' : ''}{haneulReturn.toFixed(2)}%
-              </td>
-              <td style={{
-                padding: '12px 8px',
-                textAlign: 'right',
-                fontWeight: '700',
-                color: gayoonReturn >= 0 ? '#00C853' : '#F04438'
-              }}>
-                {gayoonReturn >= 0 ? '+' : ''}{gayoonReturn.toFixed(2)}%
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div style={{
-          marginTop: '16px',
-          padding: '12px',
-          backgroundColor: '#FEF2F2',
-          borderRadius: '8px',
-          fontSize: '12px',
-          color: '#991B1B',
-          lineHeight: '1.5',
-        }}>
-          <strong>⚠️ 확인 필요:</strong> 위 "시작 평가 (02.22)" 값이 대결 시작일 기준 실제 총 평가금액과 일치하는지 확인해주세요.
-          다르다면 정확한 값을 알려주세요.
-        </div>
-      </div>
-
-      {/* 월간 승리 현황 */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '20px',
-        padding: '20px',
-        marginBottom: '16px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-      }}>
-        <div style={{
-          fontSize: '15px',
-          fontWeight: '600',
-          color: '#191F28',
-          marginBottom: '16px',
-        }}>
-          월간 스코어
-        </div>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '24px',
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '32px', fontWeight: '800', color: '#3182F6' }}>{haneulWins}</div>
-            <div style={{ fontSize: '13px', color: '#8B95A1' }}>☁️ 하늘</div>
-          </div>
-          <div style={{ fontSize: '20px', color: '#E5E8EB' }}>:</div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '32px', fontWeight: '800', color: '#00C853' }}>{gayoonWins}</div>
-            <div style={{ fontSize: '13px', color: '#8B95A1' }}>🐰 가윤</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 통계 그리드 */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '12px',
-        marginBottom: '16px',
-      }}>
-        {[
-          { label: '종목 수', h: haugaAnalytics.count, g: gayoonAnalytics.count, unit: '개' },
-          { label: '평균', h: haugaAnalytics.avg, g: gayoonAnalytics.avg, unit: '%', format: true },
-          { label: '최고', h: haugaAnalytics.max, g: gayoonAnalytics.max, unit: '%', format: true, green: true },
-          { label: '최저', h: haugaAnalytics.min, g: gayoonAnalytics.min, unit: '%', format: true, red: true },
-        ].map((item, i) => (
-          <div key={i} style={{
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '16px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          }}>
-            <div style={{ fontSize: '12px', color: '#8B95A1', marginBottom: '12px' }}>{item.label}</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: '11px', color: '#8B95A1', marginBottom: '2px' }}>하늘</div>
-                <div style={{
-                  fontSize: '16px',
+        {/* 가윤 투자수익 breakdown */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', color: '#8B95A1', marginBottom: '8px' }}>🐰 가윤</div>
+          <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
+            <tbody>
+              {INVESTMENT_GAINS_2026.gayoon.breakdown.map((item, idx) => (
+                <tr key={idx} style={{ borderBottom: '1px solid #F2F4F6' }}>
+                  <td style={{ padding: '10px 8px', color: '#4E5968' }}>{item.account}</td>
+                  <td style={{
+                    padding: '10px 8px',
+                    textAlign: 'right',
+                    fontWeight: '600',
+                    color: item.gain >= 0 ? '#00C853' : '#F04438'
+                  }}>
+                    {item.gain >= 0 ? '+' : ''}{item.gain.toLocaleString()}원
+                  </td>
+                </tr>
+              ))}
+              <tr style={{ backgroundColor: '#F7F8FA' }}>
+                <td style={{ padding: '12px 8px', fontWeight: '600', color: '#191F28' }}>총 투자수익</td>
+                <td style={{
+                  padding: '12px 8px',
+                  textAlign: 'right',
                   fontWeight: '700',
-                  color: item.green ? '#00C853' : item.red ? '#F04438' : item.format ? (item.h >= 0 ? '#00C853' : '#F04438') : '#191F28'
+                  fontSize: '15px',
+                  color: '#00C853'
                 }}>
-                  {item.format ? `${item.h >= 0 ? '+' : ''}${item.h.toFixed(1)}` : item.h}{item.unit}
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '11px', color: '#8B95A1', marginBottom: '2px' }}>가윤</div>
-                <div style={{
-                  fontSize: '16px',
-                  fontWeight: '700',
-                  color: item.green ? '#00C853' : item.red ? '#F04438' : item.format ? (item.g >= 0 ? '#00C853' : '#F04438') : '#191F28'
-                }}>
-                  {item.format ? `${item.g >= 0 ? '+' : ''}${item.g.toFixed(1)}` : item.g}{item.unit}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+                  +{INVESTMENT_GAINS_2026.gayoon.totalGain.toLocaleString()}원
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      {/* 공통 종목 비교 */}
-      {holdingsComparison.length > 0 && (
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '20px',
-          padding: '20px',
-          marginBottom: '16px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-        }}>
-          <div style={{
-            fontSize: '15px',
-            fontWeight: '600',
-            color: '#191F28',
-            marginBottom: '16px',
-          }}>
-            공통 종목
-          </div>
-          {holdingsComparison.map((item, idx) => (
-            <div key={idx} style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '12px 0',
-              borderBottom: idx < holdingsComparison.length - 1 ? '1px solid #F2F4F6' : 'none',
+        {/* 하늘 투자수익 */}
+        <div>
+          <div style={{ fontSize: '13px', color: '#8B95A1', marginBottom: '8px' }}>☁️ 하늘</div>
+          {INVESTMENT_GAINS_2026.haneul.totalGain === 0 ? (
+            <div style={{
+              padding: '20px',
+              textAlign: 'center',
+              backgroundColor: '#F7F8FA',
+              borderRadius: '8px',
+              color: '#8B95A1',
+              fontSize: '13px',
             }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: '#191F28' }}>{item.name}</div>
-              </div>
-              <div style={{ textAlign: 'right', marginRight: '16px' }}>
-                <div style={{ fontSize: '13px', color: '#8B95A1' }}>하늘</div>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: item.haneul.gain >= 0 ? '#00C853' : '#F04438' }}>
-                  {item.haneul.gain >= 0 ? '+' : ''}{item.haneul.gain.toFixed(1)}%
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '13px', color: '#8B95A1' }}>가윤</div>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: item.gayoon.gain >= 0 ? '#00C853' : '#F04438' }}>
-                  {item.gayoon.gain >= 0 ? '+' : ''}{item.gayoon.gain.toFixed(1)}%
-                </div>
-              </div>
+              데이터 업데이트 대기 중
             </div>
-          ))}
+          ) : (
+            <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
+              <tbody>
+                {INVESTMENT_GAINS_2026.haneul.breakdown.map((item, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #F2F4F6' }}>
+                    <td style={{ padding: '10px 8px', color: '#4E5968' }}>{item.account}</td>
+                    <td style={{
+                      padding: '10px 8px',
+                      textAlign: 'right',
+                      fontWeight: '600',
+                      color: item.gain >= 0 ? '#00C853' : '#F04438'
+                    }}>
+                      {item.gain >= 0 ? '+' : ''}{item.gain.toLocaleString()}원
+                    </td>
+                  </tr>
+                ))}
+                <tr style={{ backgroundColor: '#F7F8FA' }}>
+                  <td style={{ padding: '12px 8px', fontWeight: '600', color: '#191F28' }}>총 투자수익</td>
+                  <td style={{
+                    padding: '12px 8px',
+                    textAlign: 'right',
+                    fontWeight: '700',
+                    fontSize: '15px',
+                    color: INVESTMENT_GAINS_2026.haneul.totalGain >= 0 ? '#00C853' : '#F04438'
+                  }}>
+                    {INVESTMENT_GAINS_2026.haneul.totalGain >= 0 ? '+' : ''}{INVESTMENT_GAINS_2026.haneul.totalGain.toLocaleString()}원
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </div>
-      )}
 
-      {/* 월별 누적 기록 */}
+      </div>
+
+      {/* 월별 투자수익 기록 */}
       <div style={{
         backgroundColor: 'white',
         borderRadius: '20px',
@@ -884,13 +1109,13 @@ export default function PortfolioBattlePage() {
           color: '#191F28',
           marginBottom: '16px',
         }}>
-          월별 누적 기록
+          월별 투자수익 기록
         </div>
 
         {/* 테이블 헤더 */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '50px 1fr 1fr 1fr 1fr 50px',
+          gridTemplateColumns: '60px 1fr 1fr 60px',
           gap: '4px',
           padding: '8px 0',
           borderBottom: '2px solid #E5E8EB',
@@ -899,31 +1124,18 @@ export default function PortfolioBattlePage() {
           fontWeight: '500',
         }}>
           <div>월</div>
-          <div style={{ textAlign: 'right' }}>하늘 평가</div>
-          <div style={{ textAlign: 'right' }}>하늘 수익률</div>
-          <div style={{ textAlign: 'right' }}>가윤 평가</div>
-          <div style={{ textAlign: 'right' }}>가윤 수익률</div>
+          <div style={{ textAlign: 'right' }}>☁️ 하늘</div>
+          <div style={{ textAlign: 'right' }}>🐰 가윤</div>
           <div style={{ textAlign: 'center' }}>승자</div>
         </div>
 
-        {['02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map((m) => {
+        {['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map((m) => {
           const key = `2026-${m}`
-          const data = MONTHLY_RECORDS[key]
+          const data = MONTHLY_GAINS[key]
           const monthName = parseInt(m) + '월'
 
-          // 수익률 계산 (시작 대비)
-          const calcReturn = (person, personData) => {
-            if (!personData) return null
-            const startData = BATTLE_START_DATA[person]
-            const cumDeposits = Object.entries(MONTHLY_RECORDS)
-              .filter(([k]) => k <= key)
-              .reduce((sum, [, d]) => sum + (d[person]?.deposits || 0) - (d[person]?.withdrawals || 0), 0)
-            const adjustedBase = startData.initialCapital + cumDeposits
-            return ((personData.totalValue - adjustedBase) / adjustedBase) * 100
-          }
-
-          const hReturn = data ? calcReturn('haneul', data.haneul) : null
-          const gReturn = data ? calcReturn('gayoon', data.gayoon) : null
+          const hGain = data?.haneul
+          const gGain = data?.gayoon
 
           return (
             <div key={key} style={{
@@ -933,36 +1145,30 @@ export default function PortfolioBattlePage() {
               alignItems: 'center',
               padding: '10px 0',
               borderBottom: m !== '12' ? '1px solid #F2F4F6' : 'none',
-              opacity: data ? 1 : 0.4,
+              opacity: (hGain !== null && hGain !== undefined) || (gGain !== null && gGain !== undefined) ? 1 : 0.4,
               fontSize: '13px',
             }}>
               <div style={{ fontWeight: '500', color: '#191F28' }}>
                 {monthName}
               </div>
-              <div style={{ textAlign: 'right', color: '#4E5968' }}>
-                {data ? `${(data.haneul.totalValue / 10000).toFixed(0)}만` : '-'}
+              <div style={{
+                textAlign: 'right',
+                fontWeight: '600',
+                color: hGain !== null && hGain !== undefined && hGain !== 0 ? (hGain >= 0 ? '#00C853' : '#F04438') : '#CED4DA'
+              }}>
+                {hGain !== null && hGain !== undefined ? (hGain === 0 ? '대기중' : `${hGain >= 0 ? '+' : ''}${hGain.toLocaleString()}원`) : '-'}
               </div>
               <div style={{
                 textAlign: 'right',
                 fontWeight: '600',
-                color: hReturn !== null ? (hReturn >= 0 ? '#00C853' : '#F04438') : '#CED4DA'
+                color: gGain !== null && gGain !== undefined ? (gGain >= 0 ? '#00C853' : '#F04438') : '#CED4DA'
               }}>
-                {hReturn !== null ? `${hReturn >= 0 ? '+' : ''}${hReturn.toFixed(1)}%` : '-'}
-              </div>
-              <div style={{ textAlign: 'right', color: '#4E5968' }}>
-                {data ? `${(data.gayoon.totalValue / 10000).toFixed(0)}만` : '-'}
-              </div>
-              <div style={{
-                textAlign: 'right',
-                fontWeight: '600',
-                color: gReturn !== null ? (gReturn >= 0 ? '#00C853' : '#F04438') : '#CED4DA'
-              }}>
-                {gReturn !== null ? `${gReturn >= 0 ? '+' : ''}${gReturn.toFixed(1)}%` : '-'}
+                {gGain !== null && gGain !== undefined ? `${gGain >= 0 ? '+' : ''}${gGain.toLocaleString()}원` : '-'}
               </div>
               <div style={{ textAlign: 'center' }}>
-                {hReturn !== null && gReturn !== null ? (
-                  hReturn > gReturn ? '☁️' : gReturn > hReturn ? '🐰' : '🤝'
-                ) : '-'}
+                {hGain !== null && gGain !== null && hGain !== undefined && gGain !== undefined && hGain !== 0 ? (
+                  hGain > gGain ? '☁️' : gGain > hGain ? '🐰' : '🤝'
+                ) : (gGain !== null && gGain !== undefined ? '🐰' : '-')}
               </div>
             </div>
           )
@@ -977,7 +1183,7 @@ export default function PortfolioBattlePage() {
         fontSize: '12px',
         color: '#8B95A1',
       }}>
-        2026.02.22 ~ 12.24 · 패자가 {BATTLE_INFO.prize} 사기
+        2026년 투자수익 대결 · 패자가 {BATTLE_INFO.prize} 사기
       </div>
     </div>
   )
