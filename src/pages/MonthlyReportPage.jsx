@@ -104,6 +104,57 @@ const MONTHLY_REPORT_DATA = {
         { risk: '국내증시 2,400선 붕괴', level: 'medium', status: 'monitoring' },
       ],
     },
+    '2026-04': {
+      period: '2026.04.01 ~ 04.22',
+      summary: '관세 완화 기대감에 기술주 반등, 에너지 강세 지속',
+      monthReturn: 3.44,
+      cumulative: 3.44,
+      alpha: 5.1,
+      volatility: 14.8,
+      mdd: -6.2,
+      totalAsset: 4981364,
+      totalInvested: 4815580,
+      topStocks: [
+        { ticker: 'CVX', name: '셰브론', return: 15.2, reason: '에너지 섹터 강세 지속' },
+        { ticker: 'KODEX_NAS', name: 'KODEX 나스닥100', return: 8.5, reason: '기술주 반등' },
+        { ticker: 'TIGER_SP', name: 'TIGER S&P500', return: 6.2, reason: '미국증시 회복' },
+      ],
+      bottomStocks: [
+        { ticker: 'KHC', name: '크래프트 하인즈', return: -5.2, reason: '소비재 약세' },
+        { ticker: 'KODEX200', name: 'KODEX 200', return: -2.1, reason: '국내증시 부진' },
+        { ticker: 'GOOGL', name: '알파벳', return: -1.8, reason: '반독점 이슈 지속' },
+      ],
+      sectorContribution: [
+        { sector: '에너지', contribution: 2.5, weight: 18 },
+        { sector: '해외지수', contribution: 1.8, weight: 35 },
+        { sector: '채권', contribution: 0.3, weight: 8 },
+        { sector: '국내주식', contribution: -0.5, weight: 32 },
+      ],
+      marketEnvironment: {
+        sp500: { value: 5450, change: 4.2 },
+        kospi: { value: 2520, change: 1.6 },
+        usdkrw: { value: 1420, change: -3.5 },
+        btc: { value: 125000000, change: 16.8 },
+        events: [
+          { date: '04.02', event: '트럼프 관세 90일 유예 발표' },
+          { date: '04.10', event: 'CPI 발표 (2.6% YoY)' },
+          { date: '04.15', event: 'NVIDIA 실적 발표' },
+          { date: '04.18', event: 'FOMC 금리 동결 (5.25%)' },
+        ],
+      },
+      keyFactors: [
+        '트럼프 관세 90일 유예로 시장 안정, 기술주 반등',
+        '에너지 섹터 꾸준한 강세, 배당 수익 확보',
+        '국내주식 상대적 약세로 리밸런싱 필요성 대두',
+      ],
+      nextMonthOutlook: '5월은 관세 협상 결과와 2분기 실적에 주목. 기술주 추가 반등 가능성 높으나 변동성 주의. 국내주식 비중 축소 검토.',
+      riskChecklist: [
+        { risk: '관세 협상 결렬', level: 'medium', status: 'monitoring' },
+        { risk: '기술주 과열', level: 'low', status: 'monitoring' },
+        { risk: '원화 강세 지속', level: 'low', status: 'resolved' },
+        { risk: '국내증시 추가 하락', level: 'medium', status: 'monitoring' },
+      ],
+    },
   },
   gayoon: {
     '2026-02': {
@@ -207,6 +258,58 @@ const MONTHLY_REPORT_DATA = {
         { risk: '케이뱅크 추가 하락', level: 'high', status: 'monitoring' },
       ],
     },
+    '2026-04': {
+      period: '2026.04.01 ~ 04.22',
+      summary: '관세 완화 기대감에 S&P500 중심 포트폴리오 반등',
+      monthReturn: 6.70,
+      cumulative: 6.70,
+      alpha: 7.2,
+      volatility: 12.5,
+      mdd: -4.8,
+      totalAsset: 87450618,
+      totalInvested: 81962161,
+      topStocks: [
+        { ticker: 'BTC', name: '비트코인', return: 22.40, reason: '암호화폐 강세' },
+        { ticker: 'VOO', name: 'Vanguard S&P500', return: 15.58, reason: '미국증시 반등' },
+        { ticker: 'SCHD', name: 'Schwab 배당주', return: 14.2, reason: '배당주 안정적 상승' },
+      ],
+      bottomStocks: [
+        { ticker: 'KBANK', name: '케이뱅크', return: -18.5, reason: '지속적 하락세' },
+        { ticker: 'PLUS_EM', name: 'PLUS 신흥국MSCI', return: -8.2, reason: '신흥국 약세 지속' },
+        { ticker: 'KODEX200', name: 'KODEX 200', return: -3.5, reason: '국내증시 부진' },
+      ],
+      sectorContribution: [
+        { sector: 'S&P500', contribution: 3.8, weight: 30 },
+        { sector: '배당주', contribution: 1.5, weight: 8 },
+        { sector: '채권/금', contribution: 0.8, weight: 10 },
+        { sector: '국내주식', contribution: -1.2, weight: 17 },
+        { sector: '암호화폐', contribution: 0.4, weight: 2 },
+      ],
+      marketEnvironment: {
+        sp500: { value: 5450, change: 4.2 },
+        kospi: { value: 2520, change: 1.6 },
+        usdkrw: { value: 1420, change: -3.5 },
+        btc: { value: 125000000, change: 16.8 },
+        events: [
+          { date: '04.02', event: '트럼프 관세 90일 유예 발표' },
+          { date: '04.10', event: 'CPI 발표 (2.6% YoY)' },
+          { date: '04.15', event: 'NVIDIA 실적 발표' },
+          { date: '04.18', event: 'FOMC 금리 동결 (5.25%)' },
+        ],
+      },
+      keyFactors: [
+        '관세 유예로 S&P500 중심 포트폴리오 강세',
+        '비트코인 급등으로 대체투자 수익 기여',
+        '국내주식/신흥국 비중이 수익률 제한 요인',
+      ],
+      nextMonthOutlook: '5월은 관세 협상과 2분기 실적 시즌 주목. S&P500 비중 유지하며 배당주 추가 매수 검토. 케이뱅크 손절 고려.',
+      riskChecklist: [
+        { risk: '관세 협상 결렬', level: 'medium', status: 'monitoring' },
+        { risk: '케이뱅크 추가 하락', level: 'high', status: 'monitoring' },
+        { risk: '암호화폐 변동성', level: 'medium', status: 'monitoring' },
+        { risk: '국내증시 추가 약세', level: 'low', status: 'resolved' },
+      ],
+    },
   },
 }
 
@@ -227,7 +330,7 @@ const RISK_STATUS = {
 export default function MonthlyReportPage() {
   const [isMobile, setIsMobile] = useState(false)
   const [mainTab, setMainTab] = useState('hauga')
-  const [selectedMonth, setSelectedMonth] = useState('2026-03')
+  const [selectedMonth, setSelectedMonth] = useState('2026-04')
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -238,11 +341,11 @@ export default function MonthlyReportPage() {
 
   // 현재 선택된 데이터
   const reportData = MONTHLY_REPORT_DATA[mainTab]?.[selectedMonth]
-  const availableMonths = ['2026-02', '2026-03']
+  const availableMonths = ['2026-02', '2026-03', '2026-04']
 
   // 총 자산 계산 (탭 선택용)
-  const haugaTotal = MONTHLY_REPORT_DATA.hauga['2026-03']?.totalAsset || 0
-  const gayoonTotal = MONTHLY_REPORT_DATA.gayoon['2026-03']?.totalAsset || 0
+  const haugaTotal = MONTHLY_REPORT_DATA.hauga['2026-04']?.totalAsset || 0
+  const gayoonTotal = MONTHLY_REPORT_DATA.gayoon['2026-04']?.totalAsset || 0
 
   const styles = {
     container: {

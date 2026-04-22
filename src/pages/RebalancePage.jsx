@@ -1061,55 +1061,53 @@ export default function RebalancePage() {
       </div>
     )
 
-    // 하늘버핏 데이터
+    // 하늘버핏 데이터 (2026.04.22 기준)
     const haneulData = {
-      total: 4430000,
+      total: 4981364,
       portfolio: [
-        { account: '연금저축', asset: 'KODEX 200, 코스닥150', amount: 1390000, ratio: 31.4 },
-        { account: 'ISA', asset: '코스닥150, 미국채, S&P500', amount: 500000, ratio: 11.3 },
-        { account: '해외주식(미래)', asset: '셰브론, 알파벳, 화이자', amount: 1100000, ratio: 24.8 },
-        { account: '토스', asset: '아마존, 알파벳, 메타 등', amount: 560000, ratio: 12.6 },
-        { account: 'IRP', asset: '예수금', amount: 250000, ratio: 5.6 },
-        { account: 'CMA', asset: '가족여행', amount: 610000, ratio: 13.8 },
-        { account: '암호화폐', asset: '비트코인', amount: 20000, ratio: 0.5 },
+        { account: '연금저축', asset: 'KODEX 200, 코스닥150, 나스닥100', amount: 1757300, ratio: 35.3 },
+        { account: 'ISA', asset: '코스닥150, 미국채, S&P500', amount: 508635, ratio: 10.2 },
+        { account: '해외주식', asset: 'CVX, GOOG, KHC, S&P500', amount: 1587887, ratio: 31.9 },
+        { account: 'IRP', asset: '나스닥100, 국채', amount: 263861, ratio: 5.3 },
+        { account: 'CMA', asset: '발행어음', amount: 863681, ratio: 17.3 },
       ],
       allocation: [
-        { category: '해외주식(S&P/나스닥)', current: 25, target: 50, gap: -25 },
-        { category: '국내주식', current: 43, target: 20, gap: 23 },
-        { category: '채권/금', current: 5, target: 10, gap: -5 },
-        { category: '현금', current: 19, target: 10, gap: 9 },
-        { category: '대체투자(암호화폐)', current: 0.5, target: 5, gap: -4.5 },
-        { category: '개별종목', current: 7.5, target: 5, gap: 2.5 },
+        { category: '해외주식(S&P/나스닥)', current: 32, target: 50, gap: -18 },
+        { category: '국내주식', current: 35, target: 20, gap: 15 },
+        { category: '채권/금', current: 8, target: 10, gap: -2 },
+        { category: '현금', current: 17, target: 10, gap: 7 },
+        { category: '대체투자(암호화폐)', current: 0, target: 5, gap: -5 },
+        { category: '개별종목', current: 8, target: 5, gap: 3 },
       ],
       sellRecommend: [
-        { asset: 'KODEX 200', current: 1060000, sell: 500000, reason: '국내주식 비중 축소' },
-        { asset: 'CMA(가족여행)', current: 610000, sell: 300000, reason: '현금 과다 조정' },
+        { asset: 'KODEX 200', current: 800000, sell: 400000, reason: '국내주식 비중 축소' },
+        { asset: 'CMA', current: 863681, sell: 350000, reason: '현금 과다 조정' },
       ],
       buyRecommend: [
-        { asset: 'TIGER 미국S&P500', target: 0, buy: 500000, reason: '해외주식 비중 확대' },
+        { asset: 'TIGER 미국S&P500', target: 0, buy: 450000, reason: '해외주식 비중 확대' },
         { asset: 'TIGER 미국채10년', target: 0, buy: 150000, reason: '안전자산 확보' },
-        { asset: '비트코인', target: 20000, buy: 150000, reason: '대체투자 분산' },
+        { asset: '비트코인', target: 0, buy: 150000, reason: '대체투자 분산' },
       ],
     }
 
-    // 가윤달리오 데이터
+    // 가윤달리오 데이터 (2026.04.22 기준)
     const gayoonData = {
-      total: 65620000,
+      total: 87450618,
       portfolio: [
-        { account: '해외주식(삼성)', asset: 'VOO, SCHD, 케이뱅크', amount: 24610000, ratio: 37.5 },
-        { account: '한투', asset: '아마존', amount: 2700000, ratio: 4.1 },
-        { account: 'ISA(삼성)', asset: '코스피, 나스닥, 신흥국, 채권, 금', amount: 19380000, ratio: 29.5 },
-        { account: '연금저축', asset: 'KODEX 200, 코스닥150', amount: 5540000, ratio: 8.4 },
-        { account: 'CMA', asset: '발행어음', amount: 14030000, ratio: 21.4 },
-        { account: 'IRP', asset: 'TDF2025', amount: 270000, ratio: 0.4 },
-        { account: '암호화폐', asset: '비트코인', amount: 1090000, ratio: 1.7 },
+        { account: '해외주식(삼성)', asset: 'VOO, SCHD, 케이뱅크', amount: 26399608, ratio: 30.2 },
+        { account: 'ISA(삼성)', asset: 'S&P500, 나스닥, 신흥국, 채권, 금', amount: 21231426, ratio: 24.3 },
+        { account: '연금저축(미래)', asset: 'KODEX200, 고배당, S&P500, 나스닥', amount: 15485830, ratio: 17.7 },
+        { account: '종합(미래)', asset: '아마존, 기아, 삼성화재, 셰브론, UNH', amount: 9613559, ratio: 11.0 },
+        { account: 'CMA(미래)', asset: '발행어음', amount: 10063001, ratio: 11.5 },
+        { account: 'IRP(미래)', asset: '금, 신흥국, 나스닥, TDF', amount: 3312857, ratio: 3.8 },
+        { account: '암호화폐', asset: 'BTC', amount: 1344337, ratio: 1.5 },
       ],
       allocation: [
-        { category: '해외주식(S&P/배당)', current: 42, target: 50, gap: -8 },
-        { category: '국내주식', current: 18, target: 15, gap: 3 },
-        { category: '채권/금', current: 6, target: 10, gap: -4 },
-        { category: '현금', current: 21, target: 10, gap: 11 },
-        { category: '신흥국/대체', current: 6, target: 10, gap: -4 },
+        { category: '해외주식(S&P/배당)', current: 41, target: 50, gap: -9 },
+        { category: '국내주식', current: 17, target: 15, gap: 2 },
+        { category: '채권/금', current: 8, target: 10, gap: -2 },
+        { category: '현금', current: 12, target: 10, gap: 2 },
+        { category: '신흥국/대체', current: 5, target: 10, gap: -5 },
         { category: '암호화폐', current: 2, target: 5, gap: -3 },
       ],
       // 해외주식 전략

@@ -11,12 +11,12 @@ const MILESTONES = [
   { amount: 1000000000, label: '10억', emoji: '🎉' },
 ]
 
-// 기본 설정값
+// 기본 설정값 (2026.04.22 기준)
 const DEFAULT_SETTINGS = {
   targetAmount: 1000000000,
   monthlyInvestment: 3000000,
   expectedReturn: 7,
-  currentAssets: 153260000, // 1억 5,326만원
+  currentAssets: 92431982, // 하늘버핏 4,981,364원 + 가윤달리오 87,450,618원
   milestones: {},
 }
 
