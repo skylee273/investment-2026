@@ -1097,11 +1097,21 @@ export default function RebalancePage() {
         { account: '해외주식(삼성)', asset: 'VOO, SCHD, 케이뱅크', amount: 26399608, ratio: 30.2 },
         { account: 'ISA(삼성)', asset: 'S&P500, 나스닥, 신흥국, 채권, 금', amount: 21231426, ratio: 24.3 },
         { account: '연금저축(미래)', asset: 'KODEX200, 고배당, S&P500, 나스닥', amount: 15485830, ratio: 17.7 },
-        { account: '종합(미래)', asset: '아마존, 기아, 삼성화재, 셰브론, UNH', amount: 9613559, ratio: 11.0 },
         { account: 'CMA(미래)', asset: '발행어음', amount: 10063001, ratio: 11.5 },
         { account: 'IRP(미래)', asset: '금, 신흥국, 나스닥, TDF', amount: 3312857, ratio: 3.8 },
         { account: '암호화폐', asset: 'BTC', amount: 1344337, ratio: 1.5 },
       ],
+      // 개별주식 (미래에셋 종합)
+      individualStocks: [
+        { ticker: 'AMZN', name: '아마존', amount: 1854752, gainPercent: 16.22, type: '해외' },
+        { ticker: 'CVX', name: '셰브론', amount: 1645472, gainPercent: 0.97, type: '해외' },
+        { ticker: 'UNH', name: '유나이티드헬스', amount: 3592135, gainPercent: 9.16, type: '해외' },
+        { ticker: 'KIA', name: '기아', amount: 480000, gainPercent: 1.14, type: '국내' },
+        { ticker: 'SAMSUNG_FIRE', name: '삼성화재', amount: 923000, gainPercent: -2.12, type: '국내' },
+        { ticker: 'SKT', name: 'SK텔레콤', amount: 401200, gainPercent: 1.21, type: '국내' },
+        { ticker: 'HANA', name: '하나금융지주', amount: 717000, gainPercent: -3.55, type: '국내' },
+      ],
+      individualTotal: 9613559,
       allocation: [
         { category: '해외주식(S&P/배당)', current: 41, target: 50, gap: -9 },
         { category: '국내주식', current: 17, target: 15, gap: 2 },
@@ -1136,93 +1146,6 @@ export default function RebalancePage() {
           { asset: 'KODEX 200', amount: 1000000, ratio: 5 },
         ],
         reason: '목표 포트폴리오 비중에 맞춰 리밸런싱 (배당주 30% + 안전자산 45% + 성장주 25%)',
-        // 분할 매도 전략 (6단계) - 총 600만원
-        sellStrategy: [
-          { step: '1차', rate: '+5%', amount: 1000000, items: [
-            { name: 'KODEX 200', amount: 500000 },
-            { name: '신흥국MSCI', amount: 500000 },
-          ]},
-          { step: '2차', rate: '+7%', amount: 1000000, items: [
-            { name: 'KODEX 200', amount: 500000 },
-            { name: '신흥국MSCI', amount: 500000 },
-          ]},
-          { step: '3차', rate: '+10%', amount: 1000000, items: [
-            { name: 'KODEX 200', amount: 500000 },
-            { name: '신흥국MSCI', amount: 500000 },
-          ]},
-          { step: '4차', rate: '+12%', amount: 1000000, items: [
-            { name: 'KODEX 200', amount: 500000 },
-            { name: '신흥국MSCI', amount: 500000 },
-          ]},
-          { step: '5차', rate: '+15%', amount: 1000000, items: [
-            { name: 'KODEX 200', amount: 500000 },
-            { name: '신흥국MSCI', amount: 500000 },
-          ]},
-          { step: '6차', rate: '+18%', amount: 1000000, items: [
-            { name: 'KODEX 200', amount: 500000 },
-            { name: '신흥국MSCI', amount: 500000 },
-          ]},
-        ],
-        sellTotal: 6000000,
-        sellNote: '6월까지 미매도 시: 5% 이상이면 전량 매도',
-        // 분할 매수 전략 (6단계) - 총 600만원 (목표 비중대로)
-        buyStrategy: [
-          { step: '1차', rate: '-3%', amount: 1000000, items: [
-            { name: 'S&P500', amount: 250000 },
-            { name: '배당다우존스', amount: 200000 },
-            { name: '미국채30년', amount: 150000 },
-            { name: '미국채10년', amount: 150000 },
-            { name: '금액티브', amount: 100000 },
-            { name: 'CD금리', amount: 80000 },
-            { name: 'SOFR', amount: 70000 },
-          ]},
-          { step: '2차', rate: '-5%', amount: 1000000, items: [
-            { name: 'S&P500', amount: 250000 },
-            { name: '배당다우존스', amount: 200000 },
-            { name: '나스닥100', amount: 100000 },
-            { name: '미국채30년', amount: 150000 },
-            { name: '미국채10년', amount: 150000 },
-            { name: '금액티브', amount: 100000 },
-            { name: 'SOFR', amount: 50000 },
-          ]},
-          { step: '3차', rate: '-7%', amount: 1000000, items: [
-            { name: 'S&P500', amount: 250000 },
-            { name: '배당다우존스', amount: 200000 },
-            { name: '나스닥100', amount: 100000 },
-            { name: '미국채30년', amount: 100000 },
-            { name: '미국채10년', amount: 100000 },
-            { name: '금액티브', amount: 100000 },
-            { name: 'CD금리', amount: 80000 },
-            { name: 'SOFR', amount: 70000 },
-          ]},
-          { step: '4차', rate: '-10%', amount: 1000000, items: [
-            { name: 'S&P500', amount: 250000 },
-            { name: '배당다우존스', amount: 200000 },
-            { name: '나스닥100', amount: 200000 },
-            { name: '미국채30년', amount: 100000 },
-            { name: '미국채10년', amount: 100000 },
-            { name: '금액티브', amount: 100000 },
-            { name: 'SOFR', amount: 50000 },
-          ]},
-          { step: '5차', rate: '-12%', amount: 1000000, items: [
-            { name: 'S&P500', amount: 250000 },
-            { name: '배당다우존스', amount: 300000 },
-            { name: '나스닥100', amount: 200000 },
-            { name: '미국채10년', amount: 100000 },
-            { name: '금액티브', amount: 100000 },
-            { name: 'SOFR', amount: 50000 },
-          ]},
-          { step: '6차', rate: '-15%', amount: 1000000, items: [
-            { name: 'S&P500', amount: 250000 },
-            { name: '배당다우존스', amount: 300000 },
-            { name: '나스닥100', amount: 200000 },
-            { name: '미국채30년', amount: 100000 },
-            { name: '미국채10년', amount: 100000 },
-            { name: 'SOFR', amount: 50000 },
-          ]},
-        ],
-        buyTotal: 6000000,
-        buyNote: '6월까지 미매수 시: 마이너스면 목표 비중대로 일괄 매수',
       },
       // 연금저축 리밸런싱 (미래에셋) - 목표 비중 기반
       pensionRebalance: {
@@ -1243,51 +1166,6 @@ export default function RebalancePage() {
           { asset: 'KODEX 코스닥150', amount: 750000, ratio: 5 },
         ],
         reason: '목표 포트폴리오 비중에 맞춰 리밸런싱 (배당주 30% + 안전자산 45% + 성장주 25%)',
-        // 분할 매도 전략 (5단계) - 총 200만원
-        sellStrategy: [
-          { step: '1차', rate: '+5%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
-          { step: '2차', rate: '+7%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
-          { step: '3차', rate: '+10%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
-          { step: '4차', rate: '+12%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
-          { step: '5차', rate: '+15%', amount: 400000, items: [{ name: 'KODEX 200', amount: 400000 }]},
-        ],
-        sellTotal: 2000000,
-        sellNote: '6월까지 미매도 시: 5% 이상이면 전량 매도',
-        // 분할 매수 전략 (3단계) - 총 200만원 (목표 비중대로)
-        buyStrategy: [
-          { step: '1차', rate: '-3%', amount: 670000, items: [
-            { name: 'S&P500', amount: 170000 },
-            { name: '배당다우존스', amount: 130000 },
-            { name: '나스닥100', amount: 70000 },
-            { name: '미국채30년', amount: 70000 },
-            { name: '미국채10년', amount: 70000 },
-            { name: '금액티브', amount: 70000 },
-            { name: 'CD금리', amount: 50000 },
-            { name: 'SOFR', amount: 40000 },
-          ]},
-          { step: '2차', rate: '-5%', amount: 670000, items: [
-            { name: 'S&P500', amount: 170000 },
-            { name: '배당다우존스', amount: 130000 },
-            { name: '나스닥100', amount: 70000 },
-            { name: '미국채30년', amount: 70000 },
-            { name: '미국채10년', amount: 70000 },
-            { name: '금액티브', amount: 70000 },
-            { name: 'CD금리', amount: 50000 },
-            { name: 'SOFR', amount: 40000 },
-          ]},
-          { step: '3차', rate: '-7%', amount: 660000, items: [
-            { name: 'S&P500', amount: 160000 },
-            { name: '배당다우존스', amount: 140000 },
-            { name: '나스닥100', amount: 60000 },
-            { name: '미국채30년', amount: 60000 },
-            { name: '미국채10년', amount: 60000 },
-            { name: '금액티브', amount: 60000 },
-            { name: 'CD금리', amount: 60000 },
-            { name: 'SOFR', amount: 60000 },
-          ]},
-        ],
-        buyTotal: 2000000,
-        buyNote: '6월까지 미매수 시: 마이너스면 목표 비중대로 일괄 매수',
       },
       sellRecommend: [
         { asset: 'KODEX 200 (ISA)', current: 3000000, sell: 3000000, reason: '신흥국MSCI와 함께 매도 후 재편입' },
@@ -1357,32 +1235,32 @@ export default function RebalancePage() {
           style: '가치투자',
           icon: '🎩',
           color: '#F59E0B',
-          rating: 'A',
-          comment: '배당다우존스 20%와 PLUS 고배당주 10%로 배당주 30%를 핵심으로 잡은 건 현명합니다. 배당 재투자를 통한 복리 효과는 장기적으로 엄청난 차이를 만들어요.',
+          rating: 'A+',
+          comment: '아마존, 셰브론, 유나이티드헬스 같은 우량 개별주를 직접 보유하고 있군요! 특히 셰브론은 배당 귀족주로 에너지 섹터의 안정성을 더해줍니다. VOO+SCHD로 기본을 다지고 개별주로 초과수익을 노리는 전략, 마음에 들어요.',
         },
         {
           name: '레이 달리오',
           style: '올웨더',
           icon: '🌊',
           color: '#3182F6',
-          rating: 'A+',
-          comment: '채권 18% + 금 10% + CD/SOFR 17%로 안전자산 45%를 확보한 건 올웨더 철학과 정확히 일치합니다! 어떤 경제 환경에서도 버틸 수 있는 포트폴리오입니다.',
+          rating: 'A',
+          comment: 'ISA와 IRP에 채권, 금, CD 등 안전자산을 배치한 건 좋습니다. 다만 개별주 비중(약 11%)이 있어서 순수 올웨더보다는 변동성이 높아요. 개별주 손실 시 채권/금이 완충 역할을 할 겁니다.',
         },
         {
           name: '피터 린치',
           style: '성장주',
           icon: '📈',
           color: '#10B981',
-          rating: 'B+',
-          comment: 'S&P500+나스닥100 20% 비중은 성장주 노출로 적절합니다. 다만 개별 성장주 발굴 기회가 제한적이네요. 안정성을 택한 거라면 이해됩니다!',
+          rating: 'A+',
+          comment: '드디어 제가 좋아하는 포트폴리오를 봤네요! 아마존(+16%), 유나이티드헬스(+9%)처럼 직접 발굴한 개별주가 있잖아요. 기아, 삼성화재 같은 한국 가치주도 포함되어 있고요. 이게 진정한 투자입니다!',
         },
         {
           name: '존 보글',
           style: '인덱스',
           icon: '📊',
           color: '#8B5CF6',
-          rating: 'A+',
-          comment: '완벽합니다! TIGER S&P500, 나스닥100, 배당다우존스 모두 저비용 인덱스 ETF입니다. 이것이 바로 제가 평생 주장한 인덱스 투자의 정수입니다.',
+          rating: 'B+',
+          comment: 'VOO, SCHD 중심의 인덱스 투자는 훌륭합니다. 다만 개별주(AMZN, CVX, UNH, 국내주식) 비중이 11%나 되네요. 수수료와 세금을 고려하면 장기적으로 인덱스만 하는 게 나을 수도 있어요.',
         },
         {
           name: '하워드 막스',
@@ -1390,7 +1268,7 @@ export default function RebalancePage() {
           icon: '⚖️',
           color: '#EF4444',
           rating: 'A',
-          comment: '채권+CD+SOFR+금 45%로 안전자산을 확보한 건 훌륭한 리스크 관리입니다. 시장 하락 시 분할 매수로 대응할 수 있는 여력이 있네요.',
+          comment: '개별주 7종목으로 섹터 분산(테크, 에너지, 헬스케어, 금융, 통신)이 잘 되어 있어요. 케이뱅크 손실(-23%)이 아프지만, 전체 포트폴리오에서 비중이 작아서 리스크 관리가 되고 있습니다.',
         },
         {
           name: '하늘버핏',
@@ -1398,11 +1276,11 @@ export default function RebalancePage() {
           icon: '🌤️',
           color: '#667EEA',
           rating: 'A+',
-          comment: '가윤이 세제혜택 포트폴리오 완벽해요! 배당주 30%로 현금흐름 확보하고, 채권+금+CD로 안전자산 45% 갖추고, 나스닥으로 성장까지! 이대로 꾸준히 하면 부자 됩니다~ 움하하 🚀',
+          comment: '가윤아 개별주 픽이 좋은데? 아마존 +16%, UNH +9%로 수익 잘 내고 있잖아! CVX는 배당도 나오고~ 다만 케이뱅크는 손절 고려해봐. 국내주식은 배당 받으면서 천천히 들고가자! 전체적으로 아주 잘하고 있어 👏',
         },
       ],
       overallGrade: 'A',
-      overallComment: '배당주 30% + 해외성장주 20% + 안전자산 45% + 국내주식 5%의 균형잡힌 목표 포트폴리오. 저비용 인덱스 ETF 중심으로 장기 복리 효과를 극대화할 수 있는 구성.',
+      overallComment: 'ETF(VOO, SCHD) 중심 + 개별주(AMZN, CVX, UNH, 국내주식) 병행 전략. 인덱스로 시장 수익률을 확보하면서 개별주로 알파 추구. 세제혜택 계좌(ISA, 연금저축, IRP)를 활용한 절세 전략도 훌륭함.',
       // 기회 매수 전략
       opportunityBuy: {
         title: '기회 매수 전략',
@@ -1901,10 +1779,72 @@ export default function RebalancePage() {
           </div>
         )}
 
+        {/* 가윤달리오 전용: 개별주식 현황 */}
+        {personalTab === 'gayoon' && data.individualStocks && (
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>📊 개별주식 현황 (미래에셋 종합)</h2>
+            <p style={{ fontSize: 13, color: '#666', marginBottom: 16 }}>
+              총 평가금액: <strong style={{ color: '#3182F6' }}>{formatMoney(data.individualTotal)}</strong>
+            </p>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ ...styles.table, minWidth: 500 }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.th, backgroundColor: '#F7F8FA' }}>종목</th>
+                    <th style={{ ...styles.th, backgroundColor: '#F7F8FA', textAlign: 'center' }}>구분</th>
+                    <th style={{ ...styles.th, backgroundColor: '#F7F8FA', textAlign: 'right' }}>평가금액</th>
+                    <th style={{ ...styles.th, backgroundColor: '#F7F8FA', textAlign: 'right' }}>수익률</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.individualStocks.map((stock, idx) => (
+                    <tr key={idx}>
+                      <td style={styles.td}>
+                        <div style={{ fontWeight: 600 }}>{stock.name}</div>
+                        <div style={{ fontSize: 11, color: '#888' }}>{stock.ticker}</div>
+                      </td>
+                      <td style={{ ...styles.td, textAlign: 'center' }}>
+                        <span style={{
+                          padding: '2px 8px',
+                          borderRadius: 4,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          backgroundColor: stock.type === '해외' ? '#E8F3FF' : '#FFF4E6',
+                          color: stock.type === '해외' ? '#3182F6' : '#F59E0B',
+                        }}>
+                          {stock.type}
+                        </span>
+                      </td>
+                      <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>
+                        {formatMoney(stock.amount)}
+                      </td>
+                      <td style={{
+                        ...styles.td,
+                        textAlign: 'right',
+                        fontWeight: 700,
+                        color: stock.gainPercent >= 0 ? COLORS.success : '#FF6B6B',
+                      }}>
+                        {stock.gainPercent >= 0 ? '+' : ''}{stock.gainPercent.toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ ...styles.tipBox('info'), marginTop: 16, marginBottom: 0 }}>
+              <div style={styles.tipTitle('info')}>💡 개별주식 전략</div>
+              <p style={styles.tipText}>
+                해외 우량주(AMZN, CVX, UNH)는 장기 보유로 배당+성장 추구.
+                국내 배당주(삼성화재, 하나금융, SKT, 기아)는 배당 수익 중심으로 관리.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* 가윤달리오 전용: 해외주식 전략 */}
         {personalTab === 'gayoon' && data.overseasStrategy && (
           <div style={{ ...styles.card, border: `2px solid ${COLORS.success}` }}>
-            <h2 style={{ ...styles.cardTitle, color: COLORS.success }}>🌍 해외주식 전략 (VOO, SCHD, 아마존)</h2>
+            <h2 style={{ ...styles.cardTitle, color: COLORS.success }}>🌍 해외주식 전략 (VOO, SCHD)</h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
               <span style={{ ...styles.badge(COLORS.success), fontSize: 14, padding: '8px 16px' }}>
                 {data.overseasStrategy.action}
