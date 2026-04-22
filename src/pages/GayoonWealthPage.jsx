@@ -70,28 +70,20 @@ const IRP_PORTFOLIO = [
   { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 10, risk: 1 },
 ]
 
-// 배당주 매월 1주 포트폴리오 (1년 1000만원)
-const DIVIDEND_MONTHLY_PORTFOLIO = [
-  { ticker: 'GOOG', name: '알파벳 C (구글)', category: '기술', targetWeight: 17, risk: 3 },
-  { ticker: 'KO', name: '코카콜라', category: '필수소비재', targetWeight: 17, risk: 2 },
-  { ticker: 'AMZN', name: '아마존', category: '기술', targetWeight: 17, risk: 3 },
-  { ticker: 'CVX', name: '쉐브론', category: '에너지', targetWeight: 17, risk: 3 },
-  { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 16, risk: 5 },
-]
 
-// 실시간 추적 자산 (매입가 기준 수익률 계산)
+// 실시간 추적 자산 (매입가 기준 수익률 계산) - 2026.04.22
 const TRACKED_ASSETS = [
   {
     id: 'amazon',
     name: '아마존 (AMZN)',
     icon: '🛒',
     type: 'manual',
-    shares: 9,
-    investedKRW: 2941594,
-    currentKRW: 2702213,
-    gainKRW: -239380,
-    gainPercent: -8.13,
-    note: '한투 · 9주',
+    shares: 5,
+    investedKRW: 1595809,
+    currentKRW: 1854752,
+    gainKRW: 258943,
+    gainPercent: 16.22,
+    note: '미래에셋 · 5주',
   },
   {
     id: 'bitcoin',
@@ -100,39 +92,40 @@ const TRACKED_ASSETS = [
     type: 'crypto',
     btcAmount: 0.01076814,
     investedKRW: 1098351,
-    currentKRW: 1091846,
-    gainKRW: -6504,
-    gainPercent: -0.59,
+    currentKRW: 1344337,
+    gainKRW: 245986,
+    gainPercent: 22.40,
     note: '업비트 · 0.0108 BTC',
   },
 ]
 
-// 1. 고정자산 (빼면 손해나는 자산) - 청년도약계좌, 청약저축, ISA, 연금저축
+// 1. 고정자산 (빼면 손해나는 자산) - 청년도약계좌, 청약저축, ISA, 연금저축 - 2026.04.22
 const FIXED_ASSETS = [
   { id: 'youth-account', name: '청년 도약 계좌', icon: '🚀', currentKRW: 16800000, note: '5년 만기 · 6%+정부기여금' },
   { id: 'housing', name: '청약저축', icon: '🏠', currentKRW: 6220000, note: '1순위 충족 · 2.3%' },
-  { id: 'isa', name: 'ISA', icon: '📈', currentKRW: 19391447, investedKRW: 19999167, gainKRW: -607720, gainPercent: -3.04, note: '삼성증권 · -3.04%' },
-  { id: 'pension', name: '연금저축', icon: '🧓', currentKRW: 5538195, investedKRW: 5997025, gainKRW: -458830, gainPercent: -7.65, note: '미래에셋 · -7.65%' },
+  { id: 'isa', name: 'ISA', icon: '📈', currentKRW: 21231426, investedKRW: 20520572, gainKRW: 710854, gainPercent: 3.46, note: '삼성증권 · +3.46%' },
+  { id: 'pension', name: '연금저축', icon: '🧓', currentKRW: 15485830, investedKRW: 15102380, gainKRW: 383450, gainPercent: 2.54, note: '미래에셋 · +2.54%' },
 ]
 
-// 2. 비변동성 자산 (투자 중인 자산 + 받을 돈) - S&P500, 아마존, 비트코인, 가족받을돈, 전세보증금
+// 2. 비변동성 자산 (투자 중인 자산 + 받을 돈) - S&P500, 아마존, 비트코인, 가족받을돈, 전세보증금 - 2026.04.22
 // 아마존은 TRACKED_ASSETS에서 실시간 추적 (중복 방지)
 const STABLE_ASSETS = [
-  { id: 'sp500-dividend', name: 'S&P500 + 배당주 + 케이뱅크', icon: '📈', currentKRW: 24612387, investedKRW: 22841816, gainKRW: 1770571, gainPercent: 7.76, note: '삼성증권 · +7.76%', type: 'stock' },
+  { id: 'sp500-dividend', name: 'S&P500 + 배당주 + 케이뱅크', icon: '📈', currentKRW: 26399608, investedKRW: 22841816, gainKRW: 3557792, gainPercent: 15.58, note: '삼성증권 · +15.58%', type: 'stock' },
+  { id: 'domestic-stocks', name: '국내주식 + 배당', icon: '🏢', currentKRW: 7758807, investedKRW: 7477697, gainKRW: 281110, gainPercent: 3.76, note: '미래에셋 · +3.76%', type: 'stock' },
   { id: 'family', name: '가족 받을 돈', icon: '👨‍👩‍👧', currentKRW: 20000000, note: '6월 수령 예정', type: 'receivable' },
   { id: 'deposit', name: '전세 보증금', icon: '🏢', currentKRW: 45000000, note: '7월 수령 예정', type: 'receivable' },
 ]
 
-// 3. 변동성 자산 (언제든 쓸 수 있는 자산) - CMA, 자율적금, IRP
+// 3. 변동성 자산 (언제든 쓸 수 있는 자산) - CMA, 자율적금, IRP - 2026.04.22
 const LIQUID_ASSETS = [
-  { id: 'cma', name: 'CMA', icon: '💵', currentKRW: 14030691, investedKRW: 14015160, gainKRW: 15531, gainPercent: 0.11, note: '미래에셋 · +0.11%' },
+  { id: 'cma', name: 'CMA (발행어음)', icon: '💵', currentKRW: 10063001, investedKRW: 10056989, gainKRW: 6012, gainPercent: 0.06, note: '미래에셋 · +0.06%' },
   { id: 'free-savings', name: '자율적금', icon: '💰', currentKRW: 4500000, note: '1년 만기 · 2026-09 · 3.3%' },
-  { id: 'irp', name: 'IRP (퇴직연금)', icon: '🏦', currentKRW: 266026, investedKRW: 267479, gainKRW: -1453, gainPercent: -0.54, note: '미래에셋 · -0.54%' },
+  { id: 'irp', name: 'IRP (퇴직연금)', icon: '🏦', currentKRW: 3312857, investedKRW: 3268547, gainKRW: 44310, gainPercent: 1.36, note: '미래에셋 · +1.36%' },
 ]
 
-// 전체 보유 종목 통합 (실제 데이터 기반 - 2026.03.29)
+// 전체 보유 종목 통합 (실제 데이터 기반 - 2026.04.22)
 const GAYOON_ALL_HOLDINGS = [
-  // 삼성증권 - 해외주식 (S&P500 + 배당주)
+  // 삼성증권 - 해외주식 (S&P500 + 배당주 + 케이뱅크)
   {
     ticker: 'VOO',
     name: 'Vanguard S&P500 ETF',
@@ -140,9 +133,9 @@ const GAYOON_ALL_HOLDINGS = [
     account: '해외주식',
     accountIcon: '📈',
     investedKRW: 18034965,
-    currentKRW: 19317195,
-    gainKRW: 1282230,
-    gainPercent: 7.11,
+    currentKRW: 21062208,
+    gainKRW: 3027243,
+    gainPercent: 16.79,
     risk: 3,
   },
   {
@@ -152,9 +145,9 @@ const GAYOON_ALL_HOLDINGS = [
     account: '해외주식',
     accountIcon: '📈',
     investedKRW: 676691,
-    currentKRW: 647620,
-    gainKRW: -29071,
-    gainPercent: -4.30,
+    currentKRW: 706131,
+    gainKRW: 29440,
+    gainPercent: 4.35,
     risk: 3,
   },
   {
@@ -164,9 +157,9 @@ const GAYOON_ALL_HOLDINGS = [
     account: '해외주식',
     accountIcon: '📈',
     investedKRW: 4047160,
-    currentKRW: 4584872,
-    gainKRW: 537712,
-    gainPercent: 13.29,
+    currentKRW: 4567569,
+    gainKRW: 520409,
+    gainPercent: 12.86,
     risk: 2,
   },
   {
@@ -176,23 +169,23 @@ const GAYOON_ALL_HOLDINGS = [
     account: '해외주식',
     accountIcon: '📈',
     investedKRW: 83000,
-    currentKRW: 62700,
-    gainKRW: -20300,
-    gainPercent: -24.46,
+    currentKRW: 63700,
+    gainKRW: -19300,
+    gainPercent: -23.25,
     risk: 4,
   },
-  // 한투 - 아마존
+  // 미래에셋 - 아마존 (종합)
   {
     ticker: 'AMZN',
-    name: '아마존 (한투)',
+    name: '아마존 (미래에셋)',
     category: '해외주식',
-    account: '한투',
-    accountIcon: '🏢',
-    shares: 9,
-    investedKRW: 2941594,
-    currentKRW: 2702213,
-    gainKRW: -239380,
-    gainPercent: -8.13,
+    account: '종합',
+    accountIcon: '🌍',
+    shares: 5,
+    investedKRW: 1595809,
+    currentKRW: 1854752,
+    gainKRW: 258943,
+    gainPercent: 16.22,
     risk: 4,
   },
   // 삼성증권 - ISA
@@ -202,46 +195,70 @@ const GAYOON_ALL_HOLDINGS = [
     category: '국내대형',
     account: 'ISA',
     accountIcon: '📊',
-    investedKRW: 5223390,
-    currentKRW: 5117175,
-    gainKRW: -106215,
-    gainPercent: -2.03,
+    investedKRW: 1243665,
+    currentKRW: 1459500,
+    gainKRW: 215835,
+    gainPercent: 17.35,
     risk: 2,
   },
   {
-    ticker: 'TIGER나스닥',
+    ticker: 'TIGER나스닥_ISA',
     name: 'TIGER 미국나스닥100',
     category: '나스닥',
     account: 'ISA',
     accountIcon: '📊',
-    investedKRW: 2891400,
-    currentKRW: 2857680,
-    gainKRW: -33720,
-    gainPercent: -1.17,
+    investedKRW: 2730767,
+    currentKRW: 2966840,
+    gainKRW: 236073,
+    gainPercent: 8.64,
     risk: 4,
   },
   {
-    ticker: 'PLUS신흥국',
-    name: 'PLUS 신흥국MSCI(합성 H)',
+    ticker: 'PLUS신흥국_ISA',
+    name: 'PLUS 신흥국MSCI(합성H)',
     category: '신흥국',
     account: 'ISA',
     accountIcon: '📊',
-    investedKRW: 2997060,
-    currentKRW: 2695055,
-    gainKRW: -302005,
-    gainPercent: -10.08,
+    investedKRW: 3096180,
+    currentKRW: 3101760,
+    gainKRW: 5580,
+    gainPercent: 0.18,
     risk: 4,
   },
   {
-    ticker: 'TIGER미국채',
+    ticker: 'KODEX코스닥_ISA',
+    name: 'KODEX 코스닥150',
+    category: '국내중소',
+    account: 'ISA',
+    accountIcon: '📊',
+    investedKRW: 502320,
+    currentKRW: 516620,
+    gainKRW: 14300,
+    gainPercent: 2.85,
+    risk: 3,
+  },
+  {
+    ticker: 'TIGER미국채_ISA',
     name: 'TIGER 미국채10년선물',
     category: '채권',
     account: 'ISA',
     accountIcon: '📊',
-    investedKRW: 2003535,
-    currentKRW: 2069325,
-    gainKRW: 65790,
-    gainPercent: 3.28,
+    investedKRW: 2405385,
+    currentKRW: 2451285,
+    gainKRW: 45900,
+    gainPercent: 1.91,
+    risk: 1,
+  },
+  {
+    ticker: 'TIGERCD_ISA',
+    name: 'TIGER CD금리투자KIS',
+    category: '현금성',
+    account: 'ISA',
+    accountIcon: '📊',
+    investedKRW: 1032750,
+    currentKRW: 1032930,
+    gainKRW: 180,
+    gainPercent: 0.02,
     risk: 1,
   },
   {
@@ -251,75 +268,316 @@ const GAYOON_ALL_HOLDINGS = [
     account: 'ISA',
     accountIcon: '📊',
     investedKRW: 4888810,
-    currentKRW: 4835160,
-    gainKRW: -53650,
-    gainPercent: -1.10,
+    currentKRW: 5156910,
+    gainKRW: 268100,
+    gainPercent: 5.48,
     risk: 3,
   },
   {
-    ticker: 'KODEX금',
+    ticker: 'ACE미국채_ISA',
+    name: 'ACE 미국30년국채액티브(H)',
+    category: '채권',
+    account: 'ISA',
+    accountIcon: '📊',
+    investedKRW: 1078935,
+    currentKRW: 1079650,
+    gainKRW: 715,
+    gainPercent: 0.07,
+    risk: 1,
+  },
+  {
+    ticker: 'TIGER배당_ISA',
+    name: 'TIGER 미국배당다우존스',
+    category: '배당',
+    account: 'ISA',
+    accountIcon: '📊',
+    investedKRW: 1408020,
+    currentKRW: 1416200,
+    gainKRW: 8180,
+    gainPercent: 0.58,
+    risk: 2,
+  },
+  {
+    ticker: 'KODEX금_ISA',
     name: 'KODEX 금액티브',
     category: '금',
     account: 'ISA',
     accountIcon: '📊',
-    investedKRW: 1984640,
-    currentKRW: 1806720,
-    gainKRW: -177920,
-    gainPercent: -8.96,
+    investedKRW: 2133740,
+    currentKRW: 2036880,
+    gainKRW: -96860,
+    gainPercent: -4.54,
+    risk: 1,
+  },
+  {
+    ticker: 'ISA_CASH',
+    name: 'ISA 예수금',
+    category: '현금',
+    account: 'ISA',
+    accountIcon: '📊',
+    investedKRW: 0,
+    currentKRW: 12851,
+    gainKRW: 0,
+    gainPercent: 0,
+    risk: 1,
+  },
+  // 미래에셋 - IRP
+  {
+    ticker: 'KODEX금_IRP',
+    name: 'KODEX 금액티브 (IRP)',
+    category: '금',
+    account: 'IRP',
+    accountIcon: '🏦',
+    investedKRW: 595200,
+    currentKRW: 590400,
+    gainKRW: -4800,
+    gainPercent: -0.81,
+    risk: 1,
+  },
+  {
+    ticker: 'PLUS신흥국_IRP',
+    name: 'PLUS 신흥국MSCI(합성H) (IRP)',
+    category: '신흥국',
+    account: 'IRP',
+    accountIcon: '🏦',
+    investedKRW: 414697,
+    currentKRW: 416440,
+    gainKRW: 1743,
+    gainPercent: 0.42,
+    risk: 4,
+  },
+  {
+    ticker: 'KODEX나스닥_IRP',
+    name: 'KODEX 미국나스닥100 (IRP)',
+    category: '나스닥',
+    account: 'IRP',
+    accountIcon: '🏦',
+    investedKRW: 1268800,
+    currentKRW: 1307750,
+    gainKRW: 38950,
+    gainPercent: 3.07,
+    risk: 4,
+  },
+  {
+    ticker: 'TDF2025',
+    name: '미래에셋TDF2025 (IRP)',
+    category: '퇴직연금',
+    account: 'IRP',
+    accountIcon: '🏦',
+    investedKRW: 267479,
+    currentKRW: 275896,
+    gainKRW: 8417,
+    gainPercent: 3.15,
+    risk: 2,
+  },
+  {
+    ticker: 'IRP_CASH',
+    name: 'IRP 현금성자산',
+    category: '현금',
+    account: 'IRP',
+    accountIcon: '🏦',
+    investedKRW: 722371,
+    currentKRW: 722371,
+    gainKRW: 0,
+    gainPercent: 0,
     risk: 1,
   },
   // 미래에셋 - 연금저축
   {
-    ticker: 'KODEX200',
+    ticker: 'KODEX200_연금',
     name: 'KODEX 200 (연금)',
     category: '국내대형',
     account: '연금저축',
     accountIcon: '🧓',
-    shares: 55,
-    investedKRW: 4912225,
-    currentKRW: 4467375,
-    gainKRW: -444850,
-    gainPercent: -9.06,
+    shares: 33,
+    investedKRW: 2947335,
+    currentKRW: 3210900,
+    gainKRW: 263565,
+    gainPercent: 8.94,
     risk: 2,
   },
   {
-    ticker: 'KODEX150',
+    ticker: 'PLUS고배당_연금',
+    name: 'PLUS 고배당주 (연금)',
+    category: '배당',
+    account: '연금저축',
+    accountIcon: '🧓',
+    shares: 55,
+    investedKRW: 1514975,
+    currentKRW: 1508650,
+    gainKRW: -6325,
+    gainPercent: -0.42,
+    risk: 2,
+  },
+  {
+    ticker: 'KODEX코스닥_연금',
     name: 'KODEX 코스닥150 (연금)',
     category: '국내중소',
     account: '연금저축',
     accountIcon: '🧓',
-    shares: 54,
-    investedKRW: 1084800,
-    currentKRW: 1070820,
-    gainKRW: -13980,
-    gainPercent: -1.29,
+    shares: 156,
+    investedKRW: 3080430,
+    currentKRW: 3099720,
+    gainKRW: 19290,
+    gainPercent: 0.63,
     risk: 3,
   },
-  // 미래에셋 - CMA
+  {
+    ticker: 'TIGER나스닥_연금',
+    name: 'TIGER 미국나스닥100 (연금)',
+    category: '나스닥',
+    account: '연금저축',
+    accountIcon: '🧓',
+    shares: 13,
+    investedKRW: 2198010,
+    currentKRW: 2268760,
+    gainKRW: 70750,
+    gainPercent: 3.22,
+    risk: 4,
+  },
+  {
+    ticker: 'TIGER_SP_연금',
+    name: 'TIGER 미국S&P500 (연금)',
+    category: 'S&P500',
+    account: '연금저축',
+    accountIcon: '🧓',
+    shares: 136,
+    investedKRW: 3502680,
+    currentKRW: 3542120,
+    gainKRW: 39440,
+    gainPercent: 1.13,
+    risk: 3,
+  },
+  {
+    ticker: 'TIGER배당_연금',
+    name: 'TIGER 미국배당다우존스 (연금)',
+    category: '배당',
+    account: '연금저축',
+    accountIcon: '🧓',
+    shares: 35,
+    investedKRW: 507150,
+    currentKRW: 511000,
+    gainKRW: 3850,
+    gainPercent: 0.76,
+    risk: 2,
+  },
+  {
+    ticker: 'KODEX금_연금',
+    name: 'KODEX 금액티브 (연금)',
+    category: '금',
+    account: '연금저축',
+    accountIcon: '🧓',
+    shares: 60,
+    investedKRW: 892800,
+    currentKRW: 885600,
+    gainKRW: -7200,
+    gainPercent: -0.81,
+    risk: 1,
+  },
+  {
+    ticker: 'TIGERCD_연금',
+    name: 'TIGER CD금리투자KIS (연금)',
+    category: '현금성',
+    account: '연금저축',
+    accountIcon: '🧓',
+    shares: 8,
+    investedKRW: 459000,
+    currentKRW: 459080,
+    gainKRW: 80,
+    gainPercent: 0.02,
+    risk: 1,
+  },
+  // 미래에셋 - 종합 계좌 (국내주식)
+  {
+    ticker: 'KIA',
+    name: '기아',
+    category: '국내주식',
+    account: '종합(미래에셋)',
+    accountIcon: '🏢',
+    shares: 3,
+    investedKRW: 474600,
+    currentKRW: 480000,
+    gainKRW: 5400,
+    gainPercent: 1.14,
+    risk: 3,
+  },
+  {
+    ticker: 'SAMSUNG_FIRE',
+    name: '삼성화재',
+    category: '국내주식',
+    account: '종합(미래에셋)',
+    accountIcon: '🏢',
+    shares: 2,
+    investedKRW: 943000,
+    currentKRW: 923000,
+    gainKRW: -20000,
+    gainPercent: -2.12,
+    risk: 2,
+  },
+  {
+    ticker: 'SKT',
+    name: 'SK텔레콤',
+    category: '국내주식',
+    account: '종합(미래에셋)',
+    accountIcon: '🏢',
+    shares: 4,
+    investedKRW: 396400,
+    currentKRW: 401200,
+    gainKRW: 4800,
+    gainPercent: 1.21,
+    risk: 2,
+  },
+  {
+    ticker: 'HANA',
+    name: '하나금융지주',
+    category: '국내주식',
+    account: '종합(미래에셋)',
+    accountIcon: '🏢',
+    shares: 6,
+    investedKRW: 743400,
+    currentKRW: 717000,
+    gainKRW: -26400,
+    gainPercent: -3.55,
+    risk: 3,
+  },
+  {
+    ticker: 'CVX',
+    name: '셰브론',
+    category: '해외주식',
+    account: '종합(미래에셋)',
+    accountIcon: '🏢',
+    shares: 6,
+    investedKRW: 1629588,
+    currentKRW: 1645472,
+    gainKRW: 15884,
+    gainPercent: 0.97,
+    risk: 3,
+  },
+  {
+    ticker: 'UNH',
+    name: '유나이티드헬스',
+    category: '해외주식',
+    account: '종합(미래에셋)',
+    accountIcon: '🏢',
+    shares: 7,
+    investedKRW: 3290709,
+    currentKRW: 3592135,
+    gainKRW: 301426,
+    gainPercent: 9.16,
+    risk: 3,
+  },
+  // 미래에셋 - CMA 발행어음
   {
     ticker: 'CMA',
     name: '발행어음CMA',
     category: 'CMA',
     account: 'CMA',
     accountIcon: '💵',
-    investedKRW: 14015160,
-    currentKRW: 14030691,
-    gainKRW: 15531,
-    gainPercent: 0.11,
+    investedKRW: 10056989,
+    currentKRW: 10063001,
+    gainKRW: 6012,
+    gainPercent: 0.06,
     risk: 1,
-  },
-  // 미래에셋 - IRP
-  {
-    ticker: 'TDF2025',
-    name: 'TDF2025 (IRP)',
-    category: '퇴직연금',
-    account: 'IRP',
-    accountIcon: '🏦',
-    investedKRW: 267479,
-    currentKRW: 265937,
-    gainKRW: -1542,
-    gainPercent: -0.58,
-    risk: 2,
   },
   // 업비트 - 암호화폐
   {
@@ -330,9 +588,9 @@ const GAYOON_ALL_HOLDINGS = [
     accountIcon: '₿',
     btcAmount: 0.01076814,
     investedKRW: 1098351,
-    currentKRW: 1091846,
-    gainKRW: -6504,
-    gainPercent: -0.59,
+    currentKRW: 1344337,
+    gainKRW: 245986,
+    gainPercent: 22.40,
     risk: 5,
   },
 ]
@@ -904,66 +1162,6 @@ export default function GayoonWealthPage() {
         </>
       ) : (
       <>
-      {/* 투자 원칙 */}
-      <div style={{ ...styles.rulesCard, padding: isMobile ? '16px' : '20px' }}>
-        <div style={styles.rulesTitle}>
-          <span>📋</span> 나의 투자 원칙
-        </div>
-        <div style={{
-          ...styles.rulesList,
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: isMobile ? '8px' : '12px',
-        }}>
-          <div style={styles.ruleItem}>
-            <span>🔴</span>
-            <span><strong>손절:</strong> -10% 하락 시 매도 (규칙만 정해도 편향성 제거)</span>
-          </div>
-          <div style={styles.ruleItem}>
-            <span>🟢</span>
-            <span><strong>익절:</strong> 최고가 대비 -10% 하락 시 매도</span>
-          </div>
-          <div style={styles.ruleItem}>
-            <span>⚠️</span>
-            <span><strong>레버리지:</strong> 절대 안함 (ETF로 위험 분산)</span>
-          </div>
-          <div style={styles.ruleItem}>
-            <span>🎯</span>
-            <span><strong>전략:</strong> 무릎에 사서 어깨에 판다</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 시장 인사이트 */}
-      <div style={{
-        backgroundColor: '#F0F7FF',
-        borderRadius: '16px',
-        padding: isMobile ? '16px' : '20px',
-        marginBottom: '24px',
-        border: '1px solid #BBDEFB',
-      }}>
-        <div style={{ fontSize: isMobile ? '13px' : '14px', fontWeight: '700', color: '#1565C0', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span>💡</span> 시장 인사이트
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: isMobile ? '12px' : '13px', color: '#37474F' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-            <span>📊</span>
-            <span>자산 가격은 합리적 예상보다 훨씬 높게 형성됨</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-            <span>🤖</span>
-            <span>AI 버블 주의 - 인프라 부족으로 대중화까지 시간 필요</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-            <span>⚛️</span>
-            <span>양자컴퓨팅 - 너무 먼 미래, 기대값만 반영 중</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-            <span>🧠</span>
-            <span>손절은 어렵다 - 내 위험수용능력 파악이 먼저</span>
-          </div>
-        </div>
-      </div>
-
       {/* 시세 업데이트 안내 */}
       {lastUpdate && (
         <div style={{
@@ -1284,160 +1482,6 @@ export default function GayoonWealthPage() {
           isMobile={isMobile}
         />
 
-        {/* 배당주 매월 1주 */}
-        <PortfolioChart
-          icon="📅"
-          title="배당주 매월 1주"
-          amount={10000000}
-          status="1년 1000만"
-          statusColor={{ bg: '#E8F5E9', text: '#2E7D32' }}
-          items={DIVIDEND_MONTHLY_PORTFOLIO}
-          subtitle="가장 많이 떨어진 종목 매수"
-          isMobile={isMobile}
-        />
-      </div>
-
-      {/* 월 매수 가이드 */}
-      <div style={{ marginBottom: '16px' }}>
-        <h3 style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28', marginBottom: '12px' }}>📅 월 매수 가이드</h3>
-      </div>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-        gap: isMobile ? '12px' : '16px',
-        marginBottom: '24px',
-      }}>
-        {/* IRP 월 25만원 */}
-        <div style={{
-          padding: isMobile ? '14px' : '20px',
-          backgroundColor: 'white',
-          borderRadius: '16px',
-          border: '1px solid #E5E8EB',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isMobile ? '12px' : '16px' }}>
-            <span style={{ fontSize: isMobile ? '18px' : '20px' }}>🏦</span>
-            <div>
-              <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28' }}>IRP 월 매수</div>
-              <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#3182F6', fontWeight: '600' }}>매월 25만원</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '6px' : '8px' }}>
-            {IRP_PORTFOLIO.map(item => {
-              const amount = Math.round(250000 * item.targetWeight / 100)
-              return (
-                <div key={item.ticker} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: isMobile ? '8px 10px' : '10px 12px',
-                  backgroundColor: '#F7F8FA',
-                  borderRadius: '8px',
-                }}>
-                  <div>
-                    <div style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '600', color: '#191F28' }}>
-                      {item.name.replace('TIGER ', '').replace('KODEX ', '')}
-                    </div>
-                    <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#8B95A1' }}>
-                      <span style={{ backgroundColor: '#E8F3FF', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', color: '#3182F6', fontWeight: '600', fontSize: isMobile ? '9px' : '11px' }}>{item.ticker}</span>
-                      {item.targetWeight}%
-                    </div>
-                  </div>
-                  <div style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: '#3182F6' }}>
-                    ₩{amount.toLocaleString()}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* 연금저축 월 60만원 */}
-        <div style={{
-          padding: isMobile ? '14px' : '20px',
-          backgroundColor: 'white',
-          borderRadius: '16px',
-          border: '1px solid #E5E8EB',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isMobile ? '12px' : '16px' }}>
-            <span style={{ fontSize: isMobile ? '18px' : '20px' }}>🧓</span>
-            <div>
-              <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28' }}>연금저축 월 매수</div>
-              <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#3182F6', fontWeight: '600' }}>매월 60만원</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '6px' : '8px' }}>
-            {PENSION_PORTFOLIO.map(item => {
-              const amount = Math.round(600000 * item.targetWeight / 100)
-              return (
-                <div key={item.ticker} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: isMobile ? '8px 10px' : '10px 12px',
-                  backgroundColor: '#F7F8FA',
-                  borderRadius: '8px',
-                }}>
-                  <div>
-                    <div style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '600', color: '#191F28' }}>
-                      {item.name.replace('TIGER ', '').replace('KODEX ', '').replace('PLUS ', '')}
-                    </div>
-                    <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#8B95A1' }}>
-                      <span style={{ backgroundColor: '#E8F3FF', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', color: '#3182F6', fontWeight: '600', fontSize: isMobile ? '9px' : '11px' }}>{item.ticker}</span>
-                      {item.targetWeight}%
-                    </div>
-                  </div>
-                  <div style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: '#3182F6' }}>
-                    ₩{amount.toLocaleString()}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* 배당주 매월 1주 */}
-        <div style={{
-          padding: isMobile ? '14px' : '20px',
-          backgroundColor: 'white',
-          borderRadius: '16px',
-          border: '1px solid #E5E8EB',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isMobile ? '12px' : '16px' }}>
-            <span style={{ fontSize: isMobile ? '18px' : '20px' }}>📅</span>
-            <div>
-              <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '700', color: '#191F28' }}>배당주 매월 1주</div>
-              <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#2E7D32', fontWeight: '600' }}>매월 약 83만원 (가장 많이 떨어진 종목)</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '6px' : '8px' }}>
-            {DIVIDEND_MONTHLY_PORTFOLIO.map(item => {
-              const amount = Math.round(833333 * item.targetWeight / 100)
-              return (
-                <div key={item.ticker} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: isMobile ? '8px 10px' : '10px 12px',
-                  backgroundColor: '#F7F8FA',
-                  borderRadius: '8px',
-                }}>
-                  <div>
-                    <div style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '600', color: '#191F28' }}>
-                      {item.name}
-                    </div>
-                    <div style={{ fontSize: isMobile ? '10px' : '11px', color: '#8B95A1' }}>
-                      <span style={{ backgroundColor: '#E8F5E9', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', color: '#2E7D32', fontWeight: '600', fontSize: isMobile ? '9px' : '11px' }}>{item.ticker}</span>
-                      {item.targetWeight}%
-                    </div>
-                  </div>
-                  <div style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: '#2E7D32' }}>
-                    ₩{amount.toLocaleString()}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
       </div>
 
       {/* 보유 종목 테이블 */}
@@ -1485,7 +1529,9 @@ export default function GayoonWealthPage() {
               { value: 'ISA', label: 'ISA' },
               { value: '연금저축', label: '연금저축' },
               { value: 'IRP', label: 'IRP' },
+              { value: '종합(미래에셋)', label: '종합' },
               { value: 'CMA', label: 'CMA' },
+              { value: '미래에셋', label: '미래에셋' },
               { value: '암호화폐', label: '암호화폐' },
             ].map(opt => (
               <button

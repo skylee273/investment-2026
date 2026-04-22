@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { fetchPortfolioPrices, fetchMultipleStockPrices, fetchExchangeRate, clearPriceCache } from '../services/stockApi'
 
 // 2026년 분기별 포트폴리오
@@ -6,19 +7,20 @@ import { fetchPortfolioPrices, fetchMultipleStockPrices, fetchExchangeRate, clea
 // per: 주가수익비율, pbr: 주가순자산비율 (2026.02 기준)
 const TARGET_TOTAL = 1000000 // 목표 총 투자금액 100만원
 
-// 미래에셋증권 계좌별 보유 종목 (2026.03.29 기준)
+// 미래에셋증권 계좌별 보유 종목 (2026.04.22 기준)
 const MIRAE_ACCOUNTS = [
   {
     id: 'pension',
     name: '연금저축계좌',
     accountNo: '010-8784-7546-2',
     icon: '🧓',
-    totalKRW: 1393035,
-    gainKRW: -83440,
-    gainPercent: -5.65,
+    totalKRW: 1757300,
+    gainKRW: 94705,
+    gainPercent: 5.69,
     holdings: [
-      { name: 'KODEX 200', shares: 13, currentKRW: 1055925, investedKRW: 1131700, gainKRW: -75775, gainPercent: -6.70 },
-      { name: 'KODEX 코스닥150', shares: 17, currentKRW: 337110, investedKRW: 344775, gainKRW: -7665, gainPercent: -2.22 },
+      { name: 'KODEX 200', shares: 8, currentKRW: 778400, investedKRW: 696430, gainKRW: 81970, gainPercent: 11.77 },
+      { name: 'KODEX 코스닥150', shares: 44, currentKRW: 874280, investedKRW: 874005, gainKRW: 275, gainPercent: 0.03 },
+      { name: 'KODEX 미국나스닥100', shares: 4, currentKRW: 104620, investedKRW: 92160, gainKRW: 12460, gainPercent: 13.52 },
     ]
   },
   {
@@ -26,30 +28,30 @@ const MIRAE_ACCOUNTS = [
     name: 'ISA (중개형)',
     accountNo: '660-9824-0136-0',
     icon: '📊',
-    totalKRW: 497385,
-    gainKRW: 1095,
-    gainPercent: 0.22,
+    totalKRW: 508635,
+    gainKRW: 12345,
+    gainPercent: 2.49,
     holdings: [
-      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 99150, investedKRW: 101075, gainKRW: -1925, gainPercent: -1.90 },
-      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 202875, investedKRW: 198375, gainKRW: 4500, gainPercent: 2.27 },
-      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 195360, investedKRW: 196840, gainKRW: -1480, gainPercent: -0.75 },
+      { name: 'KODEX 코스닥150', shares: 5, currentKRW: 99350, investedKRW: 101075, gainKRW: -1725, gainPercent: -1.71 },
+      { name: 'TIGER 미국채10년선물', shares: 15, currentKRW: 200925, investedKRW: 198375, gainKRW: 2550, gainPercent: 1.29 },
+      { name: 'TIGER 미국S&P500', shares: 8, currentKRW: 208360, investedKRW: 196840, gainKRW: 11520, gainPercent: 5.85 },
     ]
   },
   {
     id: 'stock',
     name: '종합 (해외주식)',
-    accountNo: '종합계좌',
+    accountNo: '010-8784-7546-0',
     icon: '🌍',
-    totalKRW: 1385816,
-    gainKRW: 8472,
-    gainPercent: 0.62,
+    totalKRW: 1587887,
+    gainKRW: 45003,
+    gainPercent: 2.92,
     holdings: [
-      { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 170940, investedKRW: 174090, gainKRW: -3150, gainPercent: -1.81 },
-      { name: '1Q 미국S&P500미국채혼합', shares: 10, currentKRW: 116200, investedKRW: 116250, gainKRW: -50, gainPercent: -0.04 },
-      { name: '셰브론 (CVX)', shares: 2, currentKRW: 636068, investedKRW: 568711, gainKRW: 67357, gainPercent: 11.84 },
-      { name: '알파벳 C (GOOG)', shares: 1, currentKRW: 412337, investedKRW: 468022, gainKRW: -55685, gainPercent: -11.90 },
-      { name: '미국달러', shares: 0.18, currentKRW: 271, investedKRW: 271, gainKRW: 0, gainPercent: 0.00 },
-      { name: '화이자 (PFE)', shares: 2, currentKRW: 50000, investedKRW: 50000, gainKRW: 0, gainPercent: 0.00 },
+      { name: '1Q 미국S&P500미국채혼합', shares: 10, currentKRW: 119050, investedKRW: 116250, gainKRW: 2800, gainPercent: 2.41 },
+      { name: 'TIGER 미국S&P500', shares: 7, currentKRW: 182315, investedKRW: 174090, gainKRW: 8225, gainPercent: 4.72 },
+      { name: '미국달러', shares: 8.81, currentKRW: 12953, investedKRW: 12953, gainKRW: 0, gainPercent: 0.00 },
+      { name: '셰브론 (CVX)', shares: 2, currentKRW: 555958, investedKRW: 555345, gainKRW: 613, gainPercent: 0.11 },
+      { name: '알파벳 C (GOOG)', shares: 1, currentKRW: 490644, investedKRW: 457022, gainKRW: 33622, gainPercent: 7.36 },
+      { name: '크래프트 하인즈 (KHC)', shares: 7, currentKRW: 226967, investedKRW: 227224, gainKRW: -257, gainPercent: -0.11 },
     ]
   },
   {
@@ -57,11 +59,13 @@ const MIRAE_ACCOUNTS = [
     name: '이하늘 개인형IRP',
     accountNo: '496-5412-7732-0',
     icon: '🏦',
-    totalKRW: 250069,
-    gainKRW: 0,
-    gainPercent: 0.00,
+    totalKRW: 263861,
+    gainKRW: 13495,
+    gainPercent: 5.40,
     holdings: [
-      { name: 'IRP 예수금', shares: 0, currentKRW: 250069, investedKRW: 250069, gainKRW: 0, gainPercent: 0.00 },
+      { name: 'TIGER 미국나스닥100', shares: 0, currentKRW: 173860, investedKRW: 160815, gainKRW: 13045, gainPercent: 8.11 },
+      { name: 'KODEX 미국10년국채액티브(H)', shares: 0, currentKRW: 89325, investedKRW: 88875, gainKRW: 450, gainPercent: 0.51 },
+      { name: '현금성자산', shares: 0, currentKRW: 676, investedKRW: 0, gainKRW: 0, gainPercent: 0.00 },
     ]
   },
   {
@@ -69,33 +73,25 @@ const MIRAE_ACCOUNTS = [
     name: 'CMA (가족여행)',
     accountNo: '010-8784-7546-1',
     icon: '✈️',
-    totalKRW: 610106,
-    gainKRW: 10,
-    gainPercent: 0.00,
+    totalKRW: 627700,
+    gainKRW: 222,
+    gainPercent: 0.04,
     holdings: [
-      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 610106, investedKRW: 610096, gainKRW: 10, gainPercent: 0.00 },
+      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 627700, investedKRW: 627478, gainKRW: 222, gainPercent: 0.04 },
     ]
   },
-]
-
-// 토스증권 해외주식 보유 종목 (2026.03.29 기준)
-const TOSS_HOLDINGS = [
-  { name: '마이크로소프트 (MSFT)', currentKRW: 41152, investedKRW: 47590, gainKRW: -6437, gainPercent: -13.52 },
-  { name: '메타 (META)', currentKRW: 19672, investedKRW: 23670, gainKRW: -3997, gainPercent: -16.88 },
-  { name: '뱅크오브아메리카 (BAC)', currentKRW: 19012, investedKRW: 20702, gainKRW: -1689, gainPercent: -8.16 },
-  { name: '브로드컴 (AVGO)', currentKRW: 2686, investedKRW: 2973, gainKRW: -286, gainPercent: -9.64 },
-  { name: '아마존 (AMZN)', currentKRW: 365295, investedKRW: 405610, gainKRW: -40314, gainPercent: -9.93 },
-  { name: '알파벳 A (GOOGL)', currentKRW: 16903, investedKRW: 19727, gainKRW: -2823, gainPercent: -14.31 },
-  { name: '알파벳 C (GOOG)', currentKRW: 58467, investedKRW: 63641, gainKRW: -5173, gainPercent: -8.12 },
-  { name: '인튜이티브 서지컬 (ISRG)', currentKRW: 7313, investedKRW: 7882, gainKRW: -568, gainPercent: -7.21 },
-  { name: '퀄컴 (QCOM)', currentKRW: 6850, investedKRW: 7883, gainKRW: -1032, gainPercent: -13.09 },
-  { name: '테슬라 (TSLA)', currentKRW: 2687, investedKRW: 2969, gainKRW: -281, gainPercent: -9.48 },
-  { name: 'SPY', currentKRW: 16890, investedKRW: 17704, gainKRW: -813, gainPercent: -4.59 },
-]
-
-// 업비트 암호화폐 보유 종목 (2026.03.29 기준)
-const CRYPTO_HOLDINGS = [
-  { name: '비트코인 (BTC)', currentKRW: 165490, investedKRW: 167040, gainKRW: -1552, gainPercent: -0.93 },
+  {
+    id: 'cma_emergency',
+    name: 'CMA (비상금)',
+    accountNo: '690-6340-5654-1',
+    icon: '💰',
+    totalKRW: 235981,
+    gainKRW: 14,
+    gainPercent: 0.01,
+    holdings: [
+      { name: '발행어음CMA(개인)', shares: 0, currentKRW: 235981, investedKRW: 235967, gainKRW: 14, gainPercent: 0.01 },
+    ]
+  },
 ]
 
 // 미래에셋 전체 보유 종목 (기존 코드 호환용)
@@ -122,50 +118,41 @@ const CATEGORY_COLORS = {
   '금': '#FBBF24',
 }
 
-// 연금저축 포트폴리오
-const PENSION_PORTFOLIO = [
-  { ticker: '192090', name: 'TIGER 차이나CSI300', category: '중국', targetWeight: 30, risk: 4 },
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 25, risk: 3 },
-  { ticker: '456600', name: 'TIGER 미국달러SOFR금리액티브(합성)', category: '달러', targetWeight: 20, risk: 1 },
-  { ticker: '069500', name: 'KODEX 200', category: '국내대형', targetWeight: 10, risk: 2 },
-  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 10, risk: 3 },
-  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '나스닥', targetWeight: 5, risk: 4 },
-]
-
-// ISA 포트폴리오 (중개형)
+// ISA 포트폴리오 (중개형) - 가윤달리오 동일
 const ISA_PORTFOLIO = [
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 40, risk: 3 },
-  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내중소', targetWeight: 20, risk: 3 },
-  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '나스닥', targetWeight: 20, risk: 4 },
+  { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 20, risk: 2 },
+  { ticker: '360750', name: 'TIGER S&P500', category: '해외주식', targetWeight: 15, risk: 3 },
+  { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 10, risk: 2 },
   { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
-  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '357870', name: 'TIGER CD금리액티브', category: '현금성', targetWeight: 10, risk: 1 },
+  { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 8, risk: 1 },
+  { ticker: '456600', name: 'TIGER SOFR금리액티브', category: '달러', targetWeight: 7, risk: 1 },
+  { ticker: '133690', name: 'TIGER 나스닥100', category: '해외주식', targetWeight: 5, risk: 4 },
+  { ticker: '069500', name: 'KODEX 200', category: '국내주식', targetWeight: 5, risk: 2 },
 ]
 
-// IRP 포트폴리오 (25만원) - 위험자산 70% + 안전자산 30%
+// 연금저축 포트폴리오 - 가윤달리오 동일
+const PENSION_PORTFOLIO = [
+  { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 20, risk: 2 },
+  { ticker: '360750', name: 'TIGER S&P500', category: '해외주식', targetWeight: 15, risk: 3 },
+  { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 10, risk: 2 },
+  { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
+  { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '357870', name: 'TIGER CD금리액티브', category: '현금성', targetWeight: 10, risk: 1 },
+  { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 8, risk: 1 },
+  { ticker: '456600', name: 'TIGER SOFR금리액티브', category: '달러', targetWeight: 7, risk: 1 },
+  { ticker: '133690', name: 'TIGER 나스닥100', category: '해외주식', targetWeight: 5, risk: 4 },
+  { ticker: '229200', name: 'KODEX 코스닥150', category: '국내주식', targetWeight: 5, risk: 3 },
+]
+
+// IRP 포트폴리오 - 가윤달리오 동일 (안전자산 30% 규정 준수)
 const IRP_PORTFOLIO = [
-  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '나스닥', targetWeight: 30, risk: 4 },
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 20, risk: 3 },
-  { ticker: '195980', name: 'TIGER MSCI신흥국', category: '신흥국', targetWeight: 20, risk: 5 },
-  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 15, risk: 1 },
-  { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 15, risk: 1 },
-]
-
-// 배당주 매월 1주 포트폴리오 (가장 많이 떨어진 종목 매수)
-// 배당주 매월 1주 포트폴리오 (1년 1000만원)
-const DIVIDEND_MONTHLY_PORTFOLIO = [
-  { ticker: 'GOOG', name: '알파벳 C (구글)', category: '기술', targetWeight: 20, risk: 3 },
-  { ticker: 'KO', name: '코카콜라', category: '필수소비재', targetWeight: 20, risk: 2 },
-  { ticker: 'AMZN', name: '아마존', category: '기술', targetWeight: 20, risk: 3 },
-  { ticker: 'CVX', name: '쉐브론', category: '에너지', targetWeight: 20, risk: 3 },
-  { ticker: 'BTC', name: '비트코인', category: '암호화폐', targetWeight: 20, risk: 5 },
-]
-
-// 추가 연금저축 포트폴리오 (900만원 목표)
-const PENSION_EXTRA_PORTFOLIO = [
-  { ticker: '456600', name: 'TIGER 미국달러SOFR금리액티브(합성)', category: '달러', targetWeight: 30, risk: 1 },
-  { ticker: '360750', name: 'TIGER 미국S&P500', category: 'S&P500', targetWeight: 40, risk: 3 },
-  { ticker: '133690', name: 'TIGER 미국나스닥100', category: '나스닥', targetWeight: 20, risk: 4 },
-  { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 35, risk: 2 },
+  { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 35, risk: 2 },
+  { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+  { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
+  { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 10, risk: 1 },
 ]
 
 // 별 5개 위험도 표시
@@ -340,7 +327,7 @@ function PortfolioChart({ icon, title, subtitle, amount, gainKRW, gainPercent, s
   )
 }
 
-// 전체 보유 종목 통합 (미래에셋 + 토스 + 암호화폐)
+// 전체 보유 종목 통합 (미래에셋)
 const ALL_HOLDINGS = [
   // 미래에셋증권 (계좌별)
   ...MIRAE_ACCOUNTS.flatMap(acc =>
@@ -352,22 +339,6 @@ const ALL_HOLDINGS = [
       ticker: h.name, // 미래에셋은 name을 ticker로 사용
     }))
   ),
-  // 토스증권 해외주식
-  ...TOSS_HOLDINGS.map(h => ({
-    ...h,
-    broker: '토스증권',
-    account: '해외주식',
-    accountIcon: '🌏',
-    ticker: h.name,
-  })),
-  // 업비트 암호화폐
-  ...CRYPTO_HOLDINGS.map(h => ({
-    ...h,
-    broker: '업비트',
-    account: '암호화폐',
-    accountIcon: '₿',
-    ticker: h.name,
-  })),
 ]
 
 // 매도 예정/완료 종목 (비중 미포함)
@@ -501,34 +472,6 @@ const styles = {
     fontSize: '12px',
     color: '#8B95A1',
     marginTop: '8px',
-  },
-  rulesCard: {
-    backgroundColor: '#FFF9E6',
-    borderRadius: '16px',
-    padding: '20px',
-    marginBottom: '24px',
-    border: '1px solid #FFE082',
-  },
-  rulesTitle: {
-    fontSize: '14px',
-    fontWeight: '700',
-    color: '#F57F17',
-    marginBottom: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  rulesList: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '12px',
-    fontSize: '13px',
-    color: '#5D4037',
-  },
-  ruleItem: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '8px',
   },
   summaryGrid: {
     display: 'grid',
@@ -772,6 +715,7 @@ const getPieChartStyle = (portfolio) => {
 }
 
 export default function PortfolioPage() {
+  const navigate = useNavigate()
   const [currentQuarter, setCurrentQuarter] = useState('Q2')
   const [data, setData] = useState({})
   const [lastUpdate, setLastUpdate] = useState(null)
@@ -1025,7 +969,7 @@ export default function PortfolioPage() {
     return ((stockData.price - tracking.avgPrice) / tracking.avgPrice) * 100
   }
 
-  // 포트폴리오 가치 계산 (전체 자산 포함)
+  // 포트폴리오 가치 계산 (미래에셋 자산)
   const calculatePortfolioValue = () => {
     let totalCost = 0 // 총 투자원금
     let totalGain = 0 // 총 수익금
@@ -1038,18 +982,6 @@ export default function PortfolioPage() {
       })
     })
 
-    // 토스증권 해외주식
-    TOSS_HOLDINGS.forEach(item => {
-      totalCost += item.investedKRW || 0
-      totalGain += item.gainKRW || 0
-    })
-
-    // 업비트 암호화폐
-    CRYPTO_HOLDINGS.forEach(item => {
-      totalCost += item.investedKRW || 0
-      totalGain += item.gainKRW || 0
-    })
-
     const totalValue = totalCost + totalGain
     const totalGainPercent = totalCost > 0 ? (totalGain / totalCost) * 100 : 0
     return { totalCost, totalValue, totalGain, totalGainPercent }
@@ -1057,8 +989,6 @@ export default function PortfolioPage() {
 
   // 총 투자금액 계산
   const TOTAL_INVESTMENT = MIRAE_ACCOUNTS.reduce((sum, acc) => sum + acc.holdings.reduce((s, h) => s + h.investedKRW, 0), 0)
-    + TOSS_HOLDINGS.reduce((sum, h) => sum + h.investedKRW, 0)
-    + CRYPTO_HOLDINGS.reduce((sum, h) => sum + h.investedKRW, 0)
 
   const portfolioStats = calculatePortfolioValue()
 
@@ -1082,9 +1012,16 @@ export default function PortfolioPage() {
         gap: isMobile ? '16px' : '0',
       }}>
         <div>
-          <h1 style={{ ...styles.title, fontSize: isMobile ? '20px' : '24px' }}>🏠 하우가 패밀리</h1>
+          <h1 style={{ ...styles.title, fontSize: isMobile ? '20px' : '24px' }}>📈 하늘 버핏</h1>
           <p style={{ ...styles.subtitle, fontSize: isMobile ? '12px' : '14px' }}>
             {quarterInfo?.label} ({quarterInfo?.period}) · 투자 원금: ₩{TOTAL_INVESTMENT.toLocaleString()}
+            <span style={{
+              marginLeft: '8px',
+              color: portfolioStats.totalGain >= 0 ? '#00C853' : '#F04438',
+              fontWeight: '600'
+            }}>
+              ({portfolioStats.totalGain >= 0 ? '+' : ''}{portfolioStats.totalGainPercent.toFixed(2)}%)
+            </span>
           </p>
           <p style={styles.lastUpdate}>
             <span style={styles.statusDot(isLive)} />
@@ -1094,19 +1031,20 @@ export default function PortfolioPage() {
           </p>
         </div>
         <button
+          onClick={() => navigate('/portfolio/report')}
           style={{
-            ...styles.refreshButton,
-            opacity: isRefreshing ? 0.7 : 1,
-            width: isMobile ? '100%' : 'auto',
-            justifyContent: 'center',
             padding: isMobile ? '10px 16px' : '12px 20px',
+            backgroundColor: '#3182F6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
             fontSize: isMobile ? '13px' : '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            width: isMobile ? '100%' : 'auto',
           }}
-          onClick={() => refreshData(true)}
-          disabled={isRefreshing}
         >
-          <span style={isRefreshing ? { animation: 'spin 1s linear infinite', display: 'inline-block' } : {}}>↻</span>
-          {isRefreshing ? '새로고침 중...' : '새로고침'}
+          📊 상세 리포트
         </button>
       </div>
 
@@ -1193,35 +1131,6 @@ export default function PortfolioPage() {
         </div>
       ) : (
       <>
-      {/* 투자 원칙 */}
-      <div style={{ ...styles.rulesCard, padding: isMobile ? '16px' : '20px' }}>
-        <div style={styles.rulesTitle}>
-          <span>📋</span> 나의 투자 원칙
-        </div>
-        <div style={{
-          ...styles.rulesList,
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: isMobile ? '8px' : '12px',
-        }}>
-          <div style={styles.ruleItem}>
-            <span>🔴</span>
-            <span><strong>손절:</strong> -15% 고려, -20% 무조건 실행 (무서워하면 안 된다)</span>
-          </div>
-          <div style={styles.ruleItem}>
-            <span>🟢</span>
-            <span><strong>익절:</strong> 최고가 대비 -10% 하락 시 매도</span>
-          </div>
-          <div style={styles.ruleItem}>
-            <span>📈</span>
-            <span><strong>원칙:</strong> 오르는 주식은 팔지 않는다</span>
-          </div>
-          <div style={styles.ruleItem}>
-            <span>🎯</span>
-            <span><strong>전략:</strong> 무릎에 사서 어깨에 판다</span>
-          </div>
-        </div>
-      </div>
-
       {/* 요약 카드 */}
       <div style={{
         ...styles.summaryGrid,
@@ -1372,32 +1281,11 @@ export default function PortfolioPage() {
           icon="🏦"
           title="IRP"
           amount={3000000}
-          gainKRW={0}
-          gainPercent={0}
+          gainKRW={MIRAE_ACCOUNTS.find(a => a.id === 'irp')?.gainKRW || 0}
+          gainPercent={MIRAE_ACCOUNTS.find(a => a.id === 'irp')?.gainPercent || 0}
           status="진행중"
           statusColor={{ bg: '#E8F3FF', text: '#3182F6' }}
           items={IRP_PORTFOLIO}
-        />
-
-        {/* 배당주 매월 1주 */}
-        <PortfolioChart
-          icon="📅"
-          title="배당주 매월 1주"
-          amount={10000000}
-          status="1년 1000만"
-          statusColor={{ bg: '#E8F5E9', text: '#2E7D32' }}
-          items={DIVIDEND_MONTHLY_PORTFOLIO}
-          subtitle="가장 많이 떨어진 종목 매수"
-        />
-
-        {/* 추가 연금저축 */}
-        <PortfolioChart
-          icon="💰"
-          title="추가 연금저축"
-          amount={9000000}
-          status="예정"
-          statusColor={{ bg: '#FFF3E0', text: '#E65100' }}
-          items={PENSION_EXTRA_PORTFOLIO}
         />
       </div>
 
@@ -1413,7 +1301,7 @@ export default function PortfolioPage() {
           }}>
             <span style={{ ...styles.tableTitle, fontSize: isMobile ? '14px' : '16px' }}>보유 종목</span>
             <span style={{ fontSize: isMobile ? '11px' : '13px', color: '#8B95A1' }}>
-              {liveHoldings.length}개 종목 · 미래에셋 {MIRAE_ACCOUNTS.reduce((acc, a) => acc + a.holdings.length, 0)}개
+              미래에셋 {liveHoldings.length}개 종목
             </span>
           </div>
 
@@ -1431,9 +1319,7 @@ export default function PortfolioPage() {
               <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#8B95A1' }}>증권사:</span>
               {[
                 { value: 'all', label: '전체' },
-                { value: '미래에셋', label: '미래' },
-                { value: '토스증권', label: '토스' },
-                { value: '업비트', label: '업비트' },
+                { value: '미래에셋', label: '미래에셋' },
               ].map(opt => (
                 <button
                   key={opt.value}
@@ -1471,8 +1357,10 @@ export default function PortfolioPage() {
                 <option value="all">전체</option>
                 <option value="연금저축계좌">연금저축</option>
                 <option value="ISA (중개형)">ISA</option>
-                <option value="비상금 CMA">비상금</option>
-                <option value="하우가 가족여행 CMA">가족여행</option>
+                <option value="종합 (해외주식)">해외주식</option>
+                <option value="이하늘 개인형IRP">IRP</option>
+                <option value="CMA (가족여행)">가족여행</option>
+                <option value="CMA (비상금)">비상금</option>
               </select>
             </div>
 

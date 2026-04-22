@@ -6,6 +6,7 @@ import LearnPage from './pages/LearnPage'
 import GayoonWealthPage from './pages/GayoonWealthPage'
 import PortfolioBattlePage from './pages/PortfolioBattlePage'
 import PortfolioReportPage from './pages/PortfolioReportPage'
+import HaneulReportPage from './pages/HaneulReportPage'
 import TaxGuidePage from './pages/TaxGuidePage'
 import RiaGuidePage from './pages/RiaGuidePage'
 import HaugaHousePage from './pages/HaugaHousePage'
@@ -23,6 +24,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<PortfolioPage />} />
             <Route path="portfolio" element={<PortfolioPage />} />
+            <Route path="portfolio/report" element={<HaneulReportPage />} />
             <Route path="learn" element={<LearnPage />} />
             <Route path="gayoon" element={<GayoonWealthPage />} />
             <Route path="gayoon/report" element={<PortfolioReportPage />} />

@@ -1,87 +1,99 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// 실제 보유 종목 (2026.04.22 기준)
+// 실제 보유 종목 (2026.04.22 기준) - PortfolioPage와 동일
 const ACTUAL_HOLDINGS = {
-  isa: {
-    investedKRW: 20520572,
-    currentKRW: 21231426,
-    gainKRW: 710854,
-    gainPercent: 3.46,
+  pension: {
+    investedKRW: 1662595,
+    currentKRW: 1757300,
+    gainKRW: 94705,
+    gainPercent: 5.69,
     holdings: [
-      { name: 'KODEX 200', investedKRW: 1243665, currentKRW: 1459500, gainKRW: 215835, gainPercent: 17.35 },
-      { name: 'TIGER 미국나스닥100', investedKRW: 2730767, currentKRW: 2966840, gainKRW: 236073, gainPercent: 8.64 },
-      { name: 'PLUS 신흥국MSCI(합성H)', investedKRW: 3096180, currentKRW: 3101760, gainKRW: 5580, gainPercent: 0.18 },
-      { name: 'KODEX 코스닥150', investedKRW: 502320, currentKRW: 516620, gainKRW: 14300, gainPercent: 2.85 },
-      { name: 'TIGER 미국채10년선물', investedKRW: 2405385, currentKRW: 2451285, gainKRW: 45900, gainPercent: 1.91 },
-      { name: 'TIGER CD금리투자KIS', investedKRW: 1032750, currentKRW: 1032930, gainKRW: 180, gainPercent: 0.02 },
-      { name: 'TIGER 미국S&P500', investedKRW: 4888810, currentKRW: 5156910, gainKRW: 268100, gainPercent: 5.48 },
-      { name: 'ACE 미국30년국채액티브(H)', investedKRW: 1078935, currentKRW: 1079650, gainKRW: 715, gainPercent: 0.07 },
-      { name: 'TIGER 미국배당다우존스', investedKRW: 1408020, currentKRW: 1416200, gainKRW: 8180, gainPercent: 0.58 },
-      { name: 'KODEX 금액티브', investedKRW: 2133740, currentKRW: 2036880, gainKRW: -96860, gainPercent: -4.54 },
+      { name: 'KODEX 200', investedKRW: 696430, currentKRW: 778400, gainKRW: 81970, gainPercent: 11.77 },
+      { name: 'KODEX 코스닥150', investedKRW: 874005, currentKRW: 874280, gainKRW: 275, gainPercent: 0.03 },
+      { name: 'KODEX 미국나스닥100', investedKRW: 92160, currentKRW: 104620, gainKRW: 12460, gainPercent: 13.52 },
     ],
   },
-  pension: {
-    investedKRW: 15102380,
-    currentKRW: 15485830,
-    gainKRW: 383450,
-    gainPercent: 2.54,
+  isa: {
+    investedKRW: 496290,
+    currentKRW: 508635,
+    gainKRW: 12345,
+    gainPercent: 2.49,
     holdings: [
-      { name: 'KODEX 200', investedKRW: 2947335, currentKRW: 3210900, gainKRW: 263565, gainPercent: 8.94 },
-      { name: 'PLUS 고배당주', investedKRW: 1514975, currentKRW: 1508650, gainKRW: -6325, gainPercent: -0.42 },
-      { name: 'KODEX 코스닥150', investedKRW: 3080430, currentKRW: 3099720, gainKRW: 19290, gainPercent: 0.63 },
-      { name: 'TIGER 미국나스닥100', investedKRW: 2198010, currentKRW: 2268760, gainKRW: 70750, gainPercent: 3.22 },
-      { name: 'TIGER 미국S&P500', investedKRW: 3502680, currentKRW: 3542120, gainKRW: 39440, gainPercent: 1.13 },
-      { name: 'TIGER 미국배당다우존스', investedKRW: 507150, currentKRW: 511000, gainKRW: 3850, gainPercent: 0.76 },
-      { name: 'KODEX 금액티브', investedKRW: 892800, currentKRW: 885600, gainKRW: -7200, gainPercent: -0.81 },
-      { name: 'TIGER CD금리투자KIS', investedKRW: 459000, currentKRW: 459080, gainKRW: 80, gainPercent: 0.02 },
+      { name: 'KODEX 코스닥150', investedKRW: 101075, currentKRW: 99350, gainKRW: -1725, gainPercent: -1.71 },
+      { name: 'TIGER 미국채10년선물', investedKRW: 198375, currentKRW: 200925, gainKRW: 2550, gainPercent: 1.29 },
+      { name: 'TIGER 미국S&P500', investedKRW: 196840, currentKRW: 208360, gainKRW: 11520, gainPercent: 5.85 },
+    ],
+  },
+  stock: {
+    investedKRW: 1542884,
+    currentKRW: 1587887,
+    gainKRW: 45003,
+    gainPercent: 2.92,
+    holdings: [
+      { name: '1Q 미국S&P500미국채혼합', investedKRW: 116250, currentKRW: 119050, gainKRW: 2800, gainPercent: 2.41 },
+      { name: 'TIGER 미국S&P500', investedKRW: 174090, currentKRW: 182315, gainKRW: 8225, gainPercent: 4.72 },
+      { name: '미국달러', investedKRW: 12953, currentKRW: 12953, gainKRW: 0, gainPercent: 0.00 },
+      { name: '셰브론 (CVX)', investedKRW: 555345, currentKRW: 555958, gainKRW: 613, gainPercent: 0.11 },
+      { name: '알파벳 C (GOOG)', investedKRW: 457022, currentKRW: 490644, gainKRW: 33622, gainPercent: 7.36 },
+      { name: '크래프트 하인즈 (KHC)', investedKRW: 227224, currentKRW: 226967, gainKRW: -257, gainPercent: -0.11 },
     ],
   },
   irp: {
-    investedKRW: 3268547,
-    currentKRW: 3312857,
-    gainKRW: 44310,
-    gainPercent: 1.36,
+    investedKRW: 250366,
+    currentKRW: 263861,
+    gainKRW: 13495,
+    gainPercent: 5.40,
     holdings: [
-      { name: 'KODEX 금액티브', investedKRW: 595200, currentKRW: 590400, gainKRW: -4800, gainPercent: -0.81 },
-      { name: 'PLUS 신흥국MSCI(합성H)', investedKRW: 414697, currentKRW: 416440, gainKRW: 1743, gainPercent: 0.42 },
-      { name: 'KODEX 미국나스닥100', investedKRW: 1268800, currentKRW: 1307750, gainKRW: 38950, gainPercent: 3.07 },
-      { name: '미래에셋TDF2025', investedKRW: 267479, currentKRW: 275896, gainKRW: 8417, gainPercent: 3.15 },
-      { name: 'IRP 현금성자산', investedKRW: 722371, currentKRW: 722371, gainKRW: 0, gainPercent: 0 },
+      { name: 'TIGER 미국나스닥100', investedKRW: 160815, currentKRW: 173860, gainKRW: 13045, gainPercent: 8.11 },
+      { name: 'KODEX 미국10년국채액티브(H)', investedKRW: 88875, currentKRW: 89325, gainKRW: 450, gainPercent: 0.51 },
+      { name: '현금성자산', investedKRW: 0, currentKRW: 676, gainKRW: 0, gainPercent: 0.00 },
     ],
   },
 }
 
-// 포트폴리오 데이터 (GayoonWealthPage와 동일)
+// 목표 포트폴리오 (가윤달리오와 동일)
 const PORTFOLIOS = {
-  isa: {
-    id: 'isa',
-    name: 'ISA',
-    icon: '📈',
-    amount: 20000000,
-    status: '완료',
-    taxBenefit: '비과세 200만원 + 9.9% 분리과세',
-    description: '해외주식 + 국내주식 분산 투자',
-    items: [
-      { ticker: '069500', name: 'KODEX 코스피200', category: '국내주식', targetWeight: 30, risk: 2 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 20, risk: 3 },
-      { ticker: '133690', name: 'TIGER 미국나스닥100', category: '해외주식', targetWeight: 15, risk: 4 },
-      { ticker: '195980', name: 'TIGER MSCI신흥국', category: '해외주식', targetWeight: 15, risk: 5 },
-      { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 10, risk: 1 },
-      { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
-    ],
-  },
   pension: {
     id: 'pension',
     name: '연금저축',
     icon: '🧓',
     amount: 6000000,
-    status: '완료',
+    status: '진행중',
     taxBenefit: '세액공제 79.2만원',
-    description: '국내주식 중심 + 세액공제',
+    description: '배당+성장+안전자산 혼합',
     items: [
-      { ticker: '069500', name: 'KODEX 코스피200', category: '국내주식', targetWeight: 70, risk: 2 },
-      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내주식', targetWeight: 30, risk: 3 },
+      { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 20, risk: 2 },
+      { ticker: '360750', name: 'TIGER S&P500', category: '해외주식', targetWeight: 15, risk: 3 },
+      { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 10, risk: 2 },
+      { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
+      { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+      { ticker: '357870', name: 'TIGER CD금리액티브', category: '현금성', targetWeight: 10, risk: 1 },
+      { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 8, risk: 1 },
+      { ticker: '456600', name: 'TIGER SOFR금리액티브', category: '달러', targetWeight: 7, risk: 1 },
+      { ticker: '133690', name: 'TIGER 나스닥100', category: '해외주식', targetWeight: 5, risk: 4 },
+      { ticker: '229200', name: 'KODEX 코스닥150', category: '국내주식', targetWeight: 5, risk: 3 },
+    ],
+  },
+  isa: {
+    id: 'isa',
+    name: 'ISA',
+    icon: '📊',
+    amount: 20000000,
+    status: '진행중',
+    taxBenefit: '비과세 200만원 + 9.9% 분리과세',
+    description: '배당+성장+안전자산 혼합',
+    items: [
+      { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 20, risk: 2 },
+      { ticker: '360750', name: 'TIGER S&P500', category: '해외주식', targetWeight: 15, risk: 3 },
+      { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 10, risk: 2 },
+      { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
+      { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+      { ticker: '357870', name: 'TIGER CD금리액티브', category: '현금성', targetWeight: 10, risk: 1 },
+      { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 8, risk: 1 },
+      { ticker: '456600', name: 'TIGER SOFR금리액티브', category: '달러', targetWeight: 7, risk: 1 },
+      { ticker: '133690', name: 'TIGER 나스닥100', category: '해외주식', targetWeight: 5, risk: 4 },
+      { ticker: '069500', name: 'KODEX 200', category: '국내주식', targetWeight: 5, risk: 2 },
     ],
   },
   irp: {
@@ -91,18 +103,54 @@ const PORTFOLIOS = {
     amount: 3000000,
     status: '진행중',
     taxBenefit: '세액공제 39.6만원',
-    description: '위험자산 70% + 안전자산 30%',
+    description: '배당 중심 + 안전자산 30%',
     items: [
-      { ticker: '133690', name: 'TIGER 미국나스닥100', category: '해외주식', targetWeight: 35, risk: 4 },
-      { ticker: '360750', name: 'TIGER 미국S&P500', category: '해외주식', targetWeight: 21, risk: 3 },
-      { ticker: '195980', name: 'TIGER MSCI신흥국', category: '해외주식', targetWeight: 14, risk: 5 },
-      { ticker: '472150', name: 'KODEX 골드액티브', category: '금', targetWeight: 30, risk: 1 },
+      { ticker: '161510', name: 'PLUS 고배당주', category: '배당', targetWeight: 35, risk: 2 },
+      { ticker: '458730', name: 'TIGER 미국배당다우존스', category: '배당', targetWeight: 35, risk: 2 },
+      { ticker: '472150', name: 'KODEX 금액티브', category: '금', targetWeight: 10, risk: 1 },
+      { ticker: '305080', name: 'TIGER 미국채10년선물', category: '채권', targetWeight: 10, risk: 1 },
+      { ticker: '305090', name: 'TIGER 미국채30년선물', category: '채권', targetWeight: 10, risk: 1 },
+    ],
+  },
+  stock: {
+    id: 'stock',
+    name: '해외주식',
+    icon: '🌍',
+    amount: 5000000,
+    status: '진행중',
+    taxBenefit: '양도세 250만원 비과세',
+    description: '미국 배당주 + 가치주 중심',
+    items: [
+      { ticker: 'GOOG', name: '알파벳 C (구글)', category: '빅테크', targetWeight: 30, risk: 3 },
+      { ticker: 'CVX', name: '셰브론', category: '에너지', targetWeight: 35, risk: 3 },
+      { ticker: 'KHC', name: '크래프트 하인즈', category: '필수소비재', targetWeight: 15, risk: 2 },
+      { ticker: '360750', name: 'TIGER S&P500', category: '해외주식', targetWeight: 10, risk: 3 },
+      { ticker: 'USD', name: '미국달러', category: '현금성', targetWeight: 10, risk: 1 },
     ],
   },
 }
 
 // ETF 상세 정보
 const ETF_DETAILS = {
+  '458730': {
+    fullName: 'TIGER 미국배당다우존스',
+    benchmark: 'Dow Jones US Dividend 100',
+    expense: '0.01%',
+    description: '미국 배당 성장주 100개에 분산 투자하는 고배당 ETF',
+    holdings: ['브로드컴 4.2%', '애브비 4.1%', '쉐브론 3.9%', '화이자 3.8%', 'JP모건 3.5%'],
+    sectors: [
+      { name: '금융', weight: 22.5, color: '#00C853' },
+      { name: '헬스케어', weight: 16.8, color: '#FF5722' },
+      { name: 'IT', weight: 15.2, color: '#3182F6' },
+      { name: '에너지', weight: 12.1, color: '#795548' },
+      { name: '기타', weight: 33.4, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '+6.2%', oneYear: '+15.3%', threeYear: '+8.5%' },
+    pros: ['초저보수 0.01%', '월배당 3%+', '변동성 낮음'],
+    cons: ['성장주 대비 수익률 낮음', '금융섹터 편중', '금리 인상시 민감'],
+    verdict: '안정적인 배당 수익이 목표라면 최적의 선택.',
+    grade: 'A+',
+  },
   '360750': {
     fullName: 'TIGER 미국S&P500',
     benchmark: 'S&P 500 Index',
@@ -122,58 +170,23 @@ const ETF_DETAILS = {
     verdict: '장기 투자의 정석. 10년 이상 묻어두면 거의 확실한 수익.',
     grade: 'A+',
   },
-  '133690': {
-    fullName: 'TIGER 미국나스닥100',
-    benchmark: 'NASDAQ-100 Index',
-    expense: '0.07%',
-    description: '미국 나스닥 상장 비금융 대형주 100개에 투자',
-    holdings: ['애플 8.9%', '마이크로소프트 8.5%', '엔비디아 7.8%', '아마존 5.2%', '브로드컴 4.1%'],
+  '161510': {
+    fullName: 'PLUS 고배당주',
+    benchmark: 'FnGuide 고배당주 지수',
+    expense: '0.25%',
+    description: '국내 고배당 우량주에 투자하는 배당 ETF',
+    holdings: ['삼성전자우 8.5%', '하나금융 6.2%', 'KB금융 5.8%', 'POSCO 5.1%', 'KT&G 4.8%'],
     sectors: [
-      { name: 'IT', weight: 51.8, color: '#3182F6' },
-      { name: '통신', weight: 15.2, color: '#FF9800' },
-      { name: '소비재', weight: 14.5, color: '#9C27B0' },
-      { name: '헬스케어', weight: 6.8, color: '#FF5722' },
-      { name: '기타', weight: 11.7, color: '#B0BEC5' },
+      { name: '금융', weight: 35.2, color: '#00C853' },
+      { name: '철강/소재', weight: 18.5, color: '#795548' },
+      { name: 'IT', weight: 15.3, color: '#3182F6' },
+      { name: '통신', weight: 12.1, color: '#FF9800' },
+      { name: '기타', weight: 18.9, color: '#B0BEC5' },
     ],
-    performance: { ytd: '+10.5%', oneYear: '+32.1%', threeYear: '+12.3%' },
-    pros: ['AI, 클라우드 성장 수혜', 'S&P500 대비 높은 성장성', '혁신 기업 집중'],
-    cons: ['IT 섹터 편중 52%', '변동성 1.5배', '금리 인상에 취약'],
-    verdict: 'S&P500보다 공격적. 기술주 강세장에서 큰 수익 가능.',
-    grade: 'A',
-  },
-  '195980': {
-    fullName: 'TIGER MSCI신흥국',
-    benchmark: 'MSCI Emerging Markets Index',
-    expense: '0.19%',
-    description: '중국, 대만, 인도, 한국 등 신흥국 대형주에 분산 투자',
-    holdings: ['TSMC 9.8%', '텐센트 4.2%', '삼성전자 3.9%', '알리바바 2.5%', '릴라이언스 1.8%'],
-    sectors: [
-      { name: 'IT/반도체', weight: 25.3, color: '#3182F6' },
-      { name: '금융', weight: 21.5, color: '#00C853' },
-      { name: '소비재', weight: 13.8, color: '#9C27B0' },
-      { name: '통신', weight: 9.2, color: '#FF9800' },
-      { name: '기타', weight: 30.2, color: '#B0BEC5' },
-    ],
-    performance: { ytd: '+4.2%', oneYear: '+12.8%', threeYear: '-2.1%' },
-    pros: ['높은 성장 잠재력', 'TSMC, 삼성 포함', '저평가 구간 PER 14배'],
-    cons: ['중국 정치 리스크', '환율 변동성', '최근 10년 성과 부진'],
-    verdict: '지역 분산 + 성장 잠재력. 신흥국 성장 수혜.',
-    grade: 'B+',
-  },
-  '472150': {
-    fullName: 'KODEX 골드액티브',
-    benchmark: 'S&P GSCI Gold Index',
-    expense: '0.39%',
-    description: '금 선물에 투자하며 액티브 운용으로 벤치마크 초과 수익 추구',
-    holdings: ['금 선물 (COMEX) 95%', '현금/단기채 5%'],
-    sectors: [
-      { name: '금 선물', weight: 95, color: '#F59E0B' },
-      { name: '현금성', weight: 5, color: '#B0BEC5' },
-    ],
-    performance: { ytd: '+12.5%', oneYear: '+18.2%', threeYear: '+8.5%' },
-    pros: ['인플레이션 헤지', '주식과 낮은 상관관계', '액티브 롤오버 최적화'],
-    cons: ['이자/배당 없음', '금리 상승 시 기회비용', '선물 롤오버 비용'],
-    verdict: '주식 하락 시 방어 역할. 안전판으로 적합.',
+    performance: { ytd: '+4.5%', oneYear: '+12.8%', threeYear: '+5.2%' },
+    pros: ['연 4%+ 배당수익률', '국내 우량주 분산', '분기배당'],
+    cons: ['금융섹터 편중 35%', '코리아 디스카운트', '성장성 제한'],
+    verdict: '안정적인 국내 배당 투자. IRP 안전자산으로 적합.',
     grade: 'A-',
   },
   '305080': {
@@ -192,23 +205,87 @@ const ETF_DETAILS = {
     verdict: '금리 인하 사이클 시작 시 큰 수익 가능.',
     grade: 'B',
   },
-  '069500': {
-    fullName: 'KODEX 코스피200',
-    benchmark: 'KOSPI 200 Index',
-    expense: '0.015%',
-    description: '코스피 시가총액 상위 200개 대형주에 투자',
-    holdings: ['삼성전자 26.8%', 'SK하이닉스 8.2%', '현대차 3.1%', '삼성바이오 2.9%', 'LG에너지솔루션 2.8%'],
+  '472150': {
+    fullName: 'KODEX 금액티브',
+    benchmark: 'S&P GSCI Gold Index',
+    expense: '0.39%',
+    description: '금 선물에 투자하며 액티브 운용으로 벤치마크 초과 수익 추구',
+    holdings: ['금 선물 (COMEX) 95%', '현금/단기채 5%'],
     sectors: [
-      { name: '반도체/IT', weight: 38.5, color: '#3182F6' },
-      { name: '금융', weight: 11.2, color: '#00C853' },
-      { name: '자동차', weight: 8.2, color: '#FF5722' },
-      { name: '바이오', weight: 7.8, color: '#9C27B0' },
-      { name: '기타', weight: 34.3, color: '#B0BEC5' },
+      { name: '금 선물', weight: 95, color: '#F59E0B' },
+      { name: '현금성', weight: 5, color: '#B0BEC5' },
     ],
-    performance: { ytd: '+5.8%', oneYear: '+8.2%', threeYear: '-3.5%' },
-    pros: ['국내 최저 보수 0.015%', '배당 수익 1.5~2%', '양도세 면제'],
-    cons: ['삼성전자 편중 27%', '코리아 디스카운트', '인구 감소 리스크'],
-    verdict: '국내 대형주 투자의 정석. 연금저축에 적합.',
+    performance: { ytd: '+12.5%', oneYear: '+18.2%', threeYear: '+8.5%' },
+    pros: ['인플레이션 헤지', '주식과 낮은 상관관계', '액티브 롤오버 최적화'],
+    cons: ['이자/배당 없음', '금리 상승 시 기회비용', '선물 롤오버 비용'],
+    verdict: '주식 하락 시 방어 역할. 안전판으로 적합.',
+    grade: 'A-',
+  },
+  '357870': {
+    fullName: 'TIGER CD금리액티브',
+    benchmark: 'KOFIA 91일 CD 금리',
+    expense: '0.05%',
+    description: 'CD 금리에 연동되는 초안전 자산. 원금 보장에 가까움',
+    holdings: ['CD 91일물 95%', '현금 5%'],
+    sectors: [
+      { name: 'CD/단기채', weight: 95, color: '#10B981' },
+      { name: '현금', weight: 5, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '+1.2%', oneYear: '+3.5%', threeYear: '+2.8%' },
+    pros: ['원금 보장에 가까움', '변동성 거의 없음', '금리 상승 수혜'],
+    cons: ['수익률 낮음', '인플레이션 헤지 불가', '장기 성장 한계'],
+    verdict: '현금 대기자금 관리용. 안전자산 필수.',
+    grade: 'A',
+  },
+  '305090': {
+    fullName: 'TIGER 미국채30년선물',
+    benchmark: 'US Treasury 30Y Futures',
+    expense: '0.09%',
+    description: '미국 30년 국채 선물에 투자. 10년물 대비 금리 민감도 높음',
+    holdings: ['미국채 30년 선물 98%', '현금/단기채 2%'],
+    sectors: [
+      { name: '미국 장기국채', weight: 98, color: '#6366F1' },
+      { name: '현금성', weight: 2, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '-5.2%', oneYear: '-2.1%', threeYear: '-15.5%' },
+    pros: ['금리 인하 시 큰 수익', '주식 급락 시 방어', '듀레이션 레버리지'],
+    cons: ['금리 상승 시 큰 손실', '변동성 높음', '최근 성과 부진'],
+    verdict: '공격적 채권 투자. 금리 피벗 확신 시 비중 확대.',
+    grade: 'B-',
+  },
+  '456600': {
+    fullName: 'TIGER SOFR금리액티브',
+    benchmark: 'SOFR (Secured Overnight Financing Rate)',
+    expense: '0.05%',
+    description: '미국 단기 금리(SOFR)에 연동. 달러 자산 + 금리 수익',
+    holdings: ['SOFR 연동 채권 95%', '현금 5%'],
+    sectors: [
+      { name: 'SOFR 채권', weight: 95, color: '#3182F6' },
+      { name: '현금', weight: 5, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '+2.8%', oneYear: '+5.2%', threeYear: '+4.1%' },
+    pros: ['달러 자산으로 환헤지', '미국 금리 수혜', '변동성 낮음'],
+    cons: ['환율 하락 시 손실', '금리 인하 시 수익 감소', '성장성 제한'],
+    verdict: '달러 현금 대기자금으로 최적. 환율+금리 이중 수익.',
+    grade: 'A',
+  },
+  '133690': {
+    fullName: 'TIGER 나스닥100',
+    benchmark: 'NASDAQ-100 Index',
+    expense: '0.07%',
+    description: '미국 나스닥 상장 비금융 대형주 100개에 투자',
+    holdings: ['애플 8.9%', '마이크로소프트 8.5%', '엔비디아 7.8%', '아마존 5.2%', '브로드컴 4.1%'],
+    sectors: [
+      { name: 'IT', weight: 51.8, color: '#3182F6' },
+      { name: '통신', weight: 15.2, color: '#FF9800' },
+      { name: '소비재', weight: 14.5, color: '#9C27B0' },
+      { name: '헬스케어', weight: 6.8, color: '#FF5722' },
+      { name: '기타', weight: 11.7, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '+10.5%', oneYear: '+32.1%', threeYear: '+12.3%' },
+    pros: ['AI, 클라우드 성장 수혜', 'S&P500 대비 높은 성장성', '혁신 기업 집중'],
+    cons: ['IT 섹터 편중 52%', '변동성 1.5배', '금리 인상에 취약'],
+    verdict: 'S&P500보다 공격적. 기술주 강세장에서 큰 수익 가능.',
     grade: 'A',
   },
   '229200': {
@@ -230,28 +307,108 @@ const ETF_DETAILS = {
     verdict: '고위험 고수익. 변동성 감내 필요.',
     grade: 'B+',
   },
+  '069500': {
+    fullName: 'KODEX 200',
+    benchmark: 'KOSPI 200 Index',
+    expense: '0.015%',
+    description: '코스피 시가총액 상위 200개 대형주에 투자',
+    holdings: ['삼성전자 26.8%', 'SK하이닉스 8.2%', '현대차 3.1%', '삼성바이오 2.9%', 'LG에너지솔루션 2.8%'],
+    sectors: [
+      { name: '반도체/IT', weight: 38.5, color: '#3182F6' },
+      { name: '금융', weight: 11.2, color: '#00C853' },
+      { name: '자동차', weight: 8.2, color: '#FF5722' },
+      { name: '바이오', weight: 7.8, color: '#9C27B0' },
+      { name: '기타', weight: 34.3, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '+5.8%', oneYear: '+8.2%', threeYear: '-3.5%' },
+    pros: ['국내 최저 보수 0.015%', '배당 수익 1.5~2%', '양도세 면제'],
+    cons: ['삼성전자 편중 27%', '코리아 디스카운트', '인구 감소 리스크'],
+    verdict: '국내 대형주 투자의 정석. 연금저축에 적합.',
+    grade: 'A',
+  },
+  'GOOG': {
+    fullName: '알파벳 C (구글)',
+    benchmark: '-',
+    expense: '-',
+    description: '세계 최대 검색엔진 구글, 유튜브, 클라우드 운영',
+    holdings: ['검색 광고 58%', '유튜브 10%', '클라우드 11%', '기타 21%'],
+    sectors: [
+      { name: '검색 광고', weight: 58, color: '#4285F4' },
+      { name: '유튜브', weight: 10, color: '#FF0000' },
+      { name: '클라우드', weight: 11, color: '#3182F6' },
+      { name: '기타', weight: 21, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '+12.5%', oneYear: '+28.3%', threeYear: '+15.2%' },
+    pros: ['검색 시장 독점 92%', 'AI/클라우드 성장', '현금 보유 1,100억 달러'],
+    cons: ['광고 의존 80%', '규제 리스크', 'AI 경쟁 심화'],
+    verdict: '빅테크 중 가장 저평가. PER 23배로 매력적.',
+    grade: 'A',
+  },
+  'CVX': {
+    fullName: '셰브론',
+    benchmark: '-',
+    expense: '-',
+    description: '미국 2위 석유 메이저. 배당 37년 연속 증가',
+    holdings: ['석유/가스 생산 55%', '정유 25%', '화학 12%', '기타 8%'],
+    sectors: [
+      { name: '석유/가스', weight: 55, color: '#795548' },
+      { name: '정유', weight: 25, color: '#FF5722' },
+      { name: '화학', weight: 12, color: '#9C27B0' },
+      { name: '기타', weight: 8, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '+5.2%', oneYear: '+12.1%', threeYear: '+8.5%' },
+    pros: ['배당수익률 4.2%', '37년 연속 배당 증가', '저유가에도 수익성'],
+    cons: ['유가 변동 영향', 'ESG 리스크', '에너지 전환 압박'],
+    verdict: '안정적 배당 수익. 에너지 섹터 필수 종목.',
+    grade: 'A-',
+  },
+  'KHC': {
+    fullName: '크래프트 하인즈',
+    benchmark: '-',
+    expense: '-',
+    description: '버핏이 사랑한 식품 대기업. 케첩, 치즈, 커피 등',
+    holdings: ['소스/양념 35%', '치즈/유제품 25%', '음료 20%', '기타 20%'],
+    sectors: [
+      { name: '소스', weight: 35, color: '#F44336' },
+      { name: '치즈', weight: 25, color: '#FFC107' },
+      { name: '음료', weight: 20, color: '#795548' },
+      { name: '기타', weight: 20, color: '#B0BEC5' },
+    ],
+    performance: { ytd: '-2.1%', oneYear: '+5.2%', threeYear: '+2.1%' },
+    pros: ['배당수익률 4.5%', '경기 방어주', '브랜드 파워'],
+    cons: ['성장성 한계', '원자재 비용 상승', '소비 트렌드 변화'],
+    verdict: '고배당 방어주. 불확실성 시기 안전 투자.',
+    grade: 'B+',
+  },
+  'USD': {
+    fullName: '미국달러',
+    benchmark: '-',
+    expense: '-',
+    description: '세계 기축통화. 환율 변동에 따른 수익/손실',
+    holdings: ['현금 100%'],
+    sectors: [
+      { name: '현금', weight: 100, color: '#10B981' },
+    ],
+    performance: { ytd: '+2.1%', oneYear: '+5.5%', threeYear: '+8.2%' },
+    pros: ['안전자산', '원화 약세 시 수익', '유동성 최고'],
+    cons: ['이자 수익 없음', '원화 강세 시 손실', '기회비용'],
+    verdict: '대기 자금 관리용. 환율 헤지 효과.',
+    grade: 'B',
+  },
 }
 
 // 카테고리별 색상
 const CATEGORY_COLORS = {
-  'S&P500': '#3182F6',
-  '나스닥': '#7C3AED',
-  '신흥국': '#10B981',
-  '금': '#F59E0B',
+  '배당': '#10B981',
+  '해외주식': '#3182F6',
   '채권': '#6B7280',
-  '국내대형': '#EF4444',
-  '국내중소': '#F97316',
-}
-
-const getAssetCategory = (name) => {
-  if (name.includes('S&P')) return 'S&P500'
-  if (name.includes('나스닥')) return '나스닥'
-  if (name.includes('신흥국')) return '신흥국'
-  if (name.includes('골드') || name.includes('금')) return '금'
-  if (name.includes('채권')) return '채권'
-  if (name.includes('코스피') || name.includes('200')) return '국내대형'
-  if (name.includes('코스닥')) return '국내중소'
-  return '기타'
+  '금': '#F59E0B',
+  '현금성': '#10B981',
+  '달러': '#3182F6',
+  '국내주식': '#EF4444',
+  '빅테크': '#7C3AED',
+  '에너지': '#795548',
+  '필수소비재': '#FF5722',
 }
 
 // 별 5개 위험도 표시
@@ -296,9 +453,9 @@ const styles = {
   }),
 }
 
-export default function PortfolioReportPage() {
+export default function HaneulReportPage() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('isa')
+  const [activeTab, setActiveTab] = useState('pension')
 
   const portfolio = PORTFOLIOS[activeTab]
   const actual = ACTUAL_HOLDINGS[activeTab]
@@ -308,12 +465,12 @@ export default function PortfolioReportPage() {
 
   return (
     <div style={styles.container}>
-      <button style={styles.backBtn} onClick={() => navigate('/gayoon')}>
-        ← 가윤 달리오로 돌아가기
+      <button style={styles.backBtn} onClick={() => navigate('/')}>
+        ← 하늘 버핏으로 돌아가기
       </button>
 
       <div style={styles.header}>
-        <h1 style={styles.title}>📊 포트폴리오 상세 리포트</h1>
+        <h1 style={styles.title}>📊 하늘버핏 포트폴리오 상세 리포트</h1>
         <p style={styles.subtitle}>각 계좌별 ETF 구성, 위험도, 성과 분석</p>
       </div>
 
@@ -352,7 +509,7 @@ export default function PortfolioReportPage() {
         padding: '24px',
         marginBottom: '24px',
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ fontSize: '20px', fontWeight: '700', color: '#191F28', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span>{portfolio.icon}</span>
@@ -400,8 +557,10 @@ export default function PortfolioReportPage() {
           backgroundColor: '#F7F8FA',
           borderRadius: '12px',
           marginBottom: '20px',
+          flexWrap: 'wrap',
+          gap: '12px',
         }}>
-          <div style={{ display: 'flex', gap: '24px' }}>
+          <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#EF4444' }} />
               <span style={{ fontSize: '14px', color: '#4E5968' }}>위험자산 <strong>{riskWeight}%</strong></span>
@@ -426,8 +585,7 @@ export default function PortfolioReportPage() {
           marginBottom: '16px',
         }}>
           {portfolio.items.map((item, idx) => {
-            const category = getAssetCategory(item.name)
-            const color = CATEGORY_COLORS[category] || '#9CA3AF'
+            const color = CATEGORY_COLORS[item.category] || '#9CA3AF'
             return (
               <div
                 key={item.ticker}
@@ -452,12 +610,11 @@ export default function PortfolioReportPage() {
         {/* 범례 */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
           {portfolio.items.map(item => {
-            const category = getAssetCategory(item.name)
-            const color = CATEGORY_COLORS[category] || '#9CA3AF'
+            const color = CATEGORY_COLORS[item.category] || '#9CA3AF'
             return (
               <div key={item.ticker} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: color }} />
-                <span style={{ color: '#4E5968' }}>{item.name.replace('TIGER ', '').replace('KODEX ', '')}</span>
+                <span style={{ color: '#4E5968' }}>{item.name.replace('TIGER ', '').replace('KODEX ', '').replace('PLUS ', '')}</span>
                 <span style={{ color: '#8B95A1' }}>{item.targetWeight}%</span>
               </div>
             )
@@ -479,9 +636,11 @@ export default function PortfolioReportPage() {
                   padding: '12px 16px',
                   backgroundColor: '#F7F8FA',
                   borderRadius: '10px',
+                  flexWrap: 'wrap',
+                  gap: '8px',
                 }}>
                   <span style={{ fontSize: '13px', fontWeight: '500', color: '#191F28' }}>{h.name}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '13px', color: '#8B95A1' }}>
                       ₩{h.currentKRW.toLocaleString()}
                     </span>
@@ -518,8 +677,7 @@ export default function PortfolioReportPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {portfolio.items.map(item => {
           const etf = ETF_DETAILS[item.ticker]
-          const category = getAssetCategory(item.name)
-          const color = CATEGORY_COLORS[category] || '#9CA3AF'
+          const color = CATEGORY_COLORS[item.category] || '#9CA3AF'
           const itemAmount = Math.round(portfolio.amount * item.targetWeight / 100)
 
           if (!etf) return null
@@ -538,6 +696,8 @@ export default function PortfolioReportPage() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
+                flexWrap: 'wrap',
+                gap: '16px',
               }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                   <div style={{
@@ -551,11 +711,12 @@ export default function PortfolioReportPage() {
                     color: 'white',
                     fontWeight: '700',
                     fontSize: '14px',
+                    flexShrink: 0,
                   }}>
                     {item.targetWeight}%
                   </div>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '18px', fontWeight: '700', color: '#191F28' }}>{etf.fullName}</span>
                       <RiskStars risk={item.risk} size={12} />
                     </div>
@@ -587,7 +748,7 @@ export default function PortfolioReportPage() {
               {/* 성과 */}
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #F2F4F6' }}>
                 <div style={{ fontSize: '13px', fontWeight: '600', color: '#191F28', marginBottom: '12px' }}>수익률</div>
-                <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                   {[
                     { label: 'YTD', value: etf.performance.ytd },
                     { label: '1년', value: etf.performance.oneYear },
@@ -595,7 +756,7 @@ export default function PortfolioReportPage() {
                     { label: '보수', value: etf.expense },
                   ].map(stat => (
                     <div key={stat.label} style={{
-                      flex: 1,
+                      flex: '1 1 80px',
                       padding: '12px',
                       backgroundColor: '#F7F8FA',
                       borderRadius: '8px',
@@ -663,15 +824,15 @@ export default function PortfolioReportPage() {
 
               {/* 장단점 */}
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #F2F4F6' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                   <div style={{ padding: '12px', backgroundColor: '#E8F5E9', borderRadius: '10px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: '700', color: '#2E7D32', marginBottom: '8px' }}>✅ 장점</div>
+                    <div style={{ fontSize: '12px', fontWeight: '700', color: '#2E7D32', marginBottom: '8px' }}>장점</div>
                     {etf.pros.map((pro, idx) => (
                       <div key={idx} style={{ fontSize: '12px', color: '#4E5968', padding: '3px 0' }}>• {pro}</div>
                     ))}
                   </div>
                   <div style={{ padding: '12px', backgroundColor: '#FFF5F5', borderRadius: '10px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: '700', color: '#C62828', marginBottom: '8px' }}>⚠️ 리스크</div>
+                    <div style={{ fontSize: '12px', fontWeight: '700', color: '#C62828', marginBottom: '8px' }}>리스크</div>
                     {etf.cons.map((con, idx) => (
                       <div key={idx} style={{ fontSize: '12px', color: '#4E5968', padding: '3px 0' }}>• {con}</div>
                     ))}
@@ -705,7 +866,7 @@ export default function PortfolioReportPage() {
             const etf = ETF_DETAILS[item.ticker]
             return (
               <p key={item.ticker} style={{ marginBottom: '8px' }}>
-                • <strong style={{ color: 'white' }}>{item.name.replace('TIGER ', '').replace('KODEX ', '')} ({item.targetWeight}%)</strong>
+                • <strong style={{ color: 'white' }}>{item.name.replace('TIGER ', '').replace('KODEX ', '').replace('PLUS ', '')} ({item.targetWeight}%)</strong>
                 <span style={{ marginLeft: '8px' }}><RiskStars risk={item.risk} size={10} /></span>
                 <span style={{ marginLeft: '8px', color: '#8B95A1' }}>종목코드 {item.ticker}</span>
               </p>
