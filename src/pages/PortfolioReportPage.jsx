@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// 실제 보유 종목 (2026.04.22 기준)
+// 실제 보유 종목 (2026.04.22 기준) - GayoonWealthPage와 동기화
 const ACTUAL_HOLDINGS = {
   overseas: {
-    investedKRW: 32455275,
-    currentKRW: 36013167,
-    gainKRW: 3557892,
-    gainPercent: 10.96,
+    investedKRW: 43070662,
+    currentKRW: 47420505,
+    gainKRW: 4349843,
+    gainPercent: 10.10,
     holdings: [
-      { name: 'VOO (Vanguard S&P500)', investedKRW: 18034965, currentKRW: 20015000, gainKRW: 1980035, gainPercent: 10.98 },
-      { name: 'VOO (소수점)', investedKRW: 676691, currentKRW: 700000, gainKRW: 23309, gainPercent: 3.44 },
-      { name: 'SCHD (Schwab 배당주)', investedKRW: 4047160, currentKRW: 4650000, gainKRW: 602840, gainPercent: 14.90 },
+      { name: 'VOO (Vanguard S&P500)', investedKRW: 18034965, currentKRW: 21062208, gainKRW: 3027243, gainPercent: 16.79 },
+      { name: 'VOO (소수점)', investedKRW: 676691, currentKRW: 706131, gainKRW: 29440, gainPercent: 4.35 },
+      { name: 'SCHD (Schwab 배당주)', investedKRW: 4047160, currentKRW: 4567569, gainKRW: 520409, gainPercent: 12.86 },
       { name: '아마존 (AMZN)', investedKRW: 1595809, currentKRW: 1854752, gainKRW: 258943, gainPercent: 16.22 },
       { name: '셰브론 (CVX)', investedKRW: 1629588, currentKRW: 1645472, gainKRW: 15884, gainPercent: 0.97 },
       { name: '유나이티드헬스 (UNH)', investedKRW: 3290709, currentKRW: 3592135, gainKRW: 301426, gainPercent: 9.16 },
@@ -40,6 +40,7 @@ const ACTUAL_HOLDINGS = {
       { name: 'ACE 미국30년국채액티브(H)', investedKRW: 1078935, currentKRW: 1079650, gainKRW: 715, gainPercent: 0.07 },
       { name: 'TIGER 미국배당다우존스', investedKRW: 1408020, currentKRW: 1416200, gainKRW: 8180, gainPercent: 0.58 },
       { name: 'KODEX 금액티브', investedKRW: 2133740, currentKRW: 2036880, gainKRW: -96860, gainPercent: -4.54 },
+      { name: 'ISA 예수금', investedKRW: 0, currentKRW: 12851, gainKRW: 0, gainPercent: 0 },
     ],
   },
   pension: {
@@ -79,7 +80,7 @@ const PORTFOLIOS = {
     id: 'overseas',
     name: '해외주식',
     icon: '🌍',
-    amount: 36013167,
+    amount: 47420505,
     status: '운용중',
     taxBenefit: '연 250만원 비과세 (해외주식)',
     description: '삼성증권 + 미래에셋 해외주식 + 개별주식',
@@ -98,7 +99,7 @@ const PORTFOLIOS = {
     id: 'isa',
     name: 'ISA',
     icon: '📈',
-    amount: 20000000,
+    amount: 21231426,
     status: '완료',
     taxBenefit: '비과세 200만원 + 9.9% 분리과세',
     description: '해외주식 + 국내주식 분산 투자',
@@ -115,7 +116,7 @@ const PORTFOLIOS = {
     id: 'pension',
     name: '연금저축',
     icon: '🧓',
-    amount: 6000000,
+    amount: 15485830,
     status: '완료',
     taxBenefit: '세액공제 79.2만원',
     description: '국내주식 중심 + 세액공제',
@@ -128,7 +129,7 @@ const PORTFOLIOS = {
     id: 'irp',
     name: 'IRP',
     icon: '🏦',
-    amount: 3000000,
+    amount: 3312857,
     status: '진행중',
     taxBenefit: '세액공제 39.6만원',
     description: '위험자산 70% + 안전자산 30%',
