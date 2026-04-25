@@ -15,6 +15,7 @@ import MonthlyReportPage from './pages/MonthlyReportPage'
 import GuruPortfolioPage from './pages/GuruPortfolioPage'
 import FireDashboardPage from './pages/FireDashboardPage'
 import ValueStocksPage from './pages/ValueStocksPage'
+import StockScorePage from './pages/StockScorePage'
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="gurus" element={<GuruPortfolioPage />} />
             <Route path="fire" element={<FireDashboardPage />} />
             <Route path="value" element={<ValueStocksPage />} />
+            <Route path="score" element={<StockScorePage />} />
           </Route>
         </Routes>
       </BrowserRouter>
